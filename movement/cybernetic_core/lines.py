@@ -111,3 +111,11 @@ class Line3D:
         if x > self.max_x or x < self.min_x or y > self.max_y or y < self.min_y:
             return None
         return Point(x, y, z)
+
+def convert_points_to_3d_lines(D_points_history: List[List[Point]]) -> List[Line3D]:
+    lines = []
+    for i in range(len(D_points_history) - 1):
+        for j in range(4):
+            lines.append(Line3D(D_points_history[i][j], D_points_history[i+1][j]))
+
+    return lines

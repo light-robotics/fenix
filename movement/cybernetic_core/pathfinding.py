@@ -6,7 +6,7 @@ import itertools
 
 from kinematics import FenixKinematics as Fenix
 from obstacle import Obstacle, obstacle_from_csv
-from points_to_lines_convertion import convert_points_to_3d_lines
+from lines import convert_points_to_3d_lines
 from moves import Move, Attempt
 
 
