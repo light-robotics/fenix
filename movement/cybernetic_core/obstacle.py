@@ -1,7 +1,6 @@
 #!/usr/bin/env python3.9
 
-from kinematics import Point, Line
-from lines_3d import Line3D
+from lines import Point, Line3D
 #from typing import List
 
 class Obstacle:
@@ -20,13 +19,12 @@ class Obstacle:
         #print(f'[{self.min_z} -> {self.max_z}]')
 
     def __repr__(self):
-        return f'Obstacle: [{self.A}, {self.C1}]'
-    
+        return f'Obstacle: [{self.A}, {self.C1}]'    
     
     def touching_the_obstacle(self, x: int, y: int) -> int:
         # returns obstacle z if it touches the top plane, 0 else
         # throws Exception if it is too close to the edge
-        danger_offset = 1
+        danger_offset = 3
         
         if self.A.x <= x <= self.C1.x and \
             self.A.y <= y <= self.C1.y:

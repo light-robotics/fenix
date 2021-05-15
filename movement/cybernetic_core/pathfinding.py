@@ -4,8 +4,7 @@ import copy
 from typing import List, Dict, Callable
 import itertools
 
-from kinematics import MovementSequence as Fenix, Point
-from lines_3d import Line3D
+from kinematics import FenixKinematics as Fenix
 from obstacle import Obstacle, obstacle_from_csv
 from points_to_lines_convertion import convert_points_to_3d_lines
 from moves import Move, Attempt
@@ -76,7 +75,7 @@ def obstacle_collision(fenix: Fenix, obstacles: List[Obstacle]) -> bool:
     return False
 
 def check_movement_plan(plan: List[Move], target_xy: List[int]) -> int:
-    fnx = Fenix(legs_offset_v=25, legs_offset_h=15)
+    fnx = Fenix(legs_offset_v=15, legs_offset_h_x=18, legs_offset_h_y=18)
         
     try:
         plan = generate_movement_plan(fnx, plan, target_xy)
@@ -98,7 +97,12 @@ def check_movement_plan(plan: List[Move], target_xy: List[int]) -> int:
         print(str(e))
         return -1
 
-#def get_sequence(plan: List[Move], target_xy: List[int])
+def get_sequence(plan: List[Move], target_xy: List[int]):
+    fnx = Fenix(legs_offset_v=15, legs_offset_h_x=18, legs_offset_h_y=18)
+    plan = generate_movement_plan(fnx, plan, target_xy)   
+    adjusted_movement_plan = adjust_movement_plan_to_obstacles(plan, obstacles)
+    fnx.move_according_to_plan(adjusted_movement_plan)
+    return fnx.sequence
 
 def check_possibilities(check_function: Callable, target: List[int], possible_moves: List[Move], steps: int) -> List[Attempt]:
     good_tries = []
@@ -126,25 +130,33 @@ def check_possibilities(check_function: Callable, target: List[int], possible_mo
 
     return good_tries
 
-possibilities = check_possibilities(check_movement_plan, [0, 45], [Move('forward', 12), Move('forward', 9), Move('forward', 7), Move('up', 7)], 5) 
-#possibilities = check_possibilities(check_movement_plan, [0, 45], [Move('forward', 15), Move('forward', 12), Move('forward', 9), Move('forward', 7), Move('up', 7)], 5) 
-#possibilities = check_possibilities(check_movement_plan, [0, 30], [Move('forward', 15), Move('forward', 12), Move('forward', 10), Move('forward', 7), Move('forward', 5), Move('up', 4), Move('up', 7)], 6) 
-for possibility in possibilities:
-    if possibility.result > 0:
-        print(possibility)
+def get_best_sequence():
+    target = [0, 45]
+    possibilities = check_possibilities(check_movement_plan, target, [Move('forward', 11), Move('forward', 9), Move('forward', 7), Move('up', 7)], 6) 
+    #possibilities = check_possibilities(check_movement_plan, target, [Move('forward', 13), Move('forward', 10), Move('forward', 7), Move('up', 7)], 6) 
+    #possibilities = check_possibilities(check_movement_plan, target, [Move('forward', 12), Move('forward', 9), Move('forward', 7), Move('up', 7)], 6) 
+    #possibilities = check_possibilities(check_movement_plan, [0, 45], [Move('forward', 15), Move('forward', 12), Move('forward', 9), Move('forward', 7), Move('up', 7)], 5) 
+    #possibilities = check_possibilities(check_movement_plan, [0, 30], [Move('forward', 15), Move('forward', 12), Move('forward', 10), Move('forward', 7), Move('forward', 5), Move('up', 4), Move('up', 7)], 6) 
+    for possibility in possibilities:
+        if possibility.result > 0:
+            print(possibility)
 
-from operator import attrgetter
-best_option = min([x for x in possibilities if x.result > 0], key=attrgetter('result'))
-print('----------')
-print(best_option)
+    from operator import attrgetter
+    best_option = min([x for x in possibilities if x.result > 0], key=attrgetter('result'))
+    print('----------')
+    print(best_option)
+    #return get_sequence(best_option.moves, target)
+
+print('-----')
+print(get_best_sequence())
+# Result : 3695|Move[u.7]|Move[f.11]|Move[f.11]|Move[f.7]|Move[f.7]|Move[f.11]
 
 """
-fnx = Fenix(legs_offset_v=25, legs_offset_h=15)
-plan = [Move('forward', 15), Move('forward', 12), Move('up', 10), Move('forward', 12), Move('forward', 15)]
+fnx = Fenix(legs_offset_v=20, legs_offset_h_x=18, legs_offset_h_y=18)
+plan = [Move('forward', 10), Move('forward', 10), Move('up', 10), Move('forward', 12), Move('forward', 15)]
 print(check_movement_plan(plan, [0, 30]))
-"""
 
-"""
+
 generated_plan = generate_movement_plan(fnx, plan, [0, 30])
 print(generated_plan)
 adjusted_plan = adjust_movement_plan_to_obstacles(generated_plan, obstacles)

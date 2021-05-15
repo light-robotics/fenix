@@ -1,124 +1,14 @@
 import math
 import copy
-from dataclasses import dataclass
-from functools import lru_cache
 from typing import List, Dict
 
 from moves import Move
+from lines import Point, Line2D
+from angles import get_leg_angles, turn_on_angle
+import config as cfg
 
 
-@dataclass
-class Point:
-    x: float
-    y: float
-    z: float
-
-@dataclass
-class Line:
-    p1: Point
-    p2: Point
-
-class LinearFunc:
-    def __init__(self, point1, point2):
-        delta_x = (point2.x - point1.x)
-        if delta_x == 0:
-            delta_x = 0.01
-        self.k = (point2.y - point1.y) / delta_x
-        self.b = (point2.x * point1.y - point1.x * point2.y) / delta_x
-        self.angle = math.atan2(point2.y - point1.y, point2.x - point1.x)
-
-
-def calculate_intersection(func1, func2):
-    x = (func1.b - func2.b) / (func2.k - func1.k)
-    y = func1.k * x + func1.b
-    return x, y
-
-
-# function, that moves on a line from a given point to a target point for a margin distance
-def move_on_a_line(intersection_point, target_point, margin):
-    function = LinearFunc(intersection_point, target_point)
-    new_point_x = round(intersection_point.x +
-                        math.cos(function.angle) * margin,
-                        2)
-    new_point_y = round(intersection_point.y +
-                        math.sin(function.angle) * margin,
-                        2)
-
-    return [new_point_x, new_point_y]
-
-
-def get_angle_by_coords(x1, y1):
-    l = math.sqrt(x1 ** 2 + y1 ** 2)
-    initial_angle = math.asin(abs(y1) / l)
-    if x1 >= 0 and y1 >= 0:
-        return initial_angle
-    if x1 >= 0 and y1 < 0:
-        return 2*math.pi - initial_angle
-    if x1 < 0 and y1 >= 0:
-        return math.pi - initial_angle
-    if x1 < 0 and y1 < 0:
-        return initial_angle + math.pi
-
-def turn_on_angle_new(start_x, start_y, x1, y1, angle):
-    print(f'x1, y1 : {round(x1, 2)}, {round(y1, 2)}')
-    l = math.sqrt((x1 - start_x) ** 2 + (y1 - start_y) ** 2)
-    initial_angle = get_angle_by_coords((x1 - start_x), (y1 - start_y))
-    result_angle = angle + initial_angle
-    print(f'{math.degrees(initial_angle)} -> {math.degrees(result_angle)}')
-
-    return round(start_x + math.cos(result_angle) * l, 2), \
-           round(start_y + math.sin(result_angle) * l, 2)
-
-def turn_on_angle(x1, y1, angle):
-    print(f'x1, y1 : {round(x1, 2)}, {round(y1, 2)}')
-    l = math.sqrt(x1 ** 2 + y1 ** 2)
-    initial_angle = get_angle_by_coords(x1, y1)
-    result_angle = angle + initial_angle
-    print(f'{math.degrees(initial_angle)} -> {math.degrees(result_angle)}')
-
-    return round(math.cos(result_angle) * l, 2), \
-           round(math.sin(result_angle) * l, 2)
-
-"""
-class MovementPlan:
-    # [
-    #     {1: [1, 1, 0], 2: [5, 5, 0], 3:[-5, -5, 0], 4:[5, -5, 0]},
-    #     {1: [3, 1, 0], 2: [2, 5, 0], 3:[-3, -5, 0], 4:[2, -5, 0]}
-    # ]
-    def __init__(self):
-        self.plan = []
-    
-    def add_move(self, move: List[Dict]):
-        new_move = copy.deepcopy(move)
-        self.plan.append(new_move)
-
-    def __iter__(self):
-        return self.plan.__iter__()
-
-    def __repr__(self):
-        return '\n'.join([str(x) for x in self.plan])
-"""
 class Leg:
-    d = 6.7
-    """
-    a = 8.7
-    b = 6.9
-    #c = 13.2
-    c = 14.2 # star toe
-    """
-    
-    # version 21 prints
-    a = 16.7
-    b = 6.9
-    c = 20.2
-
-    # version 21.1 prints
-    a = 12.7
-    b = 6.9
-    # c = 17.2 # point toe
-    c = 15.5 # crescent toe
-    
-
     def __init__(self, O, D):
         self.O = O
         self.D = D
@@ -134,8 +24,8 @@ class Leg:
         O = self.O
         D = self.D
         tetta = math.atan2(D.y - O.y, D.x - O.x)
-        A = Point(O.x + self.d * math.cos(tetta),
-                  O.y + self.d * math.sin(tetta),
+        A = Point(O.x + cfg.leg["d"] * math.cos(tetta),
+                  O.y + cfg.leg["d"] * math.sin(tetta),
                   O.z)
 
         l = math.sqrt((D.x - A.x) ** 2 + (D.y - A.y) ** 2)
@@ -143,21 +33,21 @@ class Leg:
 
         alpha, beta, gamma = get_leg_angles(l, delta_z)
 
-        Bx = self.a * math.cos(alpha)
-        By = self.a * math.sin(alpha)
-        Cx = Bx + self.b * math.cos(alpha + beta)
-        Cy = By + self.b * math.sin(alpha + beta)
-        Dx = Cx + self.c * math.cos(alpha + beta + gamma)
-        Dy = Cy + self.c * math.sin(alpha + beta + gamma)
+        Bx = cfg.leg["a"] * math.cos(alpha)
+        By = cfg.leg["a"] * math.sin(alpha)
+        Cx = Bx + cfg.leg["b"] * math.cos(alpha + beta)
+        Cy = By + cfg.leg["b"] * math.sin(alpha + beta)
+        Dx = Cx + cfg.leg["c"] * math.cos(alpha + beta + gamma)
+        Dy = Cy + cfg.leg["c"] * math.sin(alpha + beta + gamma)
         if abs(Dx - l) > 0.01 or abs(Dy - delta_z) > 0.01:
-            print('WTF')
+            raise Exception('WTF')
 
-        B_xz = [self.a * math.cos(alpha),
-                self.a * math.sin(alpha)]
-        C_xz = [B_xz[0] + self.b * math.cos(alpha + beta),
-                B_xz[1] + self.b * math.sin(alpha + beta)]
-        D_xz = [C_xz[0] + self.c * math.cos(alpha + beta + gamma),
-                C_xz[1] + self.c * math.sin(alpha + beta + gamma)]
+        B_xz = [cfg.leg["a"] * math.cos(alpha),
+                cfg.leg["a"] * math.sin(alpha)]
+        C_xz = [B_xz[0] + cfg.leg["b"] * math.cos(alpha + beta),
+                B_xz[1] + cfg.leg["b"] * math.sin(alpha + beta)]
+        D_xz = [C_xz[0] + cfg.leg["c"] * math.cos(alpha + beta + gamma),
+                C_xz[1] + cfg.leg["c"] * math.sin(alpha + beta + gamma)]
 
         D_prev = D
         self.A = A
@@ -178,159 +68,34 @@ class Leg:
                             .format(([tetta, alpha, beta, gamma])))
 
         return tetta, alpha, beta, gamma
-
-    @staticmethod
-    def move_point(point, delta_x, delta_y, delta_z):
-        point.x += delta_x
-        point.y += delta_y
-        point.z += delta_z
-
+  
     def move_mount_point(self, delta_x, delta_y, delta_z):
-        self.move_point(self.O, delta_x, delta_y, delta_z)
+        self.O.move(delta_x, delta_y, delta_z)
         self.update_angles()
-
+    
     def move_end_point(self, delta_x, delta_y, delta_z):
-        self.move_point(self.D, delta_x, delta_y, delta_z)
+        self.D.move(delta_x, delta_y, delta_z)
         self.update_angles()
+    
 
-    # means one leg is raised and moves with the body
-    # end_delta = 0 means that leg is not moving, else it is also moving somehow
-    # wtf something weird here
-    def move_both_points(self, delta_x, delta_y, delta_z, end_delta_x, end_delta_y, end_delta_z):
-        self.move_point(self.O, delta_x, delta_y, delta_z)
-        self.move_point(self.D,
-                        delta_x + end_delta_x,
-                        delta_y + end_delta_y,
-                        delta_z + end_delta_z)
-        self.update_angles()
-
-
-@lru_cache(maxsize=None)
-def get_leg_angles(delta_x, delta_z):
-    possible_angles = find_angles(delta_x, delta_z)
-
-    return get_best_angles(possible_angles)
-
-
-def find_angles(Dx, Dy):
-    a, b, c = Leg.a, Leg.b, Leg.c
-    results = []
-    full_dist = math.sqrt(Dx ** 2 + Dy ** 2)
-    if full_dist > a + b + c:
-        raise Exception('No decisions. Full distance : {0}'.format(full_dist))
-
-    # from_angle = -45.0
-    # to_angle = 45.0
-    # angle_step = 1.5
-    # for k in np.arange(from_angle, to_angle, angle_step):
-    for k in range(-45, 46, 1):
-        ksi = math.radians(k)
-
-        Cx = Dx + c * math.cos(math.pi / 2 + ksi)
-        Cy = Dy + c * math.sin(math.pi / 2 + ksi)
-        dist = math.sqrt(Cx ** 2 + Cy ** 2)
-
-        if dist > a + b or dist < abs(a - b):
-            pass
-        else:
-            alpha1 = math.acos((a ** 2 + dist ** 2 - b ** 2) / (2 * a * dist))
-            beta1 = math.acos((a ** 2 + b ** 2 - dist ** 2) / (2 * a * b))
-            beta = -1 * (math.pi - beta1)
-
-            alpha2 = math.atan2(Cy, Cx)
-            alpha = alpha1 + alpha2
-
-            Bx = a * math.cos(alpha)
-            By = a * math.sin(alpha)
-
-            BD = math.sqrt((Dx - Bx) ** 2 + (Dy - By) ** 2)
-            angle_C = math.acos((b ** 2 + c ** 2 - BD ** 2) / (2 * b * c))
-
-            for coef in [-1, 1]:
-                gamma = coef * (math.pi - angle_C)
-
-                Cx = Bx + b * math.cos(alpha + beta)
-                Cy = By + b * math.sin(alpha + beta)
-                new_Dx = Cx + c * math.cos(alpha + beta + gamma)
-                new_Dy = Cy + c * math.sin(alpha + beta + gamma)
-                if abs(new_Dx - Dx) > 0.01 or abs(new_Dy - Dy) > 0.01:
-                    continue
-
-                results.append([alpha, beta, gamma])
-
-    return results
-
-
-def check_angles(angles):
-    # wtf check this on Fenix
-    alpha = math.degrees(angles[0])
-    beta = math.degrees(angles[1])
-    gamma = math.degrees(angles[2])
-
-    if alpha < -35 or alpha > 55:
-        return False
-    if beta < -115 or beta > -20:
-        return False
-    if gamma < -110 or gamma > 0:
-        return False
-
-    mode = 90 # 40
-    #mode = 40
-    if alpha + beta + gamma < -90 - mode or alpha + beta + gamma > -90 + mode:
-        return False
-
-    return True
-
-
-def get_best_angles(all_angles):
-    min_distance = 100000000
-    best_angles = None
-    min_distance_num = 0
-
-    for item in all_angles:
-        if not check_angles(item):
-            continue
-        cur_distance = get_angles_distance(item)
-
-        if cur_distance <= min_distance:
-            min_distance = cur_distance
-            best_angles = item[:]
-
-    if min_distance > 0.1:
-        min_distance_num += 1
-        if min_distance_num > 1:
-            # print('best_angles : {0}'.format([math.degrees(x) for x in best_angles]))
-            raise Exception('Min distance found : {0}'.format(min_distance))
-
-    if best_angles is None:        
-        raise Exception('No angles\n')
-
-    return best_angles
-
-
-def get_angles_distance(angles):
-    # no diff, just distance with perpendicular
-    # 100 -> endleg leaning inside
-    return (math.degrees(angles[0] + angles[1] + angles[2]) + 90) ** 2
-
-
-class MovementSequence:
-    def __init__(self, legs_offset_h, legs_offset_v):
+class FenixKinematics:
+    def __init__(self, legs_offset_v, legs_offset_h_x, legs_offset_h_y):
         self.legs_offset_v = legs_offset_v
-        self.legs_offset_h = legs_offset_h
+
+        self.legs_offset_h_x = legs_offset_h_x
+        self.legs_offset_h_y = legs_offset_h_y
 
         self.current_legs_offset_v = self.legs_offset_v
-        self.current_legs_offset_h = self.legs_offset_h
+        self.current_legs_offset_h_x = self.legs_offset_h_x
+        self.current_legs_offset_h_y = self.legs_offset_h_y
 
         self.legs_deltas = {1 : [0, 0, 0], 2 : [0, 0, 0], 3 : [0, 0, 0], 4 : [0, 0, 0]}
 
         self.current_angle = 0
-        self.margin = 3 # 4
-        self.leg_up = 6 # two-legged-moves # 6
-        self.leg_up_single = 3 # one-legged-move
-        self.mode = 90  # needed?
-        self.mount_point_offset = 3.8
-
+        self.margin = cfg.fenix["margin"][1]
+        self.leg_up = cfg.fenix["leg_up"][2]
+        self.leg_up_single = cfg.fenix["leg_up"][1]
+        
         self.legs = self.initiate_legs()
 
         self.angles_history = []
@@ -339,7 +104,6 @@ class MovementSequence:
 
         self.add_angles_snapshot()
         
-
     @property
     def coords(self):
         avg_x, avg_y = 0, 0 
@@ -385,19 +149,6 @@ class MovementSequence:
             position.append(tetta)
         self.angles_history.append(self.convert_angles(position))
 
-        """
-        leg_1_D_copy = copy.deepcopy(self.legs[1].D)
-        leg_1_D_copy.z -= self.legs_offset_v
-
-        leg_2_D_copy = copy.deepcopy(self.legs[2].D)
-        leg_2_D_copy.z -= self.legs_offset_v
-
-        leg_3_D_copy = copy.deepcopy(self.legs[3].D)
-        leg_3_D_copy.z -= self.legs_offset_v
-
-        leg_4_D_copy = copy.deepcopy(self.legs[4].D)
-        leg_4_D_copy.z -= self.legs_offset_v
-        """
         self.D_points_history.append([self.legs[1].D, self.legs[2].D, self.legs[3].D, self.legs[4].D])
 
     @staticmethod
@@ -434,35 +185,35 @@ class MovementSequence:
         return self.angles_history
 
     def initiate_legs(self):
-        O1 = Point(self.mount_point_offset,
-                   self.mount_point_offset,
+        O1 = Point(cfg.leg["mount_point_offset"],
+                   cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
-        D1 = Point(self.legs_offset_h,
-                   self.legs_offset_h,
+        D1 = Point(self.legs_offset_h_x,
+                   self.legs_offset_h_y,
                    0)
         Leg1 = Leg(O1, D1)
 
-        O2 = Point(self.mount_point_offset,
-                   -self.mount_point_offset,
+        O2 = Point(cfg.leg["mount_point_offset"],
+                   -cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
-        D2 = Point(self.legs_offset_h,
-                   -self.legs_offset_h,
+        D2 = Point(self.legs_offset_h_x,
+                   -self.legs_offset_h_y,
                    0)
         Leg2 = Leg(O2, D2)
 
-        O3 = Point(-self.mount_point_offset,
-                   -self.mount_point_offset,
+        O3 = Point(-cfg.leg["mount_point_offset"],
+                   -cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
-        D3 = Point(-self.legs_offset_h,
-                   -self.legs_offset_h,
+        D3 = Point(-self.legs_offset_h_x,
+                   -self.legs_offset_h_y,
                    0)
         Leg3 = Leg(O3, D3)
 
-        O4 = Point(-self.mount_point_offset,
-                   self.mount_point_offset,
+        O4 = Point(-cfg.leg["mount_point_offset"],
+                   cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
-        D4 = Point(-self.legs_offset_h,
-                   self.legs_offset_h,
+        D4 = Point(-self.legs_offset_h_x,
+                   self.legs_offset_h_y,
                    0)
         Leg4 = Leg(O4, D4)
 
@@ -514,31 +265,25 @@ class MovementSequence:
         """
 
         # find intersection point of basement lines
-        func1 = LinearFunc(self.legs[1].D, self.legs[3].D)
-        func2 = LinearFunc(self.legs[2].D, self.legs[4].D)
-        intersection = Point(*calculate_intersection(func1, func2), 0)
+        func1 = Line2D(self.legs[1].D, self.legs[3].D)
+        func2 = Line2D(self.legs[2].D, self.legs[4].D)
+        intersection = func1.calculate_intersection(func2)
+        intersection_normalized = Point(*intersection, 0)
 
         target_leg_number_by_air_leg_number = {1: 3, 2: 4, 3: 1, 4: 2}
         target_leg_number = target_leg_number_by_air_leg_number[leg_in_the_air_number]
         target_leg = self.legs[target_leg_number]
-        body_target_point = move_on_a_line(intersection,
-                                           target_leg.D,
-                                           self.margin)
+
+        line = Line2D(intersection_normalized, target_leg.D)
+        body_target_point = line.move_on_a_line(self.margin)
 
         return body_target_point
 
     def body_compensation_for_a_leg(self, leg_num):
         target = self.target_body_position(leg_num)
 
-        current_body_x = (self.legs[1].O.x +
-                          self.legs[2].O.x +
-                          self.legs[3].O.x +
-                          self.legs[4].O.x) / 4
-
-        current_body_y = (self.legs[1].O.y +
-                          self.legs[2].O.y +
-                          self.legs[3].O.y +
-                          self.legs[4].O.y) / 4
+        current_body_x = sum(leg.O.x for leg in self.legs.values())/4
+        current_body_y = sum(leg.O.y for leg in self.legs.values())/4
 
         self.body_movement(target[0] - current_body_x,
                            target[1] - current_body_y,
@@ -609,7 +354,9 @@ class MovementSequence:
                 raise Exception(e)
 
     def move_1_legged_for_diff(self, move: Move):
-        for leg_number, deltas in move.target_legs_position.items():
+        #for leg_number, deltas in move.target_legs_position.items():
+        for leg_number in [1, 3, 4, 2]:
+            deltas = move.target_legs_position[leg_number]
             D = self.legs[leg_number].D
             diff = [deltas[0] - D.x, deltas[1] - D.y, deltas[2] - D.z]
             self.leg_move_with_compensation(leg_number, *diff, move_type=2)
@@ -858,7 +605,8 @@ class MovementSequence:
         self.legs[3].move_end_point(0, 0, -self.leg_up)
         self.add_angles_snapshot()
 
-        self.current_legs_offset_h += delta_x
+        self.current_legs_offset_h_x += delta_x
+        self.current_legs_offset_h_y += delta_y
     """
     def turn_body_and_legs(self, angle_deg):
         angle = math.radians(angle_deg)
@@ -894,7 +642,7 @@ class MovementSequence:
         center_y = round((self.legs[2].O.y + self.legs[4].O.y) / 2, 2)
 
         for leg in [self.legs[2], self.legs[4]]:
-            x_new, y_new = turn_on_angle_new(center_x, center_y, leg.D.x, leg.D.y, angle)
+            x_new, y_new = turn_on_angle(center_x, center_y, leg.D.x, leg.D.y, angle)
             delta_x = x_new - leg.D.x
             delta_y = y_new - leg.D.y
 
@@ -910,7 +658,7 @@ class MovementSequence:
             self.add_angles_snapshot()
 
         for leg in [self.legs[1], self.legs[3]]:
-            x_new, y_new = turn_on_angle_new(center_x, center_y, leg.D.x, leg.D.y, angle)
+            x_new, y_new = turn_on_angle(center_x, center_y, leg.D.x, leg.D.y, angle)
             delta_x = x_new - leg.D.x
             delta_y = y_new - leg.D.y
 
@@ -964,13 +712,13 @@ class MovementSequence:
     def look_on_angle(self, angle):
         current_angle = self.current_angle
 
-        x_current = self.mount_point_offset * \
+        x_current = cfg.leg["mount_point_offset"] * \
                     math.cos(math.radians(current_angle))
-        z_current = self.mount_point_offset * \
+        z_current = cfg.leg["mount_point_offset"] * \
                     math.sin(math.radians(current_angle))
 
-        x_target = self.mount_point_offset * math.cos(math.radians(angle))
-        z_target = self.mount_point_offset * math.sin(math.radians(angle))
+        x_target = cfg.leg["mount_point_offset"] * math.cos(math.radians(angle))
+        z_target = cfg.leg["mount_point_offset"] * math.sin(math.radians(angle))
 
         x = x_current - x_target
         z = z_current - z_target

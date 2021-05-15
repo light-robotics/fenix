@@ -1,24 +1,58 @@
 #!/usr/bin/env python3.9
 
+from __future__ import annotations
 import math
-from dataclasses import dataclass
+from typing import List, Tuple
 
 
-@dataclass
 class Point:
-    x: float
-    y: float
-    z: float
+    def __init__(self, x: float, y: float, z: float):
+        self.x, self.y, self.z = x, y, z
 
-"""
-Step 1: Find the DR’s (Direction Ratios) by taking the difference of the corresponding 
-position coordinates of the two given points. 
-l = (x2 – x1), m = (y2 – y1), n = (z2 – z1); Here l, m, n are the DR’s.
-Step 2: Choose either of the two given points say, we choose (x1, y1, z1).
-Step 3: Write the required equation of the straight line passing through 
-the points (x1, y1, z1) and (x2, y2, z2). L : (x – x1)/l = (y – y1)/m = (z – z1)/n
-"""
+    def move(self, 
+            delta_x: float = 0, 
+            delta_y: float = 0,
+            delta_z: float = 0
+            ) -> None:
+        self.x += delta_x
+        self.y += delta_y
+        self.z += delta_z
 
+# 2D lines helper functions
+class Line2D:
+    def __init__(self, point1: Point, point2: Point):
+        self.point1 = point1
+        self.point2 = point2
+
+        self.k, self.b, self.angle = self.get_linear_func()
+        
+    def get_linear_func(self) -> Tuple[float, float, float]:
+        delta_x = self.point2.x - self.point1.x
+        if delta_x == 0:
+            delta_x = 0.01
+        k = (self.point2.y - self.point1.y) / delta_x
+        b = (self.point2.x * self.point1.y - self.point1.x * self.point2.y) / delta_x
+        angle = math.atan2(self.point2.y - self.point1.y, self.point2.x - self.point1.x)
+        return k, b, angle
+
+    def calculate_intersection(self, another_line: Line2D) -> Tuple[float, float]:
+        x = (self.b - another_line.b) / (another_line.k - self.k)
+        y = self.k * x + self.b
+        return x, y
+
+    # function, that moves on a line from a given point to a target point for a margin distance
+    def move_on_a_line(self, margin: float) -> Tuple[float, float]:
+        new_point_x = round(self.point1.x +
+                            math.cos(self.angle) * margin,
+                            2)
+        new_point_y = round(self.point1.y +
+                            math.sin(self.angle) * margin,
+                            2)
+
+        return new_point_x, new_point_y
+
+
+# 3D lines functions
 class Line3D:
     def __init__(self, pnt1: Point, pnt2: Point):
         self.l = pnt1.x - pnt2.x
@@ -77,25 +111,3 @@ class Line3D:
         if x > self.max_x or x < self.min_x or y > self.max_y or y < self.min_y:
             return None
         return Point(x, y, z)
-
-"""
-A = Point(0, 0, 0)
-B = Point(5, 10, 15)
-C = Point(2, 2, 2)
-D = Point(2, 2, 3)
-
-ln = Line3D(A, B)
-print(ln.point_on_line(C))
-print(ln.point_on_line(D))
-print(ln.intersect_with_plane_x(7))
-print(ln.intersect_with_plane_x(5))
-print(ln.intersect_with_plane_x(3))
-
-print(ln.intersect_with_plane_y(7))
-print(ln.intersect_with_plane_y(5))
-print(ln.intersect_with_plane_y(3))
-
-print(ln.intersect_with_plane_z(7))
-print(ln.intersect_with_plane_z(5))
-print(ln.intersect_with_plane_z(3))
-"""
