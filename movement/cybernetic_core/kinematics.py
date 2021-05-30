@@ -21,6 +21,7 @@ class Leg:
         self.tetta, self.alpha, self.beta, self.gamma = self.calculate_angles()
 
     def calculate_angles(self):
+        # print(f'O : {self.O}. D : {self.D}')
         O = self.O
         D = self.D
         tetta = math.atan2(D.y - O.y, D.x - O.x)
@@ -74,6 +75,8 @@ class Leg:
         self.update_angles()
     
     def move_end_point(self, delta_x, delta_y, delta_z):
+        #print(f'D : {self.D}')
+        #print(f'Moving D for {[delta_x, delta_y, delta_z]}')
         self.D.move(delta_x, delta_y, delta_z)
         self.update_angles()
     
@@ -100,7 +103,6 @@ class FenixKinematics:
 
         self.angles_history = []
         self.D_points_history = []
-        #self.movement_plan = MovementPlan()
 
         self.add_angles_snapshot()
         
@@ -291,12 +293,14 @@ class FenixKinematics:
 
     def compensated_leg_movement(self, leg_num, leg_delta):
         # moving body to compensate future movement
+        #print('Started body move')
         self.body_compensation_for_a_leg(leg_num)
-
+        #print('Body move ok')
         self.legs[leg_num].move_end_point(*leg_delta)
         self.add_angles_snapshot()
 
     def leg_move_with_compensation(self, leg_num, delta_x, delta_y, obstacle_z=0, move_type:int = 1):
+        #print(f'leg_num = {leg_num}, delta_x = {delta_x}, delta_y = {delta_y}, obstacle_z = {obstacle_z}')
         if move_type == 1:
             if obstacle_z >= 0:
                 self.compensated_leg_movement(leg_num, [delta_x, delta_y, self.leg_up_single + obstacle_z])
@@ -304,8 +308,11 @@ class FenixKinematics:
                 self.compensated_leg_movement(leg_num, [delta_x, delta_y, self.leg_up_single])
         else:
             if obstacle_z >= 0:
+                #print(f'Trying move for {self.leg_up_single + obstacle_z}')
                 self.compensated_leg_movement(leg_num, [0, 0, self.leg_up_single + obstacle_z])
+                #print('Compensated leg move ok')
                 self.move_leg_endpoint(leg_num, [delta_x, delta_y, 0])
+                #print('Endpoint ok')
             else:
                 self.compensated_leg_movement(leg_num, [delta_x, delta_y, self.leg_up_single])
 
@@ -355,7 +362,8 @@ class FenixKinematics:
 
     def move_1_legged_for_diff(self, move: Move):
         #for leg_number, deltas in move.target_legs_position.items():
-        for leg_number in [1, 3, 4, 2]:
+        #for leg_number in [1, 3, 4, 2]:
+        for leg_number in [1, 4, 2, 3]:
             deltas = move.target_legs_position[leg_number]
             D = self.legs[leg_number].D
             diff = [deltas[0] - D.x, deltas[1] - D.y, deltas[2] - D.z]
@@ -480,18 +488,18 @@ class FenixKinematics:
             sum_body_movement += body_movement_value
 
             if step == 0:
-                # print('Leg with delta z is 4')
+                #print('Leg with delta z is 4')
                 current_delta_z_up[4] += positive_delta_z
                 current_delta_z_down[4] -= negative_delta_z
             if step == 1:
-                # print('Leg with delta z id 1')
+                #print('Leg with delta z id 1')
                 current_delta_z_up[1] += positive_delta_z
                 current_delta_z_down[1] -= negative_delta_z
 
             if step%2 == 0:
                 sum_even += value
                 if step >= len(steps_arr) - 2:
-                    # print('Leg with delta z is 2')
+                    #print('Leg with delta z is 2')
                     current_delta_z_up[2] += positive_delta_z
                     current_delta_z_down[2] -= negative_delta_z
                 # print('Moving legs 2, 4')

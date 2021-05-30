@@ -1,3 +1,8 @@
+obstacle = {
+    "danger_offset": 1.0,
+    "outer_danger_offset": 2.0,
+}
+
 leg = {
     "a": 12.7,  # PointA to PointB
     "b": 6.9,   # PointB to PointC
@@ -14,8 +19,8 @@ angles = {
         "step": 1
     },
     "alpha": {
-        "min": -35,
-        "max": 55
+        "min": -50,
+        "max": 80
     },
     "beta": {
         "min": -115,

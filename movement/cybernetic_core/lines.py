@@ -17,6 +17,9 @@ class Point:
         self.x += delta_x
         self.y += delta_y
         self.z += delta_z
+    
+    def __repr__(self):
+        return f'Point(x={self.x}, y={self.y}, z={self.z})'
 
 # 2D lines helper functions
 class Line2D:
@@ -105,6 +108,8 @@ class Line3D:
 
     def intersect_with_plane_z(self, z: int) -> Point:
         if self.n == 0:
+            return None
+        if z < self.min_z or z > self.max_z:
             return None
         x = round((z - self.anchor_point.z) * self.l / self.n + self.anchor_point.x, 1)
         y = round((z - self.anchor_point.z) * self.m / self.n + self.anchor_point.y, 1)

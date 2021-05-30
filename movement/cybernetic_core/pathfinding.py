@@ -3,6 +3,7 @@
 import copy
 from typing import List, Dict, Callable
 import itertools
+import logging
 
 from kinematics import FenixKinematics as Fenix
 from obstacle import Obstacle, obstacle_from_csv
@@ -10,7 +11,12 @@ from lines import convert_points_to_3d_lines
 from moves import Move, Attempt
 
 
-obstacles = obstacle_from_csv('/fenix/movement/obstacles/simple_obstacle.csv')
+logging.basicConfig(filename='pathfinding.log', filemode='w', format='%(message)s')
+
+#obstacles = obstacle_from_csv('/fenix/movement/obstacles/simple_obstacle.csv')
+#obstacles = obstacle_from_csv('/fenix/movement/obstacles/two_stairs.csv')
+obstacles = obstacle_from_csv('/fenix/movement/obstacles/rugged_terrain.csv')
+#obstacles = obstacle_from_csv('/fenix/movement/obstacles/rugged_terrain_v2.csv')
 
 def generate_movement_plan(fnx: Fenix, plan: List[Move], target_xy: List[int]) -> List[Move]:
     
@@ -75,19 +81,22 @@ def obstacle_collision(fenix: Fenix, obstacles: List[Obstacle]) -> bool:
     return False
 
 def check_movement_plan(plan: List[Move], target_xy: List[int]) -> int:
-    fnx = Fenix(legs_offset_v=15, legs_offset_h_x=18, legs_offset_h_y=18)
+    fnx = Fenix(legs_offset_v=20, legs_offset_h_x=20, legs_offset_h_y=16)
+    #fnx = Fenix(legs_offset_v=15, legs_offset_h_x=13, legs_offset_h_y=20)
         
     try:
+        #print(f'Checking plan {plan}')
         plan = generate_movement_plan(fnx, plan, target_xy)
         if plan is None:
+            logging.warning('None plan')
             return 0
         
         adjusted_movement_plan = adjust_movement_plan_to_obstacles(plan, obstacles)
 
         fnx.move_according_to_plan(adjusted_movement_plan)
-        #fnx.move_1_legged_with_a_plan(adjusted_movement_plan, move_type=2)
 
         if obstacle_collision(fnx, obstacles) is True:
+            logging.warning('Collision')
             raise Exception(f'Collision')
 
         seq_len = fnx.get_sequence_length()
@@ -95,15 +104,25 @@ def check_movement_plan(plan: List[Move], target_xy: List[int]) -> int:
         return seq_len #, fnx
     except Exception as e:
         print(str(e))
+        logging.warning(str(e))
         return -1
 
 def get_sequence(plan: List[Move], target_xy: List[int]):
-    fnx = Fenix(legs_offset_v=15, legs_offset_h_x=18, legs_offset_h_y=18)
+    fnx = Fenix(legs_offset_v=20, legs_offset_h_x=20, legs_offset_h_y=16)
     plan = generate_movement_plan(fnx, plan, target_xy)   
     adjusted_movement_plan = adjust_movement_plan_to_obstacles(plan, obstacles)
     fnx.move_according_to_plan(adjusted_movement_plan)
     return fnx.sequence
 
+def get_lines(plan: List[Move], target_xy: List[int]):
+    fnx = Fenix(legs_offset_v=20, legs_offset_h_x=20, legs_offset_h_y=16)
+    plan = generate_movement_plan(fnx, plan, target_xy)   
+    adjusted_movement_plan = adjust_movement_plan_to_obstacles(plan, obstacles)
+    fnx.move_according_to_plan(adjusted_movement_plan)
+    if obstacle_collision(fnx, obstacles) is True:
+        raise Exception(f'Collision')
+    return convert_points_to_3d_lines(fnx.D_points_history)
+    
 def check_possibilities(check_function: Callable, target: List[int], possible_moves: List[Move], steps: int) -> List[Attempt]:
     good_tries = []
     bad_tries = []
@@ -118,25 +137,29 @@ def check_possibilities(check_function: Callable, target: List[int], possible_mo
                     bad_tries.append(plan)
                     bad_plan = True
                     continue
-            
-            
+            logging.warning(f'\nPlan : {plan}. Bad : {bad_plan}')
+            #print(f'Bad Plan : {bad_plan}. Plan : {plan}')
             if not bad_plan:
                 #print(plan)
                 result = check_function(plan, target)
                 if result >= 0:
                     good_tries.append(Attempt(plan, result))
+                    #print(f'Added to good. Result : {result}')
+                    if result > 0:
+                        logging.warning(f'SUCCESS!!!! Result : {result}')
+                    else:
+                        logging.warning(f'Added to good. Result : {result}')
                 else:
                     bad_tries.append(plan)
+                    #print('Added to bad')
+                    logging.warning('Added to bad')
 
     return good_tries
 
 def get_best_sequence():
-    target = [0, 45]
-    possibilities = check_possibilities(check_movement_plan, target, [Move('forward', 11), Move('forward', 9), Move('forward', 7), Move('up', 7)], 6) 
-    #possibilities = check_possibilities(check_movement_plan, target, [Move('forward', 13), Move('forward', 10), Move('forward', 7), Move('up', 7)], 6) 
-    #possibilities = check_possibilities(check_movement_plan, target, [Move('forward', 12), Move('forward', 9), Move('forward', 7), Move('up', 7)], 6) 
-    #possibilities = check_possibilities(check_movement_plan, [0, 45], [Move('forward', 15), Move('forward', 12), Move('forward', 9), Move('forward', 7), Move('up', 7)], 5) 
-    #possibilities = check_possibilities(check_movement_plan, [0, 30], [Move('forward', 15), Move('forward', 12), Move('forward', 10), Move('forward', 7), Move('forward', 5), Move('up', 4), Move('up', 7)], 6) 
+    target = [0, 60]
+    #possibilities = check_possibilities(check_movement_plan, target, [Move('forward', 9), Move('forward', 6), Move('up', 15)], 10)
+    possibilities = check_possibilities(check_movement_plan, target, [Move('forward', 13), Move('forward', 10), Move('forward', 8), Move('up', 5)], 8)
     for possibility in possibilities:
         if possibility.result > 0:
             print(possibility)
@@ -148,18 +171,36 @@ def get_best_sequence():
     #return get_sequence(best_option.moves, target)
 
 print('-----')
-print(get_best_sequence())
-# Result : 3695|Move[u.7]|Move[f.11]|Move[f.11]|Move[f.7]|Move[f.7]|Move[f.11]
+#print(get_best_sequence())
+# 40 : Result : 2493|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]
+# 50 : Result : 3115|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]
+# 60 : Result : 3811|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]|Move[u.5]|Move[f.10]
+# 70 : Plan : [Move[f.10], Move[f.8], Move[f.10], Move[f.10], Move[f.8], Move[f.8], Move[f.8], Move[u.5], Move[f.8]]. Bad : False
+# SUCCESS!!!! Result : 4840
+
+
+#plan = [Move('forward', 10), Move('forward', 10), Move('forward', 10), Move('forward', 10), Move('forward', 10), Move('up', 5), Move('forward', 10)]
+plan = [Move('forward', 10), Move('forward', 8), Move('forward', 13), Move('forward', 10), Move('forward', 10), Move('up', 5), Move('forward', 13), Move('forward', 8), Move('forward', 8)]
+
+#Move[f.10]|Move[f.8]|Move[f.13]|Move[f.10]|Move[f.10]|Move[u.5]|Move[f.13]|Move[f.8]|Move[f.8]
+
+#fnx = Fenix(legs_offset_v=15, legs_offset_h_x=18, legs_offset_h_y=18)
+
+#lines = get_lines(plan, [0, 75])
+#for line in lines:
+#    print(line)
+print(get_sequence(plan, [0, 75]))
 
 """
 fnx = Fenix(legs_offset_v=20, legs_offset_h_x=18, legs_offset_h_y=18)
-plan = [Move('forward', 10), Move('forward', 10), Move('up', 10), Move('forward', 12), Move('forward', 15)]
-print(check_movement_plan(plan, [0, 30]))
+plan = [Move('forward', 10), Move('forward', 10), Move('forward', 10), Move('forward', 10), Move('forward', 8)]
+#print(check_movement_plan(plan, [0, 60]))
 
 
-generated_plan = generate_movement_plan(fnx, plan, [0, 30])
+generated_plan = generate_movement_plan(fnx, plan, [0, 60])
 print(generated_plan)
 adjusted_plan = adjust_movement_plan_to_obstacles(generated_plan, obstacles)
 print('---------')
 print(adjusted_plan)
+check_movement_plan(adjusted_plan, [0, 60])
 """

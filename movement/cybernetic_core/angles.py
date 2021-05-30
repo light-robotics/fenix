@@ -103,7 +103,7 @@ def get_best_angles(all_angles):
             raise Exception('Min distance found : {0}'.format(min_distance))
 
     if best_angles is None:        
-        raise Exception('No angles\n')
+        raise Exception('No angles')
 
     return best_angles
 
