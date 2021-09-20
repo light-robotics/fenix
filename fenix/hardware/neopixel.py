@@ -1,10 +1,7 @@
-#!/usr/bin/env python3
-
 """
 A version of neopixel led strip for Fenix quadruped robot
 This file written by Light Robotics (light.robotics.2020@gmail.com)
 Used library written by Tony DiCola (tony@tonydicola.com)
-
 !!! Script should be run with sudo !!!
 """
 
@@ -28,6 +25,7 @@ class Neopixel:
         'green'  : Color(0, 255, 0),
         'blue'   : Color(0, 0, 255),
         'white'  : Color(255, 255, 255),
+        'none'   : Color(0, 0, 0),
 
         'yellow' : Color(204, 102, 0),        
         'cyan'   : Color(0, 255, 255),
@@ -51,28 +49,35 @@ class Neopixel:
         self.strip.begin()        
 
     def activate_mode(self, mode: str, color_str: str, brigthness: int) -> None:
-        try:
-            color = self.colors[color_str]
-            while True:
-                self.strip.setBrightness(brigthness)
-                if mode == 'steady':
-                    self.steady_color(color)
-                if mode == 'blink':
-                    self.blink(color)
-                if mode == 'flashlight':
-                    self.flashlight(color)
-                if mode == 'rainbow':
-                    self.rainbow()
-                if mode == 'theater':
-                    self.theater_chase(color)
-                if mode == 'rainbow_cycle':
-                    self.rainbow_cycle()
-                if mode == 'theater_rainbow':
-                    self.theater_chase_rainbow()
-                time.sleep(1)
-        except KeyboardInterrupt:
-            self.strip.setBrightness(0)
-            self.strip.show()
+        color = self.colors[color_str]
+        self.strip.setBrightness(brigthness)
+
+        if mode == 'shutdown':
+            self.shutdown()
+        
+        if mode == 'steady':
+            self.steady_color(color)
+        if mode == 'blink':
+            self.blink(color)
+        if mode == 'flashlight':
+            self.flashlight(color)
+        if mode == 'rainbow':
+            self.rainbow()
+        if mode == 'theater':
+            self.theater_chase(color)
+        if mode == 'rainbow_cycle':
+            self.rainbow_cycle()
+        if mode == 'theater_rainbow':
+            self.theater_chase_rainbow()
+
+    def mode_cycle(self, mode: str, color_str: str, brigthness: int) -> None:
+        while True:
+            self.activate_mode(mode, color_str, brigthness)
+            time.sleep(1.0)
+    
+    def shutdown(self):
+        self.strip.setBrightness(0)
+        self.strip.show()
 
     def steady_color(self, color: Color, wait_ms: int = 0) -> None:
         # wait_ms introduces delay between pixels turning on
@@ -90,14 +95,15 @@ class Neopixel:
         for j in range(255):
             self.strip.setBrightness(j)
             self.strip.show()
-            time.sleep(wait_ms / 1000.0)
-        
+            time.sleep(wait_ms / 1000.0)        
     
     def flashlight(self, color: Color = colors['white']) -> None:
-        self.strip.setBrightness(255)
-        for i in range(0, 6):
-            self.strip.setPixelColor(i, color)
-            self.strip.show()
+        for i in range(0, self.LED_COUNT):
+            if i < 6: # first 6 are front flashlight
+                self.strip.setPixelColor(i, color)
+            else:
+                self.strip.setPixelColor(i, self.colors['none'])
+        self.strip.show()
 
     def rainbow(self, wait_ms: int = 20, iterations: int = 1) -> None:
         """Draw rainbow that fades across all pixels at once."""
@@ -161,5 +167,8 @@ if __name__ == '__main__':
     assert 50 <= args.brightness <= 255
 
     fenix_neopixel = Neopixel()
-    fenix_neopixel.activate_mode(args.mode, args.color, args.brightness)
+    try:
+        fenix_neopixel.mode_cycle(args.mode, args.color, args.brightness)
+    except KeyboardInterrupt:
+        fenix_neopixel.shutdown()
     
