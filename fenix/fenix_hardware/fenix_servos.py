@@ -1,9 +1,15 @@
 import time
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from hardware.lx16a import LX16A
 import logging
+import configs.code_config as code_config
+import logging.config
+logging.config.dictConfig(code_config.logger_config)
 
 
-logging.basicConfig(filename='/fenix/movement/log.log', filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
+#logging.basicConfig(filename='/fenix/movement/log.log', filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
 
 
 class FenixServos:
@@ -16,6 +22,8 @@ class FenixServos:
         self.max_speed = 100 # 130 # 0 is instant, 10000 is very slow
         self.diff_from_target_limit = 2.5 # 2.0 # 5.0 # when it's time to start next movement
         self.diff_from_prev_limit = 0.5 # 1.0 # start next movement if we're stuck
+
+        self.logger = logging.getLogger('main_logger')
         
         # 0.16 sec / 60 degrees for 7.4V+
         # 0.18 sec / 60 degrees for 6V+
@@ -111,7 +119,7 @@ class FenixServos:
         #print(f'Max angle diff : {max_angle_diff}. Rate : {rate}.')
         
         self.send_command_to_servos(angles, rate)
-        logging.info(f'Command sent: {angles}')
+        self.logger.info(f'Command sent: {angles}')
         #self.send_command_to_servos_futured(angles, rate)        
         time.sleep(0.05)
         #time.sleep(avg_wait)
@@ -122,7 +130,7 @@ class FenixServos:
             time.sleep(0.03)
             
             current_angles = self.get_current_angles()
-            logging.info(f'current angles: {current_angles}')
+            self.logger.info(f'current angles: {current_angles}')
             # if diff from prev angles or target angles is small - continue
             diff_from_target = self.get_angles_diff(angles, current_angles)
             diff_from_prev = self.get_angles_diff(current_angles, prev_angles)
@@ -135,22 +143,25 @@ class FenixServos:
                     print('-----------ALARM-----------')
                     print(f'Diff from target : {diff_from_target}')
                     print(f'Diff from prev   : {diff_from_prev}')
+                    self.logger.info('-----------ALARM-----------')
+                    self.logger.info(f'Diff from target : {diff_from_target}')
+                    self.logger.info(f'Diff from prev   : {diff_from_prev}')
                 #print('Ready to move further')
-                logging.info(f'Ready to move further')
+                self.logger.info(f'Ready to move further')
                 break
             
             if diff_from_target[1] > self.diff_from_target_limit and \
                 diff_from_prev[1] < self.diff_from_prev_limit and \
                     not adjustment_done:
-                logging.info(f'Diff from prev  : {diff_from_prev[0]}')
-                logging.info(f'Diff from target: {diff_from_target[0]}')
-                logging.info(f'Command sent : {angles}')
+                self.logger.info(f'Diff from prev  : {diff_from_prev[0]}')
+                self.logger.info(f'Diff from target: {diff_from_target[0]}')
+                self.logger.info(f'Command sent : {angles}')
                 if diff_from_target[1] > self.diff_from_target_limit * 3:
-                    logging.info(f'We"re in trouble, too large diff : {diff_from_target[1]}')
-                    logging.info(diff_from_target[0])
+                    self.logger.info(f'We"re in trouble, too large diff : {diff_from_target[1]}')
+                    self.logger.info(diff_from_target[0])
                 else:
                     adjusted_angles = [round(target + (-diff), 1) for target, diff in zip(angles, diff_from_target[0])]
-                    logging.info(f'Adjusting to : {adjusted_angles}')
+                    self.logger.info(f'Adjusting to : {adjusted_angles}')
                     adjustment_done = True
                     self.send_command_to_servos(adjusted_angles, 0)
                     time.sleep(0.05)
@@ -179,7 +190,7 @@ if __name__ == '__main__':
     fnx = FenixServos()
         
     fnx.set_speed(500)
-    sequence = [[0.0, 0.0, 0.0, 6.5, 0.0, 0.0, 0.0, 6.5, 0.0, 0.0, 0.0, 6.5, 0.0, 0.0, 0.0, 6.5]]
+    sequence = [[0.0, 60.0, 60.0, -30.0, 0.0, 60.0, 60.0, -30.0, 0.0, 60.0, 60.0, -30.0, 0.0, 60.0, 60.0, -30.0]]
     """
     sequence = [[-8.02, 18.04, 95.45, -12.6, 8.02, 18.04, 95.45, -12.6, -8.02, 18.04, 95.45, -12.6, 8.02, 18.04, 95.45, -12.6], 
     [-7.64, 0.19, 24.61, -63.58, 22.98, 14.27, 73.54, -30.73, -8.72, 16.57, 112.6, -6.97, -9.18, 18.54, 100.81, -7.73], 

@@ -2,6 +2,8 @@ import math
 from functools import lru_cache
 
 import configs.config as cfg
+import configs.code_config as code_config
+import logging.config
 
 
 @lru_cache(maxsize=None)
@@ -60,24 +62,32 @@ def find_angles(Dx, Dy):
     return results
 
 def check_angles(angles):
+    logging.config.dictConfig(code_config.logger_config)
+    logger = logging.getLogger('main_logger')
+
     alpha = math.degrees(angles[0])
     beta = math.degrees(angles[1])
     gamma = math.degrees(angles[2])
+    logger.info(f'Trying {round(alpha, 2)}, {round(beta, 2)}, {round(gamma, 2)}')
 
     if alpha < cfg.angles["alpha"]["min"] or \
         alpha > cfg.angles["alpha"]["max"]:
+        logger.info(f'Alpha failed')
         return False
     if beta < cfg.angles["beta"]["min"] or \
         beta > cfg.angles["beta"]["max"]:
+        logger.info(f'Beta failed')
         return False
     if gamma < cfg.angles["gamma"]["min"] or \
         gamma > cfg.angles["gamma"]["max"]:
+        logger.info(f'Gamma failed')
         return False
 
     mode = cfg.mode
 
     if alpha + beta + gamma < -90 - mode or \
        alpha + beta + gamma > -90 + mode:
+        logger.info(f'Mode failed')
         return False
 
     return True
@@ -110,7 +120,7 @@ def get_best_angles(all_angles):
 def get_angles_distance(angles):
     # no diff, just distance with perpendicular
     # 100 -> endleg leaning inside
-    return (math.degrees(angles[0] + angles[1] + angles[2]) + 90) ** 2
+    return (math.degrees(angles[0] + angles[1] + angles[2]) + cfg.angles["to_surface"]["ideal"]) ** 2
 
 
 # ----------------------

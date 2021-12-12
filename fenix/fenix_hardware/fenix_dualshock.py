@@ -113,7 +113,7 @@ class FenixDualShock(DualShock):
             self.command_writer.write_command('body_to_center', 1000)
     
     def on_L3_y_at_rest(self):
-        self.command_writer.write_command('none', 0)
+        self.command_writer.write_command('none', 1000)
 
     def on_R3_up(self, value):
         if self.mode in [FenixModes.ONE_LEGGED, FenixModes.TWO_LEGGED]:
@@ -148,7 +148,7 @@ class FenixDualShock(DualShock):
             self.command_writer.write_command('sight_to_normal', 1000)
     
     def on_R3_y_at_rest(self):
-        self.command_writer.write_command('none', 0)
+        self.command_writer.write_command('none', 1000)
 
     def on_right_arrow_press(self):
         self.command_writer.write_command('reposition_x_up', 500)

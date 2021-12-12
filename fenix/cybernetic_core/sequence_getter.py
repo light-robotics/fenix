@@ -7,9 +7,10 @@ from cybernetic_core.kinematics import FenixKinematics
 
 class SequenceGetter:
 
-    UP_OR_DOWN_CM = 1
-    FORWARD_CM    = 2
-    REPOSITION_CM = 1
+    UP_OR_DOWN_CM   = 1
+    FORWARD_BODY_CM = 2
+    FORWARD_LEGS_CM = 6
+    REPOSITION_CM   = 1
 
     def __init__(self, fk: FenixKinematics):
         self.fk = fk
@@ -17,30 +18,44 @@ class SequenceGetter:
     def get_sequence_for_command(self, command: str) -> List[List[float]]:
         self.fk.reset_history()
         
-        if command == 'forward_two_legged':
-            pass
+        # forward_two_legged state commands
+        if command == 'forward_1':
+            # Legs 1 and 3 moved x1
+            self.fk.move_2_legs_phased_13(0, self.FORWARD_LEGS_CM)
+        elif command == 'forward_2':
+            # Legs 2 and 4 moved x2
+            self.fk.move_2_legs_phased_24(0, 2 * self.FORWARD_LEGS_CM)
+        elif command == 'forward_22':
+            # Legs 2 and 4 moved x1
+            self.fk.move_2_legs_phased_24(0, self.FORWARD_LEGS_CM)
+        elif command == 'forward_3':
+            # Legs 1 and 3 moved x2
+            self.fk.move_2_legs_phased_13(0, 2 * self.FORWARD_LEGS_CM)
+        elif command == 'forward_32':
+            # Legs 1 and 3 moved x1
+            self.fk.move_2_legs_phased_13(0, self.FORWARD_LEGS_CM)
         elif command == 'forward_one_legged':
-            pass
+            self.fk.move_body_straight(0, self.FORWARD_LEGS_CM)
         elif command == 'body_forward':
-            self.fk.body_movement(0, self.FORWARD_CM, 0)
+            self.fk.body_movement(0, self.FORWARD_BODY_CM, 0)
         elif command == 'backward_two_legged':
             pass
         elif command == 'backward_one_legged':
             pass
         elif command == 'body_backward':
-            self.fk.body_movement(0, -self.FORWARD_CM, 0)
+            self.fk.body_movement(0, -self.FORWARD_BODY_CM, 0)
         elif command == 'strafe_left_two_legged':
             pass
         elif command == 'strafe_left_one_legged':
             pass
         elif command == 'body_left':
-            self.fk.body_movement(-self.FORWARD_CM, 0, 0)
+            self.fk.body_movement(-self.FORWARD_BODY_CM, 0, 0)
         elif command == 'strafe_right_two_legged':
             pass
         elif command == 'strafe_right_one_legged':
             pass
         elif command == 'body_right':
-            self.fk.body_movement(self.FORWARD_CM, 0, 0)
+            self.fk.body_movement(self.FORWARD_BODY_CM, 0, 0)
         elif command == 'body_to_center':
             self.fk.body_to_center()
         elif command == 'up':

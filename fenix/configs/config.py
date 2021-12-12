@@ -4,43 +4,50 @@ obstacle = {
 }
 
 leg = {
-    "a": 12.7,  # PointA to PointB
-    "b": 6.9,   # PointB to PointC
-    #"c": 17.2, # PointC to PointD / point toe length
-    "c": 19.4,  # PointC to PointD / crescent toe length
-    "d": 6.7,   # PointO to PointA
-    "mount_point_offset": 3.8,
-    "phi_angle" : 2.7 # angle fix due to leg not being straight
+    "a": 7.4,    # PointA to PointB - femur
+    "b": 6.9,    # PointB to PointC - femur-tibia
+    "c": 14.7,   # PointC to PointD - tibia / point toe length 
+    #"c": 14.7,  # PointC to PointD / crescent toe length
+    "d": 6.9,    # PointO to PointA - trochanter-coxa
+    "mount_point_offset": 3.8, # ???
+    "phi_angle" : -22.5 # angle fix due to leg not being straight
+}
+
+start = {
+    "vertical"     : 14,
+    "horizontal_x" : 17,
+    "horizontal_y" : 17
 }
 
 angles = {
     "to_surface": {
         "min" : -45,
         "max" : 45,
-        "step": 1
+        "step": 1,
+        "ideal": 70
     },
     "alpha": {
-        "min": -50,
-        "max": 80
+        "min": -30,
+        "max": 55
     },
     "beta": {
-        "min": -115,
-        "max": -20
+        "min": -110,
+        "max": -30
     },
     "gamma": {
-        "min": -110,
-        "max": 0
-    }
+        "min": -90,
+        "max": -5
+    } 
 }
 
 fenix = {
     "margin": {
-        1: 6,
+        1: 4,
         2: 6
     },
     "leg_up": {
-        1: 6,
-        2: 6
+        1: 5,
+        2: 2
     }    
 }
 

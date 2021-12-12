@@ -3,6 +3,11 @@ import time
 from serial import Serial
 import struct
 from typing import Union, List
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import configs.code_config as code_config
+import logging.config
 
 
 neutral = {
@@ -72,6 +77,8 @@ class LX16A:
     SERVO_LED_ERROR_READ       = 36
 
     def __init__(self, Port: str = "/dev/ttyUSB0", Baudrate: int = 115200, Timeout: float = 0.001):
+        logging.config.dictConfig(code_config.logger_config)
+        self.logger = logging.getLogger('main_logger')
         self.serial = Serial(Port, baudrate=Baudrate, timeout=Timeout)
         self.serial.setDTR(1)
         self.TX_DELAY_TIME = 0.00002 
@@ -140,11 +147,11 @@ class LX16A:
                 self.send_packet(packet)
                 target = self.read_servo_target(id)[0]
                 if target != position:
-                    print(f'Id : {id}. Target required : {position}. Target real : {target}')
+                    self.logger.info(f'Id : {id}. Target required : {position}. Target real : {target}')
                     continue
                 break
             except:
-                print(f'{i} attempt failed for servo {id}')
+                self.logger.info(f'{i} attempt failed for servo {id}')
       
     # read target position and rate
     def read_servo_target(self, id: int) -> Union[int, int]:
@@ -374,7 +381,7 @@ class LX16A:
                 s = struct.unpack("<BBBBBhB", rpacket)
                 return s[5]
             except Exception as e:
-                print(f'Can not read values from servo {id}. Attempt {attempt}. \nException : {e}')
+                self.logger.info(f'Can not read values from servo {id}. Attempt {attempt}. \nException : {e}')
                 self.reset()
             
         raise Exception('Can not read values from servo {0}'.format(id))
