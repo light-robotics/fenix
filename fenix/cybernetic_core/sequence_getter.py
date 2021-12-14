@@ -9,7 +9,7 @@ class SequenceGetter:
 
     UP_OR_DOWN_CM   = 1
     FORWARD_BODY_CM = 2
-    FORWARD_LEGS_CM = 6
+    FORWARD_LEGS_CM = 4
     REPOSITION_CM   = 1
 
     def __init__(self, fk: FenixKinematics):

@@ -127,8 +127,8 @@ class MovementProcessor:
         start_time = datetime.datetime.now()
         for move_snapshot in sequence:
             angles = move_snapshot.angles_snapshot[:]
-            if move_snapshot.move_type == 'body' and self.speed != self.body_speed:
-                self.fs.set_speed(self.body_speed)
+            #if move_snapshot.move_type == 'body' and self.speed != self.body_speed:
+            #    self.fs.set_speed(self.body_speed)
             self.logger.info(f'Moving to {angles}')
             #time.sleep(3)
             self.fs.set_servo_values_paced(angles) # here issuing command to servos

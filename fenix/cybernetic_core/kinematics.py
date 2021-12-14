@@ -191,7 +191,7 @@ class FenixKinematics:
                    cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
         D1 = Point(self.legs_offset_h_x,
-                   self.legs_offset_h_y,
+                   self.legs_offset_h_y-5,
                    0)
         self.logger.info('Initiating leg 1')
         Leg1 = Leg(O1, D1)
@@ -200,7 +200,7 @@ class FenixKinematics:
                    -cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
         D2 = Point(self.legs_offset_h_x,
-                   -self.legs_offset_h_y,
+                   -self.legs_offset_h_y-5,
                    0)
         self.logger.info('Initiating leg 2')
         Leg2 = Leg(O2, D2)
@@ -209,7 +209,7 @@ class FenixKinematics:
                    -cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
         D3 = Point(-self.legs_offset_h_x,
-                   -self.legs_offset_h_y,
+                   -self.legs_offset_h_y-5,
                    0)
         self.logger.info('Initiating leg 3')
         Leg3 = Leg(O3, D3)
@@ -218,7 +218,7 @@ class FenixKinematics:
                    cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
         D4 = Point(-self.legs_offset_h_x,
-                   self.legs_offset_h_y,
+                   self.legs_offset_h_y-5,
                    0)
         self.logger.info('Initiating leg 4')
         Leg4 = Leg(O4, D4)
@@ -338,7 +338,9 @@ class FenixKinematics:
     Two phased moves
     """
     # phased 2-legged movement
-    def move_2_legs_phased_13(self, delta_x: int = 0, delta_y: int = 0) -> None:        
+    def move_2_legs_phased_13(self, delta_x: int = 0, delta_y: int = 0) -> None:
+        self.body_movement(round(delta_x / 2, 1), round(delta_y / 2, 1), 0)
+
         for leg in [self.legs[1], self.legs[3]]:
             leg.move_end_point(delta_x, delta_y, self.leg_up)
         self.add_angles_snapshot('endpoints')
@@ -347,9 +349,11 @@ class FenixKinematics:
             leg.move_end_point(0, 0, -self.leg_up)
         self.add_angles_snapshot('endpoints')
 
-        self.body_movement(round(delta_x / 2, 1), round(delta_y / 2, 1), 0)
+        
     
     def move_2_legs_phased_24(self, delta_x: int = 0, delta_y: int = 0) -> None:        
+        self.body_movement(round(delta_x / 2, 1), round(delta_y / 2, 1), 0)
+
         for leg in [self.legs[2], self.legs[4]]:
             leg.move_end_point(delta_x, delta_y, self.leg_up)
         self.add_angles_snapshot('endpoints')
@@ -358,7 +362,7 @@ class FenixKinematics:
             leg.move_end_point(0, 0, -self.leg_up)
         self.add_angles_snapshot('endpoints')
 
-        self.body_movement(round(delta_x / 2, 1), round(delta_y / 2, 1), 0)
+        
     
     """
     Two phased moves end

@@ -41,6 +41,7 @@ class FenixServos:
         if new_speed > 10000 or new_speed < self.max_speed:
             raise Exception(f'Invalid speed value {new_speed}. Should be between {self.max_speed} and 10000')
         self.speed = new_speed
+        self.logger.info(f'FenixServos. Speed set to {self.speed}')
     
     #@timing
     def get_current_angles(self):
@@ -111,18 +112,13 @@ class FenixServos:
 
     #@timing
     def set_servo_values_paced(self, angles):
-        #print(f'Angles before : {self.get_current_angles()}')
         _, max_angle_diff = self.get_angles_diff(angles)
         rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
-        #avg_wait = self.calculate_wait_time(max_angle_diff, rate)
-        #print(f'Max angle diff : {max_angle_diff}. Rate : {rate}. Avg_wait : {avg_wait}')
-        #print(f'Max angle diff : {max_angle_diff}. Rate : {rate}.')
+        self.logger.info(f'max_angle_diff: {max_angle_diff}, self.speed : {self.speed}, self.speed * max_angle_diff / 45 : {self.speed * max_angle_diff / 45}')
         
         self.send_command_to_servos(angles, rate)
-        self.logger.info(f'Command sent: {angles}')
-        #self.send_command_to_servos_futured(angles, rate)        
+        self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
         time.sleep(0.05)
-        #time.sleep(avg_wait)
         adjustment_done = False
 
         prev_angles = self.get_current_angles()

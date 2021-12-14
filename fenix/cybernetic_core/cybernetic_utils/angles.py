@@ -82,6 +82,10 @@ def check_angles(angles):
         gamma > cfg.angles["gamma"]["max"]:
         logger.info(f'Gamma failed')
         return False
+    
+    if beta + gamma > -100:
+        logger.info('Beta+Gamma failed')
+        #return False
 
     mode = cfg.mode
 
