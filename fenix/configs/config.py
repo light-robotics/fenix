@@ -17,6 +17,7 @@ start = {
     "horizontal_x"  : 17,
     "horizontal_y"  : 17,
     "y_offset_body" : 3
+
 }
 
 angles = {
@@ -35,8 +36,8 @@ angles = {
         "max": -10
     },
     "gamma": {
-        "min": -100,
-        "max": -5
+        "min": -100 + leg["phi_angle"],
+        "max": -15 + leg["phi_angle"]
     },
     "front_leg": {
         "alpha": {
@@ -48,16 +49,16 @@ angles = {
             "max": 0
         },
         "gamma": {
-            "min": -100,
-            "max": 0
+            "min": -100 + leg["phi_angle"],
+            "max": 0 + leg["phi_angle"]
         },
         "tetta": {
             "min": -27,
             "max": 27
         },
         "beta+gamma": {
-            "min": -170,
-            "max": -20
+            "min": -170 + leg["phi_angle"],
+            "max": -20 + leg["phi_angle"]
         }
     },
     "rear_leg": {
@@ -70,16 +71,16 @@ angles = {
             "max": 0
         },
         "gamma": {
-            "min": -100,
-            "max": 0
+            "min": -100 + leg["phi_angle"],
+            "max": 0 + leg["phi_angle"]
         },
         "tetta": {
             "min": -20,
             "max": 20
         },
         "beta+gamma": {
-            "min": -170,
-            "max": -20
+            "min": -170 + leg["phi_angle"],
+            "max": -20 + leg["phi_angle"]
         }
     }
 }
