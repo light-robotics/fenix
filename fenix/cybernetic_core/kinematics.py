@@ -191,7 +191,7 @@ class FenixKinematics:
                    cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
         D1 = Point(self.legs_offset_h_x,
-                   self.legs_offset_h_y-5,
+                   self.legs_offset_h_y - cfg.start["y_offset_body"],
                    0)
         self.logger.info('Initiating leg 1')
         Leg1 = Leg(O1, D1)
@@ -200,7 +200,7 @@ class FenixKinematics:
                    -cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
         D2 = Point(self.legs_offset_h_x,
-                   -self.legs_offset_h_y-5,
+                   -self.legs_offset_h_y - cfg.start["y_offset_body"],
                    0)
         self.logger.info('Initiating leg 2')
         Leg2 = Leg(O2, D2)
@@ -209,7 +209,7 @@ class FenixKinematics:
                    -cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
         D3 = Point(-self.legs_offset_h_x,
-                   -self.legs_offset_h_y-5,
+                   -self.legs_offset_h_y - cfg.start["y_offset_body"],
                    0)
         self.logger.info('Initiating leg 3')
         Leg3 = Leg(O3, D3)
@@ -218,7 +218,7 @@ class FenixKinematics:
                    cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
         D4 = Point(-self.legs_offset_h_x,
-                   self.legs_offset_h_y-5,
+                   self.legs_offset_h_y - cfg.start["y_offset_body"],
                    0)
         self.logger.info('Initiating leg 4')
         Leg4 = Leg(O4, D4)

@@ -3,14 +3,16 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from cybernetic_core.kinematics import FenixKinematics
+from configs import config as cfg
 
 
 class SequenceGetter:
 
-    UP_OR_DOWN_CM   = 1
-    FORWARD_BODY_CM = 2
-    FORWARD_LEGS_CM = 4
-    REPOSITION_CM   = 1
+    UP_OR_DOWN_CM   = cfg.moves["up_or_down_cm"]
+    FORWARD_BODY_CM = cfg.moves["move_body_cm"]
+    FORWARD_LEGS_1LEG_CM = cfg.moves["forward_body_1_leg_cm"]
+    FORWARD_LEGS_2LEG_CM = cfg.moves["forward_body_2_leg_cm"]
+    REPOSITION_CM   = cfg.moves["reposition_cm"]
 
     def __init__(self, fk: FenixKinematics):
         self.fk = fk
@@ -21,21 +23,21 @@ class SequenceGetter:
         # forward_two_legged state commands
         if command == 'forward_1':
             # Legs 1 and 3 moved x1
-            self.fk.move_2_legs_phased_13(0, self.FORWARD_LEGS_CM)
+            self.fk.move_2_legs_phased_13(0, self.FORWARD_LEGS_2LEG_CM)
         elif command == 'forward_2':
             # Legs 2 and 4 moved x2
-            self.fk.move_2_legs_phased_24(0, 2 * self.FORWARD_LEGS_CM)
+            self.fk.move_2_legs_phased_24(0, 2 * self.FORWARD_LEGS_2LEG_CM)
         elif command == 'forward_22':
             # Legs 2 and 4 moved x1
-            self.fk.move_2_legs_phased_24(0, self.FORWARD_LEGS_CM)
+            self.fk.move_2_legs_phased_24(0, self.FORWARD_LEGS_2LEG_CM)
         elif command == 'forward_3':
             # Legs 1 and 3 moved x2
-            self.fk.move_2_legs_phased_13(0, 2 * self.FORWARD_LEGS_CM)
+            self.fk.move_2_legs_phased_13(0, 2 * self.FORWARD_LEGS_2LEG_CM)
         elif command == 'forward_32':
             # Legs 1 and 3 moved x1
-            self.fk.move_2_legs_phased_13(0, self.FORWARD_LEGS_CM)
+            self.fk.move_2_legs_phased_13(0, self.FORWARD_LEGS_2LEG_CM)
         elif command == 'forward_one_legged':
-            self.fk.move_body_straight(0, self.FORWARD_LEGS_CM)
+            self.fk.move_body_straight(0, self.FORWARD_LEGS_1LEG_CM)
         elif command == 'body_forward':
             self.fk.body_movement(0, self.FORWARD_BODY_CM, 0)
         elif command == 'backward_two_legged':
