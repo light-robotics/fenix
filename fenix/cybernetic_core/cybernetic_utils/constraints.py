@@ -47,8 +47,8 @@ class ConstraintsChecker:
                 self.logger.info(f'Bad gamma : {gamma}')
                 return False
             
-            if not self.rule_followed(leg_constraints["beta+gamma"], beta+gamma):
-                self.logger.info(f'Bad beta+gamma : {beta+gamma}')
+            if not self.rule_followed(leg_constraints["beta-gamma"], beta-gamma):
+                self.logger.info(f'Bad beta-gamma : {beta-gamma}')
                 return False
 
         self.logger.info(f'Good angles : {alpha}, {beta}, {gamma}, {tetta}')

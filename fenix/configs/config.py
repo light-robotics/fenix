@@ -50,15 +50,15 @@ angles = {
         },
         "gamma": {
             "min": -100 + leg["phi_angle"],
-            "max": 0 + leg["phi_angle"]
+            "max": -12 + leg["phi_angle"]
         },
         "tetta": {
             "min": -27,
             "max": 27
         },
-        "beta+gamma": {
-            "min": -170 + leg["phi_angle"],
-            "max": -20 + leg["phi_angle"]
+        "beta-gamma": {
+            "min": 20 + leg["phi_angle"],
+            "max": 170 + leg["phi_angle"]
         }
     },
     "rear_leg": {
@@ -72,15 +72,15 @@ angles = {
         },
         "gamma": {
             "min": -100 + leg["phi_angle"],
-            "max": 0 + leg["phi_angle"]
+            "max": -12 + leg["phi_angle"]
         },
         "tetta": {
             "min": -20,
             "max": 20
         },
-        "beta+gamma": {
-            "min": -170 + leg["phi_angle"],
-            "max": -20 + leg["phi_angle"]
+        "beta-gamma": {
+            "min": 20 + leg["phi_angle"],
+            "max": 170 + leg["phi_angle"]
         }
     }
 }

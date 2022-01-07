@@ -5,7 +5,7 @@ from typing import Optional, Union
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from cybernetic_core.kinematics import FenixKinematics
+from cybernetic_core.kinematics_constrainted import FenixKinematics
 from cybernetic_core.sequence_getter import SequenceGetter
 from fenix_hardware.fenix_servos import FenixServos
 import configs.code_config as code_config
