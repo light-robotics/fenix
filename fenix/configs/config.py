@@ -13,7 +13,7 @@ leg = {
 }
 
 start = {
-    "vertical"      : 14,
+    "vertical"      : 13,
     "horizontal_x"  : 17,
     "horizontal_y"  : 17,
     "y_offset_body" : 3
@@ -25,7 +25,7 @@ angles = {
         "min" : -45,
         "max" : 45,
         "step": 1,
-        "ideal": 70
+        "ideal": 90
     },
     "alpha": {
         "min": -30,
@@ -87,13 +87,17 @@ angles = {
 
 fenix = {
     "margin": {
-        1: 3,
+        1: 4,
         2: 6
     },
     "leg_up": {
-        1: 5,
+        1: 6,
         2: 2
-    }    
+    },
+    "servos": {
+        "diff_from_target_limit": 5.0,
+        "diff_from_prev_limit": 0.5
+    }
 }
 
 mode = 90
@@ -102,6 +106,6 @@ moves = {
     "up_or_down_cm"         : 1,
     "move_body_cm"          : 2,
     "forward_body_1_leg_cm" : 7,
-    "forward_body_2_leg_cm" : 4,    
+    "forward_body_2_leg_cm" : 6,    
     "reposition_cm"         : 1,
 }

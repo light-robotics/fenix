@@ -92,9 +92,11 @@ class SequenceGetter:
         elif command == 'reposition_y_down':
             self.fk.reposition_legs(0, -self.REPOSITION_CM)
         elif command == 'start':
-            pass
+            self.fk.body_movement(0, 0, 2)
         elif command == 'end':
-            pass        
+            pass
+        elif command == 'hit':
+            self.fk.hit(1)
 
         return self.fk.sequence
 

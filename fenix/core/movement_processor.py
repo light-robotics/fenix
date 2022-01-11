@@ -119,6 +119,7 @@ class MovementProcessor:
             self.logger.info(f'MOVE. Trying command {command}')
             sequence = self.sg.get_sequence_for_command(command)
         except Exception as e:
+            print(f'MOVE Failed. Could not process command - {str(e)}')
             self.logger.info(f'MOVE Failed. Could not process command - {str(e)}')
             self.fk = copy.deepcopy(fk_cp)
             time.sleep(2.0)

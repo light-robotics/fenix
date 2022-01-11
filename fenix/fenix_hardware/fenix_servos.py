@@ -2,8 +2,9 @@ import time
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from hardware.lx16a import LX16A
+from hardware.lx16a import LX16A, read_values
 import logging
+import configs.config as config
 import configs.code_config as code_config
 import logging.config
 logging.config.dictConfig(code_config.logger_config)
@@ -20,8 +21,8 @@ class FenixServos:
         self.m4 = LX16A(Port='/dev/ttyAMA1') # 1-4   # 13-16
         self.speed = 1000
         self.max_speed = 100 # 130 # 0 is instant, 10000 is very slow
-        self.diff_from_target_limit = 2.5 # 2.0 # 5.0 # when it's time to start next movement
-        self.diff_from_prev_limit = 0.5 # 1.0 # start next movement if we're stuck
+        self.diff_from_target_limit = config.fenix["servos"]["diff_from_target_limit"] # when it's time to start next movement
+        self.diff_from_prev_limit = config.fenix["servos"]["diff_from_prev_limit"] # 1.0 # start next movement if we're stuck
 
         self.logger = logging.getLogger('main_logger')
         
@@ -103,6 +104,14 @@ class FenixServos:
                 time.sleep(0.0002)
                 j += 1
     
+    def log_servo_data(self):
+        j = 1
+        for m in [self.m1, self.m2, self.m3, self.m4]:
+            for _ in range(4):
+                self.logger.info(read_values(m, j))
+                time.sleep(0.0002)
+                j += 1
+    
     # sends 4 angles to one board
     def send_angles_to_board(self, board, angles, rate):
         start_numbers = {self.m1 : 1, self.m2 : 5, self.m3 : 9, self.m4 : 13}
@@ -157,6 +166,7 @@ class FenixServos:
                     self.logger.info(diff_from_target[0])
                 else:
                     adjusted_angles = [round(target + (-diff), 1) for target, diff in zip(angles, diff_from_target[0])]
+                    self.log_servo_data()
                     self.logger.info(f'Adjusting to : {adjusted_angles}')
                     adjustment_done = True
                     self.send_command_to_servos(adjusted_angles, 0)

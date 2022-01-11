@@ -521,10 +521,17 @@ def read_values(m0, servo):
         temp = m0.read_temperature(servo)
         volt = m0.read_voltage(servo)
         target = m0.read_servo_target(servo)
-        print('{5:2d}. Pos: {0:5d}. Target: {1:5d}, {2:5d}. Temp: {3:5d}. Volt: {4:5d}'
-              .format(pos, target[0], target[1], temp, volt, servo))
+        overheating = 'OK'
+        if temp > 60:
+            overheating = 'Critical'
+        elif temp > 55:
+            overheating = 'Danger'
+        elif temp > 50:
+            overheating = 'Warning'
+        return '{5:2d}. Pos: {0:5d}. Target: {1:5d}, {2:3d}. Temp: {3:5d}. Volt: {4:5d}. Overheating: {6}'.format(
+            pos, target[0], target[1], temp, volt, servo, overheating)
     except:
-        print('Could not read values from servo {0}'.format(servo))
+        return 'Could not read values from servo {0}'.format(servo)
 
 
 if __name__ == '__main__':      
@@ -537,6 +544,6 @@ if __name__ == '__main__':
         j = 1
         for m in [m1, m2, m3, m4]:
             for _ in range(4):
-                read_values(m, j)
+                print(read_values(m, j))
                 j += 1
    
