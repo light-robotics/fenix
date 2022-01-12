@@ -372,8 +372,7 @@ class FenixKinematics:
         for leg in [self.legs[2], self.legs[4]]:
             leg.move_end_point(0, 0, -self.leg_up)
         self.add_angles_snapshot('endpoints')      
-
-        
+    
     
     """
     Two phased moves end
@@ -903,6 +902,28 @@ class FenixKinematics:
 
         self.current_angle = angle
 
+    # demo part
+    def battle_stance(self) -> None:
+        self.body_movement(0, -10, -2)
+
+    def jump(self) -> None:
+        self.body_movement(0, 14, 8)
+    
+    def demo1(self) -> None:
+        self.body_movement(0, 0, 8)
+        self.turn(-20, only_body=True)
+        self.turn(40, only_body=True)
+        self.turn(-20, only_body=True)
+        #self.look_on_angle(-20)
+        #self.look_on_angle(20)
+        #self.look_on_angle(0)
+        self.body_movement(0, 0, -8)
+
+    def demo2(self) -> None:
+        self.body_movement(0, 15, 0)
+        self.look_on_angle(-20)
+        
+
     # fun moves
     def hit(self, leg_num):
         self.logger.info(f'Processing leg {leg_num} body_compensation_for_a_leg')
@@ -911,10 +932,10 @@ class FenixKinematics:
         self.legs[leg_num].move_end_point(-10, 5, 5)
         self.add_angles_snapshot('endpoint')
         self.logger.info(f'Processing leg {leg_num} move_end_point 2')
-        self.legs[leg_num].move_end_point(0, 5, 5)
+        self.legs[leg_num].move_end_point(0, 11, 5)
         self.add_angles_snapshot('endpoint')
         self.logger.info(f'Processing leg {leg_num} move_end_point 3')
-        self.legs[leg_num].move_end_point(0, -5, -5)
+        self.legs[leg_num].move_end_point(0, -11, -5)
         self.add_angles_snapshot('endpoint')
         self.logger.info(f'Processing leg {leg_num} move_end_point 4')
         self.legs[leg_num].move_end_point(10, -5, 0)

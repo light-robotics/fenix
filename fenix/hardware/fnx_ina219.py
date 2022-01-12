@@ -16,13 +16,11 @@ class FNX_INA219:
         self.ina4.configure()
     
     def read(self):
-        try:
-            return {
-                    1 : round(self.ina1.current(), 2),
-                    2 : round(self.ina2.current(), 2),
-                    3 : round(self.ina3.current(), 2),
-                    4 : round(self.ina4.current(), 2)
-            }
-        except DeviceRangeError as e:
+        result = {}
+        for i, ina in zip([1, 2, 3, 4], [self.ina1, self.ina2, self.ina3, self.ina4]):
+            try:
+                result[i] = round(ina.current(), 2)
+            except DeviceRangeError as e:
             # Current out of device range with specified shunt resistor
-            return(e)
+                result[i] = 'over 9000'
+        return result        

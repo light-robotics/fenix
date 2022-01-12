@@ -20,7 +20,7 @@ class FenixServos:
         self.m3 = LX16A(Port='/dev/ttyAMA3') # 13-16 # 9-12
         self.m4 = LX16A(Port='/dev/ttyAMA1') # 1-4   # 13-16
         self.speed = 1000
-        self.max_speed = 100 # 130 # 0 is instant, 10000 is very slow
+        self.max_speed = 0 # 130 # 0 is instant, 10000 is very slow
         self.diff_from_target_limit = config.fenix["servos"]["diff_from_target_limit"] # when it's time to start next movement
         self.diff_from_prev_limit = config.fenix["servos"]["diff_from_prev_limit"] # 1.0 # start next movement if we're stuck
 
@@ -127,57 +127,55 @@ class FenixServos:
         
         self.send_command_to_servos(angles, rate)
         self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
+        #time.sleep(0.8 * rate / 1000)
         time.sleep(0.05)
         adjustment_done = False
 
         prev_angles = self.get_current_angles()
-        for _ in range(50):
-            time.sleep(0.03)
+        for s in range(50):
+            self.logger.info(f'Step {s}')
+            time.sleep(0.02)
             
             current_angles = self.get_current_angles()
             self.logger.info(f'current angles: {current_angles}')
             # if diff from prev angles or target angles is small - continue
             diff_from_target = self.get_angles_diff(angles, current_angles)
             diff_from_prev = self.get_angles_diff(current_angles, prev_angles)
-            #print(f'Diff from target : {diff_from_target}')
-            #print(f'Diff from prev   : {diff_from_prev}')
-            #print(f'Time : {datetime.datetime.now()}')
+
+            self.logger.info(f'Diff from prev  : {diff_from_prev[0]}')
+            self.logger.info(f'Diff from target: {diff_from_target[0]}')
      
-            if diff_from_target[1] < self.diff_from_target_limit:
-                if diff_from_target[1] > self.diff_from_target_limit + 2:
-                    print('-----------ALARM-----------')
-                    print(f'Diff from target : {diff_from_target}')
-                    print(f'Diff from prev   : {diff_from_prev}')
-                    self.logger.info('-----------ALARM-----------')
-                    self.logger.info(f'Diff from target : {diff_from_target}')
-                    self.logger.info(f'Diff from prev   : {diff_from_prev}')
-                #print('Ready to move further')
+            if diff_from_target[1] < self.diff_from_target_limit:                
                 self.logger.info(f'Ready to move further')
                 break
             
-            if diff_from_target[1] > self.diff_from_target_limit and \
-                diff_from_prev[1] < self.diff_from_prev_limit and \
+            elif diff_from_prev[1] < self.diff_from_prev_limit and \
                     not adjustment_done:
-                self.logger.info(f'Diff from prev  : {diff_from_prev[0]}')
-                self.logger.info(f'Diff from target: {diff_from_target[0]}')
+
+                if diff_from_target[1] > 2 * self.diff_from_target_limit:
+                    print('-----------ALARM-----------')
+                    self.logger.info('-----------ALARM-----------')
+                
                 self.logger.info(f'Command sent : {angles}')
                 if diff_from_target[1] > self.diff_from_target_limit * 3:
                     self.logger.info(f'We"re in trouble, too large diff : {diff_from_target[1]}')
-                    self.logger.info(diff_from_target[0])
+                    break
                 else:
-                    adjusted_angles = [round(target + (-diff), 1) for target, diff in zip(angles, diff_from_target[0])]
-                    self.log_servo_data()
+                    adjusted_angles = [round(target + (-1.5 * diff if abs(diff) > self.diff_from_target_limit else 0), 1) for target, diff in zip(angles, diff_from_target[0])]
+                    
                     self.logger.info(f'Adjusting to : {adjusted_angles}')
                     adjustment_done = True
                     self.send_command_to_servos(adjusted_angles, 0)
-                    time.sleep(0.05)
+                    time.sleep(0.03)
+                    break
+
+            elif diff_from_prev[1] < self.diff_from_prev_limit and \
+                    adjustment_done:
+                self.logger.info(f'Unreachable. Moving further')
+                break
 
             prev_angles = current_angles[:]
-        
-        #print(f'Angles after : {self.get_current_angles()}')
-        #time.sleep(0.5)
-        #print(f'After sleep : {self.get_current_angles()}\n')
-        
+                
 
     def get_angles_diff(self, target_angles, test_angles=None):
         if test_angles is None:
@@ -186,9 +184,7 @@ class FenixServos:
         angles_diff = []
         for current, target in zip(test_angles, target_angles):
             angles_diff.append(round(current - target, 2))
-        #print('Angles diff : {0}'.format(angles_diff))
         max_angle_diff = max([abs(x) for x in angles_diff])
-        #print('Max angle diff : {0}'.format(max_angle_diff))
         return angles_diff, max_angle_diff
 
 

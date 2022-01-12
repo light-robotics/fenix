@@ -22,8 +22,8 @@ start = {
 
 angles = {
     "to_surface": {
-        "min" : -45,
-        "max" : 45,
+        "min" : -90,
+        "max" : 90,
         "step": 1,
         "ideal": 90
     },
@@ -87,16 +87,16 @@ angles = {
 
 fenix = {
     "margin": {
-        1: 4,
+        1: 5,
         2: 6
     },
     "leg_up": {
-        1: 6,
+        1: 7,
         2: 2
     },
     "servos": {
         "diff_from_target_limit": 5.0,
-        "diff_from_prev_limit": 0.5
+        "diff_from_prev_limit": 1.5
     }
 }
 

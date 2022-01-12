@@ -63,23 +63,23 @@ class SequenceGetter:
         elif command == 'up':
             self.fk.body_movement(0, 0, self.UP_OR_DOWN_CM)
         elif command == 'look_up':
-            self.fk.look_on_angle(20) # this should be iterative
+            self.fk.look_on_angle(-20) # this should be iterative
         elif command == 'down':
             self.fk.body_movement(0, 0, -self.UP_OR_DOWN_CM)
         elif command == 'look_down':
-            self.fk.look_on_angle(-20) # this should be iterative
+            self.fk.look_on_angle(20) # this should be iterative
         elif command == 'turn_left_two_legged':
-            self.fk.turn_move(-30)
+            self.fk.turn_move(-25)
         elif command == 'turn_left_one_legged':
             pass
         elif command == 'look_left':
-            self.fk.turn(-30, only_body=True)
+            self.fk.turn(-12, only_body=True)
         elif command == 'turn_right_two_legged':
-            self.fk.turn_move(30)
+            self.fk.turn_move(25)
         elif command == 'turn_right_one_legged':
             pass
         elif command == 'look_right':
-            self.fk.turn(30, only_body=True)
+            self.fk.turn(12, only_body=True)
         elif command == 'sight_to_normal':
             self.fk.look_on_angle(0)
             # should fix left-right sight also
@@ -95,8 +95,20 @@ class SequenceGetter:
             self.fk.body_movement(0, 0, 2)
         elif command == 'end':
             pass
+        elif command == 'body_forward':
+            self.fk.body_movement(0, 5, 0)
+        elif command == 'body_backward':
+            self.fk.body_movement(0, -5, 0)
         elif command == 'hit':
             self.fk.hit(1)
+        elif command == 'battle_stance':
+            self.fk.battle_stance()
+        elif command == 'jump':
+            self.fk.jump()
+        elif command == 'demo1':
+            self.fk.demo1()
+        elif command == 'demo2':
+            self.fk.demo2()
 
         return self.fk.sequence
 

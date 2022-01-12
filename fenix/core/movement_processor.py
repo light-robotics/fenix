@@ -54,12 +54,12 @@ class MovementProcessor:
             'backward_two_legged',
             'strafe_left_two_legged',
             'strafe_right_two_legged', 
-            'up', 
-            'down',
-            'look_up',
-            'look_down',
-            'look_left',
-            'turn_right'
+            #'up', 
+            #'down',
+            #'look_up',
+            #'look_down',
+            #'look_left',
+            #'turn_right'
             ]        
 
         if self.max_processed_command_id == 0:
