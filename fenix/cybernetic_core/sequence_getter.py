@@ -101,14 +101,42 @@ class SequenceGetter:
             self.fk.body_movement(0, -5, 0)
         elif command == 'hit':
             self.fk.hit(1)
+        elif command == 'check_leg':
+            self.fk.check_leg_2(1)
+        #elif command == 'check_leg_4':
+            self.fk.check_leg_2(4)
+        elif command == 'check_leg_2':
+            self.fk.body_movement(0, 0, self.UP_OR_DOWN_CM)
+            self.fk.demo11()
+            self.fk.demo12()
+            self.fk.demo13()
+            self.fk.check_leg_2(1)
+            self.fk.check_leg_2(4)            
+            self.fk.body_movement(0, -3*self.FORWARD_BODY_CM, 0)
+            self.fk.body_movement(0, 3*self.FORWARD_BODY_CM, 0)
+            self.fk.body_movement(0, 0, -self.UP_OR_DOWN_CM)
         elif command == 'battle_stance':
             self.fk.battle_stance()
+        elif command == 'normal_stance':
+            self.fk.normal_stance()
         elif command == 'jump':
             self.fk.jump()
         elif command == 'demo1':
             self.fk.demo1()
         elif command == 'demo2':
             self.fk.demo2()
+        elif command == 'demo11':
+            self.fk.demo11()
+        elif command == 'demo12':
+            self.fk.demo12()
+        elif command == 'demo13':
+            self.fk.demo13()
+        elif command == 'double_back':
+            self.fk.body_movement(0, -3*self.FORWARD_BODY_CM, 0)
+        elif command == 'demo_sequence':
+            self.fk.demo_sequence()
+        else:
+            print(f'Unknown command')
 
         return self.fk.sequence
 

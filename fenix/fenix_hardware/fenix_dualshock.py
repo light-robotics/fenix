@@ -14,12 +14,17 @@ class FenixModes(Enum):
     STATIONARY = 3
 
 class FenixDualShock(DualShock):
+    """
+    To execute neopixel commands run fenix/run/neopixel_commands_reader.py before running this
+    To execute servo commands run fenix/core/movement_processor.py AFTER running this
+    """
     def __init__(self):
         self.neopixel = NeopixelCommandsSetter()
         self.connect()
         self.light_on = False
         self.started = False
         self.mode = FenixModes.TWO_LEGGED
+        self.step = 0 # demo only
         self.command_writer = CommandsWriter()
         self.command_writer.write_command('none', 1000)
 
@@ -56,7 +61,17 @@ class FenixDualShock(DualShock):
         self.light_on = False
         self.neopixel.issue_command('light_off')
         print('Flashlight off')
+
+    def on_L1_press(self):
+        self.light_on = True
+        self.neopixel.issue_command('activation')
+        print('Activation')
     
+    def on_L2_press(self, value):
+        self.light_on = True
+        self.neopixel.issue_command('rampage')
+        print('Rampage')
+
     @staticmethod
     def convert_value_to_speed(value):
         """
@@ -75,7 +90,7 @@ class FenixDualShock(DualShock):
         if value < 30000:
             return 250
         return 150
-
+    """
     def on_L3_up(self, value):
         if self.mode == FenixModes.TWO_LEGGED:
             self.command_writer.write_command('forward_two_legged', self.convert_value_to_speed(value))
@@ -114,7 +129,7 @@ class FenixDualShock(DualShock):
     
     def on_L3_y_at_rest(self):
         self.command_writer.write_command('none', 1000)
-
+    
     def on_R3_up(self, value):
         if self.mode in [FenixModes.ONE_LEGGED, FenixModes.TWO_LEGGED]:
             self.command_writer.write_command('up', self.convert_value_to_speed(value))
@@ -162,6 +177,7 @@ class FenixDualShock(DualShock):
     def on_down_arrow_press(self):
         self.command_writer.write_command('reposition_y_down', 500)
     
+    
     def on_x_press(self):
         if self.started:
             self.command_writer.write_command('exit', 0)
@@ -180,6 +196,33 @@ class FenixDualShock(DualShock):
     def on_square_press(self):
         self.mode = FenixModes.ONE_LEGGED
         print('Switched mode to ONE_LEGGED')
+    """
+    def on_x_press(self):
+        #self.command_writer.write_command('check_leg_2', 700)
+        
+        if self.step == 0:
+            self.step = 1
+            self.command_writer.write_command('up', 1000)
+        elif self.step == 1:
+            self.step = 2
+            self.command_writer.write_command('demo11', 500)
+        elif self.step == 2:
+            self.step = 3            
+            self.command_writer.write_command('demo12', 1000)
+        elif self.step == 3:
+            self.step = 4            
+            self.command_writer.write_command('demo13', 500)
+        elif self.step == 4:
+            self.step = 5            
+            self.command_writer.write_command('check_leg', 700)
+        elif self.step == 5:
+            self.step = 0
+            self.command_writer.write_command('double_back', 700)
+        elif self.step == 6:
+            self.step = 0
+            self.command_writer.write_command('normal_stance', 1000)
+        
+    
 
 if __name__ == '__main__':
     FenixDualShock().start()

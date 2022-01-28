@@ -15,7 +15,9 @@ class NeopixelCommandsSetter:
             'light'        : f'flashlight,white,{value}',
             'rainbow_blue' : 'rainbow,blue,255',
             'blink_blue'   : 'blink,blue,255',
-            'shutdown'     : 'shutdown,white,0'
+            'shutdown'     : 'shutdown,white,0',
+            'activation'   : 'activation,blue,120',
+            'rampage'      : 'steady,red,255'
         }
         command_out = commands_mapper[command_in]
         

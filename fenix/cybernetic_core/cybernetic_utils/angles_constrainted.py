@@ -110,7 +110,7 @@ def get_best_angles(all_angles):
         #if not check_angles(item):
         #    continue
         cur_distance = get_angles_distance(item)
-
+        #print([math.degrees(x) for x in item], cur_distance, min_distance)
         if cur_distance <= min_distance:
             min_distance = cur_distance
             best_angles = item[:]
@@ -129,6 +129,7 @@ def get_best_angles(all_angles):
 def get_angles_distance(angles):
     # no diff, just distance with perpendicular
     # 100 -> endleg leaning inside
+    #return (math.degrees(angles[0] + angles[1] + angles[2]) + cfg.angles["to_surface"]["ideal"]) ** 2
     return (math.degrees(angles[0] + angles[1] + angles[2]) + cfg.angles["to_surface"]["ideal"]) ** 2
 
 

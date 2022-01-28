@@ -905,19 +905,32 @@ class FenixKinematics:
     # demo part
     def battle_stance(self) -> None:
         self.body_movement(0, -10, -2)
+        self.look_on_angle(-10)
+    
+    def normal_stance(self) -> None:
+        self.look_on_angle(10)
+        self.body_movement(0, 10, 2)        
 
     def jump(self) -> None:
         self.body_movement(0, 14, 8)
     
     def demo1(self) -> None:
-        self.body_movement(0, 0, 8)
+        self.body_movement(0, 3, 8)
         self.turn(-20, only_body=True)
         self.turn(40, only_body=True)
         self.turn(-20, only_body=True)
-        #self.look_on_angle(-20)
-        #self.look_on_angle(20)
-        #self.look_on_angle(0)
-        self.body_movement(0, 0, -8)
+        self.body_movement(0, -3, -8)
+    
+    def demo11(self) -> None:
+        self.body_movement(0, 3, 8)
+        self.turn(-20, only_body=True)
+    
+    def demo12(self) -> None:
+        self.turn(40, only_body=True)
+    
+    def demo13(self) -> None:
+        self.turn(-20, only_body=True)
+        self.body_movement(0, -3, -8)
 
     def demo2(self) -> None:
         self.body_movement(0, 15, 0)
@@ -944,6 +957,67 @@ class FenixKinematics:
         self.legs[leg_num].move_end_point(0, 0, -5)
         self.add_angles_snapshot('endpoint')
         self.body_to_center()
+
+    def check_leg(self, leg_num):
+        turn_angle = 20 if leg_num == 1 else -20
+        move_x = -2 if leg_num == 1 else 2
+        move_y = 10
+        self.logger.info(f'Processing leg {leg_num} body_compensation_for_a_leg')
+        self.body_compensation_for_a_leg(leg_num)
+        self.logger.info(f'Processing turn')
+        self.turn(turn_angle, only_body=True)
+        self.logger.info(f'Processing leg {leg_num} move_end_point 1')
+        self.legs[leg_num].move_end_point(0, 0, 8)
+        self.add_angles_snapshot('endpoint')
+        self.logger.info(f'Processing leg {leg_num} move_end_point 2')
+        self.legs[leg_num].move_end_point(0, move_y, 5)
+        self.add_angles_snapshot('endpoint')
+        self.logger.info(f'Processing leg {leg_num} move_end_point 3')
+        self.legs[leg_num].move_end_point(move_x, -move_y, -5)
+        self.add_angles_snapshot('endpoint')
+        #self.logger.info(f'Processing leg {leg_num} move_end_point 4')
+        #self.legs[leg_num].move_end_point(0, 0, 0)
+        #self.add_angles_snapshot('endpoint')
+        self.logger.info(f'Processing leg {leg_num} move_end_point 5')
+        self.legs[leg_num].move_end_point(0, 0, -8)
+        self.add_angles_snapshot('endpoint')
+        self.logger.info(f'Processing turn')
+        self.turn(-turn_angle, only_body=True)
+        self.body_to_center()
+
+    def check_leg_2(self, leg_num):
+        turn_angle = 15 if leg_num == 1 else -15
+        #move_x = -2 if leg_num == 1 else 2
+        move_x = 0
+        move_y = 8
+        self.logger.info(f'Processing leg {leg_num} body_compensation_for_a_leg')
+        self.body_compensation_for_a_leg(leg_num)
+        self.logger.info(f'Processing turn')
+        self.turn(turn_angle, only_body=True)
+        self.logger.info(f'Processing leg {leg_num} move_end_point 1')
+        self.legs[leg_num].move_end_point(0, 0, 8)
+        self.add_angles_snapshot('endpoint')
+        self.logger.info(f'Processing leg {leg_num} move_end_point 2')
+        self.legs[leg_num].move_end_point(0, move_y, 5)
+        self.add_angles_snapshot('endpoint')
+        self.logger.info(f'Processing leg {leg_num} move_end_point 3')
+        self.legs[leg_num].move_end_point(move_x, -move_y, -5)
+        self.add_angles_snapshot('endpoint')
+        #self.logger.info(f'Processing leg {leg_num} move_end_point 4')
+        #self.legs[leg_num].move_end_point(0, 0, 0)
+        #self.add_angles_snapshot('endpoint')
+        self.logger.info(f'Processing leg {leg_num} move_end_point 5')
+        self.legs[leg_num].move_end_point(0, 0, -8)
+        self.add_angles_snapshot('endpoint')
+        self.logger.info(f'Processing turn')
+        self.turn(-turn_angle, only_body=True)
+        self.body_to_center()
+
+    def demo_sequence(self):
+        self.demo1()
+        self.check_leg(4)
+        self.check_leg(1)
+        self.battle_stance()
 
     # dance moves
     def opposite_legs_up(self, leg_up, leg_forward):

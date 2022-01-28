@@ -10,6 +10,6 @@ from hardware.neopixel import Neopixel
 if __name__ == '__main__':
     time.sleep(10.0)
     neopixel = Neopixel()
-    neopixel.activate_mode('flashlight', 'green', 100)
+    neopixel.activate_mode('steady', 'green', 100)
     time.sleep(10.0)
     neopixel.shutdown()

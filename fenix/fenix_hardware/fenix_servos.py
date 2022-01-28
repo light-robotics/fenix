@@ -134,7 +134,7 @@ class FenixServos:
         prev_angles = self.get_current_angles()
         for s in range(50):
             self.logger.info(f'Step {s}')
-            time.sleep(0.02)
+            #time.sleep(0.02)
             
             current_angles = self.get_current_angles()
             self.logger.info(f'current angles: {current_angles}')
@@ -161,12 +161,13 @@ class FenixServos:
                     self.logger.info(f'We"re in trouble, too large diff : {diff_from_target[1]}')
                     break
                 else:
-                    adjusted_angles = [round(target + (-1.5 * diff if abs(diff) > self.diff_from_target_limit else 0), 1) for target, diff in zip(angles, diff_from_target[0])]
+                    #adjusted_angles = [round(target + (-1.5 * diff if abs(diff) > self.diff_from_target_limit else 0), 1) for target, diff in zip(angles, diff_from_target[0])]
+                    adjusted_angles = [round(target + (-1.5 * diff), 1) for target, diff in zip(angles, diff_from_target[0])]
                     
                     self.logger.info(f'Adjusting to : {adjusted_angles}')
                     adjustment_done = True
                     self.send_command_to_servos(adjusted_angles, 0)
-                    time.sleep(0.03)
+                    #time.sleep(0.03)
                     break
 
             elif diff_from_prev[1] < self.diff_from_prev_limit and \
