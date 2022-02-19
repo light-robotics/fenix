@@ -19,7 +19,8 @@ class FenixServos:
         self.m2 = LX16A(Port='/dev/ttyAMA2') # 9-12  # 5-8
         self.m3 = LX16A(Port='/dev/ttyAMA3') # 13-16 # 9-12
         self.m4 = LX16A(Port='/dev/ttyAMA1') # 1-4   # 13-16
-        self.speed = 1000
+        self.speed = 500
+        self.min_speed = 700
         self.max_speed = 0 # 130 # 0 is instant, 10000 is very slow
         self.diff_from_target_limit = config.fenix["servos"]["diff_from_target_limit"] # when it's time to start next movement
         self.diff_from_prev_limit = config.fenix["servos"]["diff_from_prev_limit"] # 1.0 # start next movement if we're stuck
@@ -99,7 +100,8 @@ class FenixServos:
     def send_command_to_servos(self, angles, rate):
         j = 1
         for m in [self.m1, self.m2, self.m3, self.m4]:
-            for _ in range(4):
+        #for m in [self.m1]: # WTF 4 -> 1
+            for _ in range(4): 
                 m.move_servo_to_angle(j, angles[j-1], rate)
                 time.sleep(0.0002)
                 j += 1
@@ -124,14 +126,14 @@ class FenixServos:
         _, max_angle_diff = self.get_angles_diff(angles)
         rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
         self.logger.info(f'max_angle_diff: {max_angle_diff}, self.speed : {self.speed}, self.speed * max_angle_diff / 45 : {self.speed * max_angle_diff / 45}')
-        
+        prev_angles = self.get_current_angles()
+
         self.send_command_to_servos(angles, rate)
         self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
         #time.sleep(0.8 * rate / 1000)
         time.sleep(0.05)
         adjustment_done = False
-
-        prev_angles = self.get_current_angles()
+        
         for s in range(50):
             self.logger.info(f'Step {s}')
             #time.sleep(0.02)
@@ -176,7 +178,69 @@ class FenixServos:
                 break
 
             prev_angles = current_angles[:]
-                
+    
+    def set_servo_values_paced_wo_adjustment(self, angles):
+        _, max_angle_diff = self.get_angles_diff(angles)
+        rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
+        self.logger.info(f'max_angle_diff: {max_angle_diff}, self.speed : {self.speed}, self.speed * max_angle_diff / 45 : {self.speed * max_angle_diff / 45}')
+        
+        self.send_command_to_servos(angles, rate)
+        self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
+        #time.sleep(0.8 * rate / 1000)
+        time.sleep(0.05)
+
+        prev_angles = self.get_current_angles()
+        for s in range(50):
+            self.logger.info(f'Step {s}')
+            #time.sleep(0.02)
+            
+            current_angles = self.get_current_angles()
+            self.logger.info(f'current angles: {current_angles}')
+            # if diff from prev angles or target angles is small - continue
+            diff_from_target = self.get_angles_diff(angles, current_angles)
+            diff_from_prev = self.get_angles_diff(current_angles, prev_angles)
+
+            self.logger.info(f'Diff from prev  : {diff_from_prev[0]}')
+            self.logger.info(f'Diff from target: {diff_from_target[0]}')
+     
+            if diff_from_target[1] < self.diff_from_target_limit:                
+                self.logger.info(f'Ready to move further')
+                break
+            
+            elif diff_from_prev[1] < self.diff_from_prev_limit:
+                self.logger.info(f'Unreachable. Moving further')
+                break
+
+            prev_angles = current_angles[:]
+
+    def set_servo_values_paced_wo_feedback_w_adjustment(self, angles):
+        _, max_angle_diff = self.get_angles_diff(angles)
+        rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
+        self.logger.info(f'max_angle_diff: {max_angle_diff}, self.speed : {self.speed}, self.speed * max_angle_diff / 45 : {self.speed * max_angle_diff / 45}')
+        
+        current_angles = self.get_current_angles()
+        self.logger.info(f'current angles: {current_angles}')
+
+        diff_from_target = self.get_angles_diff(angles, current_angles)
+
+        adjusted_angles = [round(target + (0.1 * diff), 1) for target, diff in zip(angles, diff_from_target[0])]
+
+        self.send_command_to_servos(adjusted_angles, rate)
+        self.logger.info(f'Command sent. Rate: {rate}, angles: {adjusted_angles}')
+        time.sleep(rate / 1000)
+    
+    def set_servo_values_paced_wo_feedback(self, angles):
+        _, max_angle_diff = self.get_angles_diff(angles)
+        rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
+        self.logger.info(f'max_angle_diff: {max_angle_diff}, self.speed : {self.speed}, self.speed * max_angle_diff / 45 : {self.speed * max_angle_diff / 45}')
+        
+        self.send_command_to_servos(angles, rate)
+        self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
+        time.sleep(rate / 1000)
+            
+    def set_servo_values_not_paced(self, angles):
+        self.send_command_to_servos(angles, self.speed)
+        time.sleep(self.speed / 1000)
 
     def get_angles_diff(self, target_angles, test_angles=None):
         if test_angles is None:

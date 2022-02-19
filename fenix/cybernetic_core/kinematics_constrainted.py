@@ -123,7 +123,9 @@ class FenixKinematics:
 
         self.legs_deltas = {1 : [0, 0, 0], 2 : [0, 0, 0], 3 : [0, 0, 0], 4 : [0, 0, 0]}
 
-        self.current_angle = 0
+        self.current_vertical_angle = 0
+        self.current_horizontal_angle = 0
+        self.current_body_delta = [0, 0, 0]
         self.margin = cfg.fenix["margin"][1]
         self.leg_up = cfg.fenix["leg_up"][2]
         self.leg_up_single = cfg.fenix["leg_up"][1]
@@ -242,6 +244,8 @@ class FenixKinematics:
 
     def body_movement(self, delta_x, delta_y, delta_z, snapshot=True):
         print(f'Body movement [{delta_x}, {delta_y}, {delta_z}]')
+        self.current_body_delta = [x + y for x, y in zip(self.current_body_delta, [delta_x, delta_y, delta_z])]
+        print(f'self.current_body_delta : {self.current_body_delta}')
         if delta_x == delta_y == delta_z == 0:
             return
 
@@ -252,8 +256,29 @@ class FenixKinematics:
             self.add_angles_snapshot('body')
 
         self.current_legs_offset_v -= delta_z
+    
+    def start(self):
+        self.body_movement(0, 0, -cfg.start["vertical"] + cfg.start["initial_z_position_delta"])
+        self.body_movement(0, 0, cfg.start["vertical"] - cfg.start["initial_z_position_delta"])
+    
+    def reset(self):
+        self.body_to_center()
+        delta_z = self.current_body_delta[2]
+        self.body_movement(0, 0, -delta_z)
 
-    def body_to_center(self, delta_y=0, delta_x=0):
+    def end(self):
+        self.reset()
+        self.body_movement(0, 0, -cfg.start["vertical"] + 
+                                  cfg.start["initial_z_position_delta"])
+        """
+        self.body_to_center()
+        delta_z = self.current_body_delta[2]
+        self.body_movement(0, 0, -cfg.start["vertical"] + 
+                                  cfg.start["initial_z_position_delta"] - 
+                                  delta_z)
+        """
+
+    def body_to_center(self, delta_y=cfg.start["y_offset_body"], delta_x=0):
         # move body to center
         avg_o_x, avg_o_y, avg_d_x, avg_d_y = 0, 0, 0, 0
         for leg in self.legs.values():
@@ -880,12 +905,12 @@ class FenixKinematics:
         self.add_angles_snapshot()
     """
     def look_on_angle(self, angle):
-        current_angle = self.current_angle
+        current_vertical_angle = self.current_vertical_angle
 
         x_current = cfg.leg["mount_point_offset"] * \
-                    math.cos(math.radians(current_angle))
+                    math.cos(math.radians(current_vertical_angle))
         z_current = cfg.leg["mount_point_offset"] * \
-                    math.sin(math.radians(current_angle))
+                    math.sin(math.radians(current_vertical_angle))
 
         x_target = cfg.leg["mount_point_offset"] * math.cos(math.radians(angle))
         z_target = cfg.leg["mount_point_offset"] * math.sin(math.radians(angle))
@@ -900,7 +925,7 @@ class FenixKinematics:
 
         self.add_angles_snapshot('body')
 
-        self.current_angle = angle
+        self.current_vertical_angle = angle
 
     # demo part
     def battle_stance(self) -> None:
@@ -936,28 +961,6 @@ class FenixKinematics:
         self.body_movement(0, 15, 0)
         self.look_on_angle(-20)
         
-
-    # fun moves
-    def hit(self, leg_num):
-        self.logger.info(f'Processing leg {leg_num} body_compensation_for_a_leg')
-        self.body_compensation_for_a_leg(leg_num)
-        self.logger.info(f'Processing leg {leg_num} move_end_point 1')
-        self.legs[leg_num].move_end_point(-10, 5, 5)
-        self.add_angles_snapshot('endpoint')
-        self.logger.info(f'Processing leg {leg_num} move_end_point 2')
-        self.legs[leg_num].move_end_point(0, 11, 5)
-        self.add_angles_snapshot('endpoint')
-        self.logger.info(f'Processing leg {leg_num} move_end_point 3')
-        self.legs[leg_num].move_end_point(0, -11, -5)
-        self.add_angles_snapshot('endpoint')
-        self.logger.info(f'Processing leg {leg_num} move_end_point 4')
-        self.legs[leg_num].move_end_point(10, -5, 0)
-        self.add_angles_snapshot('endpoint')
-        self.logger.info(f'Processing leg {leg_num} move_end_point 5')
-        self.legs[leg_num].move_end_point(0, 0, -5)
-        self.add_angles_snapshot('endpoint')
-        self.body_to_center()
-
     def check_leg(self, leg_num):
         turn_angle = 20 if leg_num == 1 else -20
         move_x = -2 if leg_num == 1 else 2
@@ -975,9 +978,6 @@ class FenixKinematics:
         self.logger.info(f'Processing leg {leg_num} move_end_point 3')
         self.legs[leg_num].move_end_point(move_x, -move_y, -5)
         self.add_angles_snapshot('endpoint')
-        #self.logger.info(f'Processing leg {leg_num} move_end_point 4')
-        #self.legs[leg_num].move_end_point(0, 0, 0)
-        #self.add_angles_snapshot('endpoint')
         self.logger.info(f'Processing leg {leg_num} move_end_point 5')
         self.legs[leg_num].move_end_point(0, 0, -8)
         self.add_angles_snapshot('endpoint')
@@ -1003,14 +1003,31 @@ class FenixKinematics:
         self.logger.info(f'Processing leg {leg_num} move_end_point 3')
         self.legs[leg_num].move_end_point(move_x, -move_y, -5)
         self.add_angles_snapshot('endpoint')
-        #self.logger.info(f'Processing leg {leg_num} move_end_point 4')
-        #self.legs[leg_num].move_end_point(0, 0, 0)
-        #self.add_angles_snapshot('endpoint')
         self.logger.info(f'Processing leg {leg_num} move_end_point 5')
         self.legs[leg_num].move_end_point(0, 0, -8)
         self.add_angles_snapshot('endpoint')
         self.logger.info(f'Processing turn')
         self.turn(-turn_angle, only_body=True)
+        self.body_to_center()
+
+    def hit(self, leg_num):
+        assert leg_num in [1, 4]
+        move_x = 0
+        move_y = 11
+        self.logger.info(f'Processing leg {leg_num} body_compensation_for_a_leg')
+        self.body_compensation_for_a_leg(leg_num)
+        self.logger.info(f'Processing leg {leg_num} move_end_point 1')
+        self.legs[leg_num].move_end_point(0, 0, 8)
+        self.add_angles_snapshot('endpoint')
+        self.logger.info(f'Processing leg {leg_num} move_end_point 2')
+        self.legs[leg_num].move_end_point(0, move_y, 5)
+        self.add_angles_snapshot('endpoint')
+        self.logger.info(f'Processing leg {leg_num} move_end_point 3')
+        self.legs[leg_num].move_end_point(move_x, -move_y, -5)
+        self.add_angles_snapshot('endpoint')
+        self.logger.info(f'Processing leg {leg_num} move_end_point 4')
+        self.legs[leg_num].move_end_point(0, 0, -8)
+        self.add_angles_snapshot('endpoint')
         self.body_to_center()
 
     def demo_sequence(self):

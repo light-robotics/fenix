@@ -13,11 +13,11 @@ leg = {
 }
 
 start = {
-    "vertical"      : 11,
-    "horizontal_x"  : 18,
-    "horizontal_y"  : 18,
-    "y_offset_body" : 3
-
+    "vertical"                 : 11,
+    "horizontal_x"             : 16, # 18
+    "horizontal_y"             : 16, # 18
+    "y_offset_body"            : 3,
+    "initial_z_position_delta" : 5, # 3
 }
 
 angles = {
@@ -42,7 +42,7 @@ angles = {
     "front_leg": {
         "alpha": {
             "min": -30,
-            "max": 80
+            "max": 78
         },
         "beta": {
             "min": -115,
@@ -92,7 +92,7 @@ fenix = {
     },
     "leg_up": {
         1: 7,
-        2: 2
+        2: 5
     },
     "servos": {
         "diff_from_target_limit": 3.5,

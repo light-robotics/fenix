@@ -133,7 +133,7 @@ class LX16A:
     # because sometimes command does not work and target stays unchanged
     def move_servo_to_angle(self, id: int, angle: float, rate: int = 0) -> None:
         position = neutral[id] + int(angle/0.24)
-        num_attempts = 10
+        num_attempts = 3
         for i in range(num_attempts):
             try:
                 packet = struct.pack(
@@ -387,7 +387,13 @@ class LX16A:
         raise Exception('Can not read values from servo {0}'.format(id))
 
     def read_angle(self, id):
-        return round((self.read_position(id) - neutral[id]) * 0.24 , 2)
+        num_attempts = 5
+        for i in range(num_attempts):
+            angle = round((self.read_position(id) - neutral[id]) * 0.24 , 2)
+            if -150 <= angle <= 150:
+                return angle
+            self.logger.info(f'Attempt to read angle from servo {id} failed. Value : {angle}')
+        raise Exception(f'Could not get correct angle from servo {id} in {num_attempts} attempts.')
 
     # Motor movement with speed : motor_mode = 1 motor_speed = rate
     # Otherwise set servo mode  : motor_mode = 0 

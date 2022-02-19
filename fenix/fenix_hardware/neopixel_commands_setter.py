@@ -8,7 +8,7 @@ class NeopixelCommandsSetter:
         with open(self.neopixel_command_file, 'w') as f:
             f.write(command)
     
-    def issue_command(self, command_in: str, value: int = 0):
+    def issue_command(self, command_in: str, color: str = '', value: int = 0):
         commands_mapper = {
             'light_on'     : 'flashlight,white,255',
             'light_off'    : 'steady,white,0',
@@ -17,7 +17,8 @@ class NeopixelCommandsSetter:
             'blink_blue'   : 'blink,blue,255',
             'shutdown'     : 'shutdown,white,0',
             'activation'   : 'activation,blue,120',
-            'rampage'      : 'steady,red,255'
+            'rampage'      : 'steady,red,255',
+            'steady'       : f'steady,{color},255'
         }
         command_out = commands_mapper[command_in]
         

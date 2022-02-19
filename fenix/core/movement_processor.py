@@ -54,12 +54,12 @@ class MovementProcessor:
             'backward_two_legged',
             'strafe_left_two_legged',
             'strafe_right_two_legged', 
-            #'up', 
-            #'down',
-            #'look_up',
-            #'look_down',
-            #'look_left',
-            #'turn_right'
+            'up', 
+            'down',
+            'look_up',
+            'look_down',
+            'look_left',
+            'turn_right'
             ]        
 
         if self.max_processed_command_id == 0:
@@ -132,7 +132,7 @@ class MovementProcessor:
             #    self.fs.set_speed(self.body_speed)
             self.logger.info(f'Moving to {angles}')
             #time.sleep(3)
-            self.fs.set_servo_values_paced(angles) # here issuing command to servos
+            self.fs.set_servo_values_not_paced(angles) # here issuing command to servos
         self.logger.info(f'Step took : {datetime.datetime.now() - start_time}')
 
     def move(self):
