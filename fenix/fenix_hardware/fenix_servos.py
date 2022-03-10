@@ -10,9 +10,6 @@ import logging.config
 logging.config.dictConfig(code_config.logger_config)
 
 
-#logging.basicConfig(filename='/fenix/movement/log.log', filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
-
-
 class FenixServos:
     def __init__(self):
         self.m1 = LX16A(Port='/dev/ttyAMA0') # 5-8   # 1-4

@@ -5,12 +5,14 @@ from typing import Optional, Union
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from cybernetic_core.kinematics_constrainted import FenixKinematics
-from cybernetic_core.sequence_getter import SequenceGetter
-from fenix_hardware.fenix_servos import FenixServos
+from cybernetic_core.kinematics import FenixKinematics
+from cybernetic_core.sequence_getter import get_sequence_for_command_cached
 import configs.code_config as code_config
 import configs.config as config
 import logging.config
+
+if not code_config.DEBUG:
+    from fenix_hardware.fenix_servos import FenixServos
 
 
 class MovementProcessor:
@@ -21,14 +23,12 @@ class MovementProcessor:
 
         self.max_processed_command_id = 0
         self.state = '0'
-        #self.fk = FenixKinematics(legs_offset_v=16, legs_offset_h_x=18, legs_offset_h_y=18)
-        self.fk = FenixKinematics(
-            legs_offset_v=config.start["vertical"], 
-            legs_offset_h_x=config.start["horizontal_x"],
-            legs_offset_h_y=config.start["horizontal_y"]
-        )
-        self.fs = FenixServos()
-        self.sg = SequenceGetter(self.fk)
+        
+        self.fk = FenixKinematics()
+
+        if not code_config.DEBUG:
+            self.fs = FenixServos()
+        
         self.speed = 500
         self.body_speed = 1000        
 
@@ -37,9 +37,8 @@ class MovementProcessor:
         # state f1 means legs 1 and 3 had been moved forward
         # state f2 means legs 2 and 4 had been moved forward
 
-    def read_command(self) -> Optional[Union[str, int]]:
-        command_file = '//fnx//fenix//wrk//movement_command.txt'
-        with open(command_file, 'r') as f:
+    def read_command(self) -> Optional[Union[str, int]]:        
+        with open(code_config.movement_command_file, 'r') as f:
             contents = f.readline().split(',')
 
         if len(contents) != 3:
@@ -75,7 +74,8 @@ class MovementProcessor:
 
     def execute_command(self, command: str, speed: int) -> None:
         if self.speed != speed:
-            self.fs.set_speed(speed)
+            if not code_config.DEBUG:
+                self.fs.set_speed(speed)
             self.speed = speed
             print(f'Setting speed to {speed}')
 
@@ -117,7 +117,9 @@ class MovementProcessor:
         try:
             fk_cp = copy.deepcopy(self.fk)
             self.logger.info(f'MOVE. Trying command {command}')
-            sequence = self.sg.get_sequence_for_command(command)
+            before_sequence_time = datetime.datetime.now()
+            sequence = get_sequence_for_command_cached(command, fk_cp.current_position)
+            self.logger.info(f'[TIMING] Sequence calculation took : {datetime.datetime.now() - before_sequence_time}')
         except Exception as e:
             print(f'MOVE Failed. Could not process command - {str(e)}')
             self.logger.info(f'MOVE Failed. Could not process command - {str(e)}')
@@ -131,9 +133,11 @@ class MovementProcessor:
             #if move_snapshot.move_type == 'body' and self.speed != self.body_speed:
             #    self.fs.set_speed(self.body_speed)
             self.logger.info(f'Moving to {angles}')
-            #time.sleep(3)
-            self.fs.set_servo_values_not_paced(angles) # here issuing command to servos
-        self.logger.info(f'Step took : {datetime.datetime.now() - start_time}')
+            if not code_config.DEBUG:                
+                self.fs.set_servo_values_not_paced(angles) # here issuing command to servos
+            else:
+                time.sleep(1.0)
+        self.logger.info(f'[TIMING] Step took : {datetime.datetime.now() - start_time}')
 
     def move(self):
         try:

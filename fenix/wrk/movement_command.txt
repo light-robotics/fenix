@@ -1,1 +1,1 @@
-9,forward_one_legged,130
+10,forward_two_legged,130

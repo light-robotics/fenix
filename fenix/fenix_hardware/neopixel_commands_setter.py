@@ -1,5 +1,8 @@
+from configs import code_config
+
+
 class NeopixelCommandsSetter:
-    neopixel_command_file = '//fnx//fenix//wrk//neopixel_command.txt'
+    neopixel_command_file = code_config.neopixel_command_file
     
     def __init__(self):
         pass

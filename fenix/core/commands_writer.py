@@ -1,3 +1,6 @@
+from configs import code_config
+
+
 class CommandsWriter:
     symbols = {
         'w' : 'forward',
@@ -17,7 +20,7 @@ class CommandsWriter:
     }
 
     def __init__(self):
-        self.command_file = '//fnx//fenix//wrk//movement_command.txt'
+        self.command_file = code_config.movement_command_file
         self.command_id = 1
 
     def write_command(self, command: str, speed: int) -> None:

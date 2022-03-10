@@ -1,6 +1,16 @@
 import copy
 from typing import List, Dict
+from dataclasses import dataclass
 
+
+@dataclass
+class MoveSnapshot:
+    move_type: str
+    angles_snapshot: List[float]
+
+class Sequence:
+    def __init__(self, moves: List[MoveSnapshot]):
+        self.moves = moves[:]
 
 class Move:
     def __init__(self, 

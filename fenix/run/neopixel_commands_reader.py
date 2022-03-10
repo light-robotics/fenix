@@ -4,10 +4,12 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from hardware.neopixel import Neopixel
+from configs import code_config
+
 
 class NeopixelCommandsReader():
 
-    command_file = 'wrk//neopixel_command.txt'
+    command_file = code_config.neopixel_command_file
 
     def __init__(self):
         self.neopixel = Neopixel()
