@@ -99,7 +99,8 @@ class FenixKinematics:
                         self.legs[4].tetta, self.legs[4].alpha, self.legs[4].beta, self.legs[4].gamma,
                     ]
 
-        new_move = MoveSnapshot(move_type, convert_legs_angles(angles_in))
+        #new_move = MoveSnapshot(move_type, convert_legs_angles(angles_in))
+        new_move = MoveSnapshot(move_type, angles_in)
         self.angles_history.append(new_move)
         
         self.D_points_history.append(
@@ -112,11 +113,16 @@ class FenixKinematics:
 
     @property
     def sequence(self):
-        return self.angles_history
+        sequence = []
+        for move in self.angles_history:
+            sequence.append(MoveSnapshot(move.move_type, convert_legs_angles(move.angles_snapshot)))
+        return sequence
+        #return self.angles_history
     
     @property
     def current_position(self):
-        return convert_legs_angles_back(self.sequence[-1].angles_snapshot)
+        #return convert_legs_angles_back(self.sequence[-1].angles_snapshot)
+        return self.angles_history[-1].angles_snapshot
 
     def initiate_legs(self):
         O1 = Point(cfg.leg["mount_point_offset"],
@@ -209,9 +215,9 @@ class FenixKinematics:
         self.add_angles_snapshot('endpoint')
 
     def body_movement(self, delta_x, delta_y, delta_z, snapshot=True):
-        print(f'Body movement [{delta_x}, {delta_y}, {delta_z}]')
+        #print(f'Body movement [{delta_x}, {delta_y}, {delta_z}]')
         self.current_body_delta = [x + y for x, y in zip(self.current_body_delta, [delta_x, delta_y, delta_z])]
-        print(f'self.current_body_delta : {self.current_body_delta}')
+        #print(f'self.current_body_delta : {self.current_body_delta}')
         if delta_x == delta_y == delta_z == 0:
             return
 

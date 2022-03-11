@@ -237,7 +237,8 @@ class FenixServos:
             
     def set_servo_values_not_paced(self, angles):
         self.send_command_to_servos(angles, self.speed)
-        time.sleep(self.speed / 1000)
+        wait_time = max(0, self.speed / 1000 - config['fenix']['movement_command_advance_ms'])
+        time.sleep(wait_time)
 
     def get_angles_diff(self, target_angles, test_angles=None):
         if test_angles is None:

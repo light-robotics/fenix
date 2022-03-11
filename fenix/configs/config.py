@@ -14,8 +14,8 @@ leg = {
 
 start = {
     "vertical"                 : 11,
-    "horizontal_x"             : 17, # 18
-    "horizontal_y"             : 17, # 18
+    "horizontal_x"             : 16, # 18
+    "horizontal_y"             : 16, # 18
     "y_offset_body"            : 3,
     "initial_z_position_delta" : 5, # 3
 }
@@ -94,10 +94,14 @@ fenix = {
         1: 7,
         2: 5
     },
+    # parameters for moving further, when moving with feedback
     "servos": {
         "diff_from_target_limit": 3.5,
         "diff_from_prev_limit": 0.5
-    }
+    },
+    # issue next command a little faster, than previous is finished executing
+    # when moving without feedback
+    "movement_command_advance_ms" : 0.05 
 }
 
 mode = 90
