@@ -20,42 +20,6 @@ REPOSITION_CM   = cfg.moves["reposition_cm"]
 def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> Sequence:
     fk = FenixKinematics(fenix_position=fenix_position)
     
-    """
-    commands_mapper = {
-        'forward_1'  : fk.move_2_legs_phased_13(0, FORWARD_LEGS_2LEG_CM),
-        'forward_2'  : fk.move_2_legs_phased_24(0, 2 * FORWARD_LEGS_2LEG_CM),
-        'forward_22' : fk.move_2_legs_phased_24(0, FORWARD_LEGS_2LEG_CM),
-        'forward_3'  : fk.move_2_legs_phased_13(0, 2 * FORWARD_LEGS_2LEG_CM),
-        'forward_32' : fk.move_2_legs_phased_13(0, FORWARD_LEGS_2LEG_CM),
-        'forward_one_legged' : fk.move_body_straight(0, FORWARD_LEGS_1LEG_CM),
-        'body_forward': fk.body_movement(0, FORWARD_BODY_CM, 0),
-        'body_backward': fk.body_movement(0, -FORWARD_BODY_CM, 0),
-        'body_left': fk.body_movement(-FORWARD_BODY_CM, 0, 0),
-        'body_right': fk.body_movement(FORWARD_BODY_CM, 0, 0),
-        'body_to_center': fk.body_to_center(),
-        'up': fk.body_movement(0, 0, UP_OR_DOWN_CM),
-        'down': fk.body_movement(0, 0, -UP_OR_DOWN_CM),
-        'look_up': fk.look_on_angle(-20), # this should be iterative
-        'look_down': fk.look_on_angle(20), # this should be iterative
-        'turn_left_two_legged': fk.turn_move(-25),
-        'turn_right_two_legged': fk.turn_move(25),
-        'look_left': fk.turn(-12, only_body=True),
-        'look_right': fk.turn(12, only_body=True),
-        'sight_to_normal': fk.look_on_angle(0),
-        'reposition_x_up': fk.reposition_legs(REPOSITION_CM, 0),
-        'reposition_x_down': fk.reposition_legs(-REPOSITION_CM, 0),
-        'reposition_y_up': fk.reposition_legs(0, REPOSITION_CM),
-        'reposition_y_down': fk.reposition_legs(0, -REPOSITION_CM),
-        'start': fk.start(),
-        'end': fk.end(),
-        'reset': fk.reset(),
-        'hit_1': fk.hit(1),
-        'hit_4': fk.hit(4),
-    }
-    
-    commands_mapper[command]
-    """
-
     if command == 'forward_1':
         # Legs 1 and 3 moved x1
         fk.move_2_legs_phased_13(0, FORWARD_LEGS_2LEG_CM)
@@ -73,26 +37,41 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.move_2_legs_phased_13(0, FORWARD_LEGS_2LEG_CM)
     elif command == 'forward_one_legged':
         fk.move_body_straight(0, FORWARD_LEGS_1LEG_CM)
+
     elif command == 'body_forward':
-        fk.body_movement(0, FORWARD_BODY_CM, 0)
+        if fk.body_delta_xy()[1] > cfg.limits["body_forward"]:
+            print('Forward body limit reached')
+        else:
+            fk.body_movement(0, FORWARD_BODY_CM, 0)
+    elif command == 'body_backward':
+        if fk.body_delta_xy()[1] < -cfg.limits["body_forward"]:
+            print('Backward body limit reached')
+        else:
+            fk.body_movement(0, -FORWARD_BODY_CM, 0)
+    elif command == 'body_left':
+        if fk.body_delta_xy()[0] < -cfg.limits["body_sideways"]:
+            print('Body left limit reached')
+        else:
+            fk.body_movement(-FORWARD_BODY_CM, 0, 0)
+    elif command == 'body_right':
+        if fk.body_delta_xy()[0] > cfg.limits["body_sideways"]:
+            print('Body right limit reached')
+        else:
+            fk.body_movement(FORWARD_BODY_CM, 0, 0)
     elif command == 'backward_two_legged':
         pass
     elif command == 'backward_one_legged':
         pass
-    elif command == 'body_backward':
-        fk.body_movement(0, -FORWARD_BODY_CM, 0)
+    
     elif command == 'strafe_left_two_legged':
         pass
     elif command == 'strafe_left_one_legged':
         pass
-    elif command == 'body_left':
-        fk.body_movement(-FORWARD_BODY_CM, 0, 0)
+    
     elif command == 'strafe_right_two_legged':
         pass
     elif command == 'strafe_right_one_legged':
-        pass
-    elif command == 'body_right':
-        fk.body_movement(FORWARD_BODY_CM, 0, 0)
+        pass    
     elif command == 'body_to_center':
         fk.body_to_center()
     elif command == 'up':
@@ -177,4 +156,4 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
     else:
         print(f'Unknown command')
     
-    return fk.sequence
+    return fk.sequence, fk.current_position

@@ -20,6 +20,12 @@ start = {
     "initial_z_position_delta" : 5, # 3
 }
 
+limits = {
+    "body_forward"  : 10,
+    "body_backward" : 10,
+    "body_sideways" : 10
+}
+
 angles = {
     "to_surface": {
         "min" : -90,

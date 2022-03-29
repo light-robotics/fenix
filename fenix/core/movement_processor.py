@@ -66,7 +66,7 @@ class MovementProcessor:
         elif self.max_processed_command_id == command_id and \
             command not in repeating_commands:
             # command has already been processed
-            print(f'Command {contents} has already been processed')
+            #print(f'Command {contents} has already been processed')
             return None
 
         self.max_processed_command_id = command_id
@@ -114,16 +114,17 @@ class MovementProcessor:
                     self.run_sequence(command)
                         
     def run_sequence(self, command: str) -> None:
-        try:
-            fk_cp = copy.deepcopy(self.fk)
+        try:            
             self.logger.info(f'MOVE. Trying command {command}')
             before_sequence_time = datetime.datetime.now()
-            sequence = get_sequence_for_command_cached(command, fk_cp.current_position)
+            #import math
+            #print(f'self.fk.current_position :\n{[math.degrees(x) for x in self.fk.current_position]}')
+            sequence, new_position = get_sequence_for_command_cached(command, self.fk.current_position)
             self.logger.info(f'[TIMING] Sequence calculation took : {datetime.datetime.now() - before_sequence_time}')
+            self.fk = FenixKinematics(fenix_position=new_position)
         except Exception as e:
             print(f'MOVE Failed. Could not process command - {str(e)}')
             self.logger.info(f'MOVE Failed. Could not process command - {str(e)}')
-            self.fk = copy.deepcopy(fk_cp)
             time.sleep(2.0)
             return
         self.logger.info(f'MOVE Started')    

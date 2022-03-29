@@ -252,8 +252,8 @@ class FenixKinematics:
                                   cfg.start["initial_z_position_delta"] - 
                                   delta_z)
         """
-
-    def body_to_center(self, delta_y=cfg.start["y_offset_body"], delta_x=0):
+    
+    def body_delta_xy(self, delta_y=cfg.start["y_offset_body"], delta_x=0):
         # move body to center
         avg_o_x, avg_o_y, avg_d_x, avg_d_y = 0, 0, 0, 0
         for leg in self.legs.values():
@@ -267,8 +267,17 @@ class FenixKinematics:
         avg_d_x /= 4
         avg_d_y /= 4
 
-        self.body_movement(round(avg_d_x - avg_o_x + delta_x, 2),
-                           round(avg_d_y - avg_o_y + delta_y, 2),
+        return [round(avg_o_x - avg_d_x - delta_x, 2),
+                round(avg_o_y - avg_d_y - delta_y, 2)]
+                           
+
+    def body_to_center(self, delta_y=cfg.start["y_offset_body"], delta_x=0):
+        # move body to center
+        
+        body_delta_xy = self.body_delta_xy(delta_y, delta_x)
+
+        self.body_movement(-body_delta_xy[0],
+                           -body_delta_xy[1],
                            0)
 
     # body compensation for moving up one leg
