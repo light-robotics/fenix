@@ -1,1 +1,1 @@
-10,forward_two_legged,130
+78,none,1000

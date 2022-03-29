@@ -51,8 +51,8 @@ class FenixServos:
                 current_angles.append(m.read_angle(j))
                 time.sleep(0.0002)
                 j += 1
-        #print('Current angles :')
-        #print(current_angles)
+        self.logger.info(f'Read current angles : {current_angles}')
+        
         return current_angles
     
     # return 4 angles from one board
@@ -237,8 +237,40 @@ class FenixServos:
             
     def set_servo_values_not_paced(self, angles):
         self.send_command_to_servos(angles, self.speed)
-        wait_time = max(0, self.speed / 1000 - config['fenix']['movement_command_advance_ms'])
+        wait_time = max(0, self.speed / 1000 - config.fenix['movement_command_advance_ms'])
         time.sleep(wait_time)
+
+    def set_servo_values_not_paced_v2(self, angles, prev_angles=None):
+        _, max_angle_diff = self.get_angles_diff(angles, prev_angles)
+        rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
+        wait_time = max(0, rate / 1000 - config.fenix['movement_command_advance_ms'])
+
+        self.logger.info(f'max_angle_diff: {max_angle_diff}, self.speed : {self.speed}, self.speed * max_angle_diff / 45 : {self.speed * max_angle_diff / 45}')
+        self.logger.info(f'Wait time : {wait_time}')
+        
+        self.send_command_to_servos(angles, rate)
+        
+        time.sleep(wait_time)
+        self.logger.info(f'[DIFF] Diff with target:')
+        self.get_angles_diff(angles)
+
+    def set_servo_values_not_paced_v3(self, angles, prev_angles=None):
+        angles_diff, max_angle_diff = self.get_angles_diff(angles, prev_angles)
+        rate = round(max(self.speed * (1 + config.fenix['movement_overshoot_coefficient']) * max_angle_diff / 45, self.max_speed)) # speed is normalized
+        wait_time = max(0, rate / 1000 - config.fenix['movement_command_advance_ms'])
+
+        self.logger.info(f'max_angle_diff: {max_angle_diff}, self.speed : {self.speed}, self.speed * max_angle_diff / 45 : {self.speed * max_angle_diff / 45}')
+        self.logger.info(f'Wait time : {wait_time}')
+
+        adjusted_angles = [round(target + (config.fenix['movement_overshoot_coefficient'] * diff), 1) for target, diff in zip(angles, angles_diff)]
+
+        self.logger.info(f'{angles} ->\n{adjusted_angles}')
+        
+        self.send_command_to_servos(adjusted_angles, rate)
+        
+        time.sleep(wait_time)
+        self.logger.info(f'[DIFF] Diff from target:')
+        self.get_angles_diff(angles)
 
     def get_angles_diff(self, target_angles, test_angles=None):
         if test_angles is None:
@@ -248,6 +280,7 @@ class FenixServos:
         for current, target in zip(test_angles, target_angles):
             angles_diff.append(round(current - target, 2))
         max_angle_diff = max([abs(x) for x in angles_diff])
+        self.logger.info(f'[DIFF] Max : {max_angle_diff}. Avg : {sum([abs(x) for x in angles_diff])/16}. Sum : {sum([abs(x) for x in angles_diff])}')
         return angles_diff, max_angle_diff
 
 

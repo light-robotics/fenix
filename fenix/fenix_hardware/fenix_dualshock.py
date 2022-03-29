@@ -95,6 +95,7 @@ class FenixDualShock(DualShock):
         max_speed = 100, min_speed = 2000
         abs(value) from 0 to 32768
         """
+        return 300
         value = abs(value)
         if value < 4000:
             return 700
@@ -106,7 +107,7 @@ class FenixDualShock(DualShock):
             return 300
         if value < 30000:
             return 250
-        return 150
+        return 120
     
     def on_L3_up(self, value):
         if self.mode == FenixModes.TWO_LEGGED:
@@ -145,7 +146,7 @@ class FenixDualShock(DualShock):
             self.command_writer.write_command('body_to_center', 1000)
     
     def on_L3_y_at_rest(self):
-        self.command_writer.write_command('none', 1000)
+        self.command_writer.write_command('none', 250)
     
     def on_R3_up(self, value):
         if self.mode in [FenixModes.ONE_LEGGED, FenixModes.TWO_LEGGED]:
@@ -180,7 +181,7 @@ class FenixDualShock(DualShock):
             self.command_writer.write_command('sight_to_normal', 1000)
     
     def on_R3_y_at_rest(self):
-        self.command_writer.write_command('none', 1000)
+        self.command_writer.write_command('none', 250)
 
     def on_right_arrow_press(self):
         if self.mode == FenixModes.BATTLE:

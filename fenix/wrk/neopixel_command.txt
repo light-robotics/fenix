@@ -1,1 +1,1 @@
-shutdown,white,0
+steady,blue,255

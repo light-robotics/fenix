@@ -14,8 +14,8 @@ leg = {
 
 start = {
     "vertical"                 : 11,
-    "horizontal_x"             : 16, # 18
-    "horizontal_y"             : 16, # 18
+    "horizontal_x"             : 17, # 18
+    "horizontal_y"             : 17, # 18
     "y_offset_body"            : 3,
     "initial_z_position_delta" : 5, # 3
 }
@@ -92,7 +92,7 @@ fenix = {
     },
     "leg_up": {
         1: 7,
-        2: 5
+        2: 3
     },
     # parameters for moving further, when moving with feedback
     "servos": {
@@ -101,7 +101,8 @@ fenix = {
     },
     # issue next command a little faster, than previous is finished executing
     # when moving without feedback
-    "movement_command_advance_ms" : 0.05 
+    "movement_command_advance_ms" : 0.05,
+    "movement_overshoot_coefficient" : 0.2,
 }
 
 mode = 90
@@ -110,6 +111,6 @@ moves = {
     "up_or_down_cm"         : 1,
     "move_body_cm"          : 2,
     "forward_body_1_leg_cm" : 8,
-    "forward_body_2_leg_cm" : 6,    
+    "forward_body_2_leg_cm" : 4,    
     "reposition_cm"         : 1,
 }
