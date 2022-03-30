@@ -20,6 +20,15 @@ start = {
     "initial_z_position_delta" : 5, # 3
 }
 
+modes = {
+    "run" : {
+        "horizontal_xy" : 16,
+    },
+    "one_legged" : {
+        "horizontal_xy" : 17,
+    }
+}
+
 limits = {
     "body_forward"  : 10,
     "body_backward" : 10,

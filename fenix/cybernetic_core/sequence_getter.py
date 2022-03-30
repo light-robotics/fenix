@@ -37,7 +37,10 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.move_2_legs_phased_13(0, FORWARD_LEGS_2LEG_CM)
     elif command == 'forward_one_legged':
         fk.move_body_straight(0, FORWARD_LEGS_1LEG_CM)
-
+    elif command in ['battle_mode', 'stationary_mode', 'one_legged_mode']:
+        fk.switch_mode('one_legged')
+    elif command == 'run_mode':
+        fk.switch_mode('run')
     elif command == 'body_forward':
         if fk.body_delta_xy()[1] > cfg.limits["body_forward"]:
             print('Forward body limit reached')
@@ -58,6 +61,12 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
             print('Body right limit reached')
         else:
             fk.body_movement(FORWARD_BODY_CM, 0, 0)
+    elif command == 'body_to_center':
+        fk.body_to_center()
+    elif command == 'up':
+        fk.body_movement(0, 0, UP_OR_DOWN_CM)
+    elif command == 'down':
+        fk.body_movement(0, 0, -UP_OR_DOWN_CM)
     elif command == 'backward_two_legged':
         pass
     elif command == 'backward_one_legged':
@@ -72,16 +81,12 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         pass
     elif command == 'strafe_right_one_legged':
         pass    
-    elif command == 'body_to_center':
-        fk.body_to_center()
-    elif command == 'up':
-        fk.body_movement(0, 0, UP_OR_DOWN_CM)
+    
     elif command == 'look_up':
-        fk.look_on_angle(-20) # this should be iterative
-    elif command == 'down':
-        fk.body_movement(0, 0, -UP_OR_DOWN_CM)
+        fk.look_on_angle(-20) # this should be iterative P.S.: or not
+    
     elif command == 'look_down':
-        fk.look_on_angle(20) # this should be iterative
+        fk.look_on_angle(20) # this should be iterative P.S.: or not
     elif command == 'turn_left_two_legged':
         fk.turn_move(-25)
     elif command == 'turn_left_one_legged':

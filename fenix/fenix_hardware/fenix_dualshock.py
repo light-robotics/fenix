@@ -24,8 +24,7 @@ class FenixDualShock(DualShock):
         self.connect()
         self.light_on = False
         self.started = False
-        self.mode = FenixModes.TWO_LEGGED
-        # self.step = 0 # demo only
+        self.mode = FenixModes.ONE_LEGGED
         self.command_writer = CommandsWriter()
         self.command_writer.write_command('none', 1000)
 
@@ -184,79 +183,52 @@ class FenixDualShock(DualShock):
         self.command_writer.write_command('none', 250)
 
     def on_right_arrow_press(self):
-        if self.mode == FenixModes.BATTLE:
+        #if self.mode == FenixModes.BATTLE:
             pass
-        else:
-            self.command_writer.write_command('reposition_x_up', 500)
+        #else:
+        #    self.command_writer.write_command('reposition_x_up', 500)
 
     def on_left_arrow_press(self):
-        if self.mode == FenixModes.BATTLE:
+        #if self.mode == FenixModes.BATTLE:
             self.command_writer.write_command('hit_4', 300)
-        else:
-            self.command_writer.write_command('reposition_x_down', 500)
+        #else:
+        #    self.command_writer.write_command('reposition_x_down', 500)
       
     def on_up_arrow_press(self):
-        if self.mode == FenixModes.BATTLE:
+        #if self.mode == FenixModes.BATTLE:
             self.command_writer.write_command('hit_1', 200)
-        else:
-            self.command_writer.write_command('reposition_y_up', 500)
+        #else:
+        #    self.command_writer.write_command('reposition_y_up', 500)
 
     def on_down_arrow_press(self):
-        if self.mode == FenixModes.BATTLE:
+        #if self.mode == FenixModes.BATTLE:
             pass
-        else:
-            self.command_writer.write_command('reposition_y_down', 500)
+        #else:
+        #    self.command_writer.write_command('reposition_y_down', 500)
         
     def on_x_press(self):
         self.mode = FenixModes.BATTLE
         self.neopixel.issue_command('steady', color='purple')
+        self.command_writer.write_command('battle_mode')
         print('Switched mode to BATTLE')
 
     def on_triangle_press(self):
         self.mode = FenixModes.TWO_LEGGED
         self.neopixel.issue_command('steady', color='red')
+        self.command_writer.write_command('run_mode')
         print('Switched mode to TWO_LEGGED')
 
     def on_circle_press(self):
         self.mode = FenixModes.STATIONARY
         self.neopixel.issue_command('steady', color='cyan')
+        self.command_writer.write_command('stationary_mode')
         print('Switched mode to STATIONARY')
 
     def on_square_press(self):
         self.mode = FenixModes.ONE_LEGGED
         self.neopixel.issue_command('steady', color='blue')
+        self.command_writer.write_command('one_legged_mode')
         print('Switched mode to ONE_LEGGED')
-
-
-
-    """
-    # demo only
-    def on_x_press(self):
-        #self.command_writer.write_command('check_leg_2', 700)
-        
-        if self.step == 0:
-            self.step = 1
-            self.command_writer.write_command('up', 1000)
-        elif self.step == 1:
-            self.step = 2
-            self.command_writer.write_command('demo11', 500)
-        elif self.step == 2:
-            self.step = 3            
-            self.command_writer.write_command('demo12', 1000)
-        elif self.step == 3:
-            self.step = 4            
-            self.command_writer.write_command('demo13', 500)
-        elif self.step == 4:
-            self.step = 5            
-            self.command_writer.write_command('check_leg', 700)
-        elif self.step == 5:
-            self.step = 0
-            self.command_writer.write_command('double_back', 700)
-        elif self.step == 6:
-            self.step = 0
-            self.command_writer.write_command('normal_stance', 1000)
-    """
-    
 
 if __name__ == '__main__':
     FenixDualShock().start()

@@ -236,6 +236,7 @@ class FenixKinematics:
     
     # ?
     def reset(self):
+        self.logger.info('Processing reset command')
         self.body_to_center()
         delta_z = self.current_body_delta[2]
         self.body_movement(0, 0, -delta_z)
@@ -245,13 +246,21 @@ class FenixKinematics:
         self.reset()
         self.body_movement(0, 0, -cfg.start["vertical"] + 
                                   cfg.start["initial_z_position_delta"])
-        """
-        self.body_to_center()
-        delta_z = self.current_body_delta[2]
-        self.body_movement(0, 0, -cfg.start["vertical"] + 
-                                  cfg.start["initial_z_position_delta"] - 
-                                  delta_z)
-        """
+            
+    def legs_D_offsets(self):
+        x_offset = abs(round((self.legs[1].D.x - self.legs[4].D.x)/2))
+        y_offset = abs(round((self.legs[1].D.y - self.legs[2].D.y)/2))
+        return [x_offset, y_offset]
+    
+    def switch_mode(self, mode: str):
+        self.logger.info(f'Switching mode to {mode}')
+        self.reset()
+        required_xy = cfg.modes[mode]["horizontal_xy"]
+        current_xy = self.legs_D_offsets()
+        # for now we suppose that x = y
+        delta = required_xy - current_xy[0]
+        if delta != 0:
+            self.reposition_legs(delta, delta)
     
     def body_delta_xy(self, delta_y=cfg.start["y_offset_body"], delta_x=0):
         # move body to center
@@ -749,7 +758,7 @@ class FenixKinematics:
         self.add_angles_snapshot()
     """
     def reposition_legs(self, delta_x, delta_y):
-        print(f'reposition_legs ({delta_x}, {delta_y})')
+        self.logger.info(f'reposition_legs ({delta_x}, {delta_y})')
         if delta_x == delta_y == 0:
             return None
 
