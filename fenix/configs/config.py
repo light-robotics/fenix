@@ -30,9 +30,9 @@ modes = {
 }
 
 limits = {
-    "body_forward"  : 10,
-    "body_backward" : 10,
-    "body_sideways" : 10
+    "body_forward"  : 7,
+    "body_backward" : 7,
+    "body_sideways" : 7
 }
 
 angles = {
