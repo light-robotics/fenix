@@ -29,10 +29,23 @@ modes = {
     }
 }
 
+moves = {
+    "up_or_down_cm"         : 1,
+    "move_body_cm"          : 2,
+    "forward_body_1_leg_cm" : 8,
+    "forward_body_2_leg_cm" : 4,    
+    "reposition_cm"         : 1,
+    "side_look_angle"       : 12,
+    "vertical_look_angle"   : 20,
+}
+
+
 limits = {
-    "body_forward"  : 7,
-    "body_backward" : 7,
-    "body_sideways" : 7
+    "body_forward"        : 7,
+    "body_backward"       : 7,
+    "body_sideways"       : 7,
+    "side_look_angle"     : 24,
+    "vertical_look_angle" : 20,
 }
 
 angles = {
@@ -121,11 +134,3 @@ fenix = {
 }
 
 mode = 90
-
-moves = {
-    "up_or_down_cm"         : 1,
-    "move_body_cm"          : 2,
-    "forward_body_1_leg_cm" : 8,
-    "forward_body_2_leg_cm" : 4,    
-    "reposition_cm"         : 1,
-}

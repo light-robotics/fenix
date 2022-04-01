@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Tuple
 import sys
 import os
 from joblib import Memory
@@ -15,6 +15,46 @@ FORWARD_BODY_CM = cfg.moves["move_body_cm"]
 FORWARD_LEGS_1LEG_CM = cfg.moves["forward_body_1_leg_cm"]
 FORWARD_LEGS_2LEG_CM = cfg.moves["forward_body_2_leg_cm"]
 REPOSITION_CM   = cfg.moves["reposition_cm"]
+SIDE_LOOK_ANGLE = cfg.moves["side_look_angle"]
+VERTICAL_LOOK_ANGLE = cfg.moves["vertical_look_angle"]
+
+
+class VirtualFenix():
+    """
+    An intermediate level of abstraction to apply constraints
+    Actually this is only for look angles, cuz other constraints it is easy to check on the fly
+    This looks really bad, I need some better decision some day
+    """
+    def __init__(self, logger):
+        self.logger = logger
+        self.side_look_angle = 0
+        self.vertical_look_angle = 0
+
+    def get_sequence(self, command: str, fenix_position: List[int]):
+        if command == 'look_left':
+            if self.side_look_angle <= -cfg.limits['side_look_angle']:
+                self.logger.info(f'Look left limit reached')
+                return None, None
+            self.side_look_angle -= SIDE_LOOK_ANGLE
+        elif command == 'look_right':
+            if self.side_look_angle >= cfg.limits['side_look_angle']:
+                self.logger.info(f'Look right limit reached')
+                return None, None
+            self.side_look_angle += SIDE_LOOK_ANGLE
+        elif command == 'look_down':
+            if self.vertical_look_angle <= -cfg.limits['vertical_look_angle']:
+                self.logger.info(f'Look down limit reached')
+                return None, None
+            self.vertical_look_angle -= VERTICAL_LOOK_ANGLE
+        elif command == 'look_up':
+            if self.vertical_look_angle >= cfg.limits['vertical_look_angle']:
+                self.logger.info(f'Look up limit reached')
+                return None, None
+            self.vertical_look_angle += VERTICAL_LOOK_ANGLE
+        
+        sequence, new_position = get_sequence_for_command_cached(command, fenix_position)
+        return sequence, new_position
+
 
 @memory.cache
 def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> Sequence:
@@ -83,25 +123,24 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         pass    
     
     elif command == 'look_up':
-        fk.look_on_angle(-20) # this should be iterative P.S.: or not
-    
+        fk.look_on_angle(-20) # this should be iterative P.S.: or not    
     elif command == 'look_down':
         fk.look_on_angle(20) # this should be iterative P.S.: or not
-    elif command == 'turn_left_two_legged':
-        fk.turn_move(-25)
-    elif command == 'turn_left_one_legged':
-        pass
     elif command == 'look_left':
         fk.turn(-12, only_body=True)
-    elif command == 'turn_right_two_legged':
-        fk.turn_move(25)
-    elif command == 'turn_right_one_legged':
-        pass
     elif command == 'look_right':
         fk.turn(12, only_body=True)
     elif command == 'sight_to_normal':
         fk.look_on_angle(0)
-        # should fix left-right sight also
+        fk.turn(-fk.side_look_angle, only_body=True)
+    elif command == 'turn_left_two_legged':
+        fk.turn_move(-25)
+    elif command == 'turn_left_one_legged':
+        pass    
+    elif command == 'turn_right_two_legged':
+        fk.turn_move(25)
+    elif command == 'turn_right_one_legged':
+        pass    
     elif command == 'reposition_x_up':
         fk.reposition_legs(REPOSITION_CM, 0)
     elif command == 'reposition_x_down':
@@ -116,10 +155,6 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.end()
     elif command == 'reset':
         fk.reset()
-    elif command == 'body_forward':
-        fk.body_movement(0, 5, 0)
-    elif command == 'body_backward':
-        fk.body_movement(0, -5, 0)
     elif command == 'hit_1':
         fk.hit(1)
     elif command == 'hit_4':

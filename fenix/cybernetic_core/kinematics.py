@@ -76,7 +76,8 @@ class FenixKinematics:
 
         self.legs_deltas = {1 : [0, 0, 0], 2 : [0, 0, 0], 3 : [0, 0, 0], 4 : [0, 0, 0]}
 
-        self.current_angle = 0 # ?
+        self.current_angle = 0 # up/down
+        self.side_look_angle = 0 # left/right
         self.current_vertical_angle = 0
         self.current_horizontal_angle = 0
         self.current_body_delta = [0, 0, 0]
@@ -844,6 +845,7 @@ class FenixKinematics:
             leg.move_end_point(0, 0, -self.leg_up)
 
         self.add_angles_snapshot('endpoint')
+        self.side_look_angle += angle
 
     """
     def old_turn(self, angle_deg, only_body=False):

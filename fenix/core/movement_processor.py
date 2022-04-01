@@ -1,12 +1,12 @@
 import time
 import datetime
 import copy
-from typing import Optional, Union
+from typing import Callable, Optional, Union
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from cybernetic_core.kinematics import FenixKinematics
-from cybernetic_core.sequence_getter import get_sequence_for_command_cached
+from cybernetic_core.sequence_getter import get_sequence_for_command_cached, VirtualFenix
 import configs.code_config as code_config
 import configs.config as config
 import logging.config
@@ -24,7 +24,9 @@ class MovementProcessor:
         self.max_processed_command_id = 0
         self.state = '0'
         
-        self.fk = FenixKinematics()
+        fk = FenixKinematics()
+        self.vf = VirtualFenix(self.logger)
+        self.fenix_position = fk.current_position
 
         if not code_config.DEBUG:
             self.fs = FenixServos()
@@ -114,16 +116,27 @@ class MovementProcessor:
                     time.sleep(0.1)
                 else:    
                     self.run_sequence(command)
+
+    def move_function_dispatch(self, command: str) -> Callable:
+        if command in ['forward_1', 'forward_2', 'forward_22', 'forward_3', 'forward_32']:
+            self.logger.info('Using function set_servo_values_not_paced_v2')
+            return self.fs.set_servo_values_not_paced_v2
+        else:
+            self.logger.info('Using function set_servo_values_paced')
+            return self.fs.set_servo_values_paced
                         
     def run_sequence(self, command: str) -> None:
         try:            
             self.logger.info(f'MOVE. Trying command {command}')
             before_sequence_time = datetime.datetime.now()
-            #import math
-            #print(f'self.fk.current_position :\n{[math.degrees(x) for x in self.fk.current_position]}')
-            sequence, new_position = get_sequence_for_command_cached(command, self.fk.current_position)
+            #sequence, new_position = get_sequence_for_command_cached(command, self.fenix_position)
+            sequence, new_position = self.vf.get_sequence(command, self.fenix_position)
+            
+            if sequence is None:
+                self.logger.info(f'MOVE. Command aborted')
+                return
             self.logger.info(f'[TIMING] Sequence calculation took : {datetime.datetime.now() - before_sequence_time}')
-            self.fk = FenixKinematics(fenix_position=new_position)
+            self.fenix_position = new_position[:]
         except Exception as e:
             print(f'MOVE Failed. Could not process command - {str(e)}')
             self.logger.info(f'MOVE Failed. Could not process command - {str(e)}')
@@ -131,19 +144,20 @@ class MovementProcessor:
             return
         self.logger.info(f'MOVE Started')    
         start_time = datetime.datetime.now()
-        prev_angles = None
+        #prev_angles = None
+        if not code_config.DEBUG:
+            move_function = self.move_function_dispatch(command)
+
         for move_snapshot in sequence:
             angles = move_snapshot.angles_snapshot[:]
             #if move_snapshot.move_type == 'body' and self.speed != self.body_speed:
             #    self.fs.set_speed(self.body_speed)
-            self.logger.info(f'Moving to {angles}')
-            if not code_config.DEBUG:                
-                #self.fs.set_servo_values_not_paced(angles) # here issuing command to servos
-                self.fs.set_servo_values_not_paced_v2(angles, prev_angles)
-                #self.fs.set_servo_values_not_paced_v2(angles)
-                #self.fs.set_servo_values_not_paced_v3(angles, prev_angles)
+            self.logger.info(f'Moving to {angles}. Move type: {move_snapshot.move_type}')
+            if not code_config.DEBUG:
+                move_function(angles)
+                #self.fs.set_servo_values_not_paced_v2(angles, prev_angles)
                 #self.fs.set_servo_values_paced(angles)
-                prev_angles = angles[:]
+                #prev_angles = angles[:]
             else:
                 time.sleep(1.0)
         self.logger.info(f'[TIMING] Step took : {datetime.datetime.now() - start_time}')

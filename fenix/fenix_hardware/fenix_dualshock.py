@@ -115,6 +115,8 @@ class FenixDualShock(DualShock):
             self.command_writer.write_command('forward_one_legged', self.convert_value_to_speed(value))
         elif self.mode == FenixModes.STATIONARY:
             self.command_writer.write_command('body_forward', 1000)
+        elif self.mode == FenixModes.BATTLE:
+            self.command_writer.write_command('hit_4', 500)
     
     def on_L3_down(self, value):
         if self.mode == FenixModes.TWO_LEGGED:
@@ -151,15 +153,17 @@ class FenixDualShock(DualShock):
         self.command_writer.write_command('none', 250)
     
     def on_R3_up(self, value):
-        if self.mode in [FenixModes.ONE_LEGGED, FenixModes.TWO_LEGGED]:
-            self.command_writer.write_command('up', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.STATIONARY:
+        #if self.mode in [FenixModes.ONE_LEGGED, FenixModes.TWO_LEGGED]:
+        #    self.command_writer.write_command('up', self.convert_value_to_speed(value))
+        if self.mode == FenixModes.STATIONARY:
             self.command_writer.write_command('look_up', 300)
+        elif self.mode == FenixModes.BATTLE:
+            self.command_writer.write_command('hit_1', 500)
     
     def on_R3_down(self, value):
-        if self.mode in [FenixModes.ONE_LEGGED, FenixModes.TWO_LEGGED]:
-            self.command_writer.write_command('down', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.STATIONARY:
+        #if self.mode in [FenixModes.ONE_LEGGED, FenixModes.TWO_LEGGED]:
+        #    self.command_writer.write_command('down', self.convert_value_to_speed(value))
+        if self.mode == FenixModes.STATIONARY:
             self.command_writer.write_command('look_down', 300)
     
     def on_R3_left(self, value):
@@ -189,28 +193,16 @@ class FenixDualShock(DualShock):
         self.command_writer.write_command('none', 250)
 
     def on_right_arrow_press(self):
-        #if self.mode == FenixModes.BATTLE:
-            pass
-        #else:
-        #    self.command_writer.write_command('reposition_x_up', 500)
+        pass
 
     def on_left_arrow_press(self):
-        #if self.mode == FenixModes.BATTLE:
-            self.command_writer.write_command('hit_4', 500)
-        #else:
-        #    self.command_writer.write_command('reposition_x_down', 500)
+        pass
       
     def on_up_arrow_press(self):
-        #if self.mode == FenixModes.BATTLE:
-            self.command_writer.write_command('hit_1', 500)
-        #else:
-        #    self.command_writer.write_command('reposition_y_up', 500)
+        self.command_writer.write_command('up', 500)
 
     def on_down_arrow_press(self):
-        #if self.mode == FenixModes.BATTLE:
-            pass
-        #else:
-        #    self.command_writer.write_command('reposition_y_down', 500)
+        self.command_writer.write_command('down', 500)
         
     def on_x_press(self):
         self.mode = FenixModes.BATTLE
