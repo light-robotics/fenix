@@ -94,7 +94,7 @@ class FenixDualShock(DualShock):
         max_speed = 100, min_speed = 2000
         abs(value) from 0 to 32768
         """
-        return 500
+        return 1000
         value = abs(value)
         if value < 4000:
             return 700
@@ -156,7 +156,7 @@ class FenixDualShock(DualShock):
         #if self.mode in [FenixModes.ONE_LEGGED, FenixModes.TWO_LEGGED]:
         #    self.command_writer.write_command('up', self.convert_value_to_speed(value))
         if self.mode == FenixModes.STATIONARY:
-            self.command_writer.write_command('look_up', 300)
+            self.command_writer.write_command('look_up', 1000)
         elif self.mode == FenixModes.BATTLE:
             self.command_writer.write_command('hit_1', 500)
     
@@ -164,7 +164,7 @@ class FenixDualShock(DualShock):
         #if self.mode in [FenixModes.ONE_LEGGED, FenixModes.TWO_LEGGED]:
         #    self.command_writer.write_command('down', self.convert_value_to_speed(value))
         if self.mode == FenixModes.STATIONARY:
-            self.command_writer.write_command('look_down', 300)
+            self.command_writer.write_command('look_down', 1000)
     
     def on_R3_left(self, value):
         if self.mode == FenixModes.TWO_LEGGED:
@@ -199,10 +199,13 @@ class FenixDualShock(DualShock):
         pass
       
     def on_up_arrow_press(self):
-        self.command_writer.write_command('up', 500)
+        self.command_writer.write_command('up', 1000)
 
     def on_down_arrow_press(self):
-        self.command_writer.write_command('down', 500)
+        self.command_writer.write_command('down', 1000)
+
+    def on_up_down_arrow_release(self):
+        self.command_writer.write_command('none', 500)
         
     def on_x_press(self):
         self.mode = FenixModes.BATTLE
