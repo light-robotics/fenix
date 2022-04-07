@@ -216,7 +216,7 @@ class FenixKinematics:
         self.add_angles_snapshot('endpoint')
 
     def body_movement(self, delta_x, delta_y, delta_z, snapshot=True):
-        #print(f'Body movement [{delta_x}, {delta_y}, {delta_z}]')
+        self.logger.info(f'Body movement [{delta_x}, {delta_y}, {delta_z}]')
         self.current_body_delta = [x + y for x, y in zip(self.current_body_delta, [delta_x, delta_y, delta_z])]
         #print(f'self.current_body_delta : {self.current_body_delta}')
         if delta_x == delta_y == delta_z == 0:
@@ -239,7 +239,8 @@ class FenixKinematics:
     def reset(self):
         self.logger.info('Processing reset command')
         self.body_to_center()
-        delta_z = self.current_body_delta[2]
+        #delta_z = self.current_body_delta[2]
+        delta_z = self.legs[1].O.z - self.legs[1].D.z - cfg.start["vertical"]
         self.body_movement(0, 0, -delta_z)
 
     # ?
@@ -285,7 +286,7 @@ class FenixKinematics:
         # move body to center
         
         body_delta_xy = self.body_delta_xy(delta_y, delta_x)
-
+        self.logger.info(f'Moving body: {body_delta_xy}')
         self.body_movement(-body_delta_xy[0],
                            -body_delta_xy[1],
                            0)
@@ -944,19 +945,23 @@ class FenixKinematics:
 
     # fun moves
     def hit(self, leg_num):
+        x_move = 10
+        if leg_num == 4:
+            x_move = -10
+        y_move = 11
         self.logger.info(f'Processing leg {leg_num} body_compensation_for_a_leg')
         self.body_compensation_for_a_leg(leg_num)
         self.logger.info(f'Processing leg {leg_num} move_end_point 1')
-        self.legs[leg_num].move_end_point(-10, 5, 5)
+        self.legs[leg_num].move_end_point(-x_move, 5, 5)
         self.add_angles_snapshot('endpoint')
         self.logger.info(f'Processing leg {leg_num} move_end_point 2')
-        self.legs[leg_num].move_end_point(0, 11, 5)
+        self.legs[leg_num].move_end_point(0, y_move, 5)
         self.add_angles_snapshot('endpoint')
         self.logger.info(f'Processing leg {leg_num} move_end_point 3')
-        self.legs[leg_num].move_end_point(0, -11, -5)
+        self.legs[leg_num].move_end_point(0, -y_move, -5)
         self.add_angles_snapshot('endpoint')
         self.logger.info(f'Processing leg {leg_num} move_end_point 4')
-        self.legs[leg_num].move_end_point(10, -5, 0)
+        self.legs[leg_num].move_end_point(x_move, -5, 0)
         self.add_angles_snapshot('endpoint')
         self.logger.info(f'Processing leg {leg_num} move_end_point 5')
         self.legs[leg_num].move_end_point(0, 0, -5)

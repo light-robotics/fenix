@@ -9,9 +9,9 @@ from core.commands_writer import CommandsWriter
 
 
 class FenixModes(Enum):
-    ONE_LEGGED = 1
-    TWO_LEGGED = 2
-    STATIONARY = 3
+    WALKING = 1
+    RUN = 2
+    SENTRY = 3
     BATTLE     = 4
 
 class FenixDualShock(DualShock):
@@ -24,7 +24,7 @@ class FenixDualShock(DualShock):
         self.connect()
         self.light_on = False
         self.started = False
-        self.mode = FenixModes.ONE_LEGGED
+        self.mode = FenixModes.WALKING
         self.command_writer = CommandsWriter()
         self.command_writer.write_command('none', 1000)
 
@@ -109,41 +109,41 @@ class FenixDualShock(DualShock):
         return 120
     
     def on_L3_up(self, value):
-        if self.mode == FenixModes.TWO_LEGGED:
+        if self.mode == FenixModes.RUN:
             self.command_writer.write_command('forward_two_legged', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.ONE_LEGGED:
+        elif self.mode == FenixModes.WALKING:
             self.command_writer.write_command('forward_one_legged', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.STATIONARY:
+        elif self.mode == FenixModes.SENTRY:
             self.command_writer.write_command('body_forward', 1000)
         elif self.mode == FenixModes.BATTLE:
             self.command_writer.write_command('hit_4', 500)
     
     def on_L3_down(self, value):
-        if self.mode == FenixModes.TWO_LEGGED:
+        if self.mode == FenixModes.RUN:
             self.command_writer.write_command('backward_two_legged', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.ONE_LEGGED:
+        elif self.mode == FenixModes.WALKING:
             self.command_writer.write_command('backward_one_legged', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.STATIONARY:
+        elif self.mode == FenixModes.SENTRY:
             self.command_writer.write_command('body_backward', 1000)
 
     def on_L3_left(self, value):
-        if self.mode == FenixModes.TWO_LEGGED:
+        if self.mode == FenixModes.RUN:
             self.command_writer.write_command('strafe_left_two_legged', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.ONE_LEGGED:
+        elif self.mode == FenixModes.WALKING:
             self.command_writer.write_command('strafe_left_one_legged', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.STATIONARY:
+        elif self.mode == FenixModes.SENTRY:
             self.command_writer.write_command('body_left', 1000)
 
     def on_L3_right(self, value):
-        if self.mode == FenixModes.TWO_LEGGED:
+        if self.mode == FenixModes.RUN:
             self.command_writer.write_command('strafe_right_two_legged', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.ONE_LEGGED:
+        elif self.mode == FenixModes.WALKING:
             self.command_writer.write_command('strafe_right_one_legged', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.STATIONARY:
+        elif self.mode == FenixModes.SENTRY:
             self.command_writer.write_command('body_right', 1000)
     
     def on_L3_press(self):
-        #if self.mode == FenixModes.STATIONARY:
+        #if self.mode == FenixModes.SENTRY:
             self.command_writer.write_command('body_to_center', 1000)
     
     def on_L3_y_at_rest(self):
@@ -153,37 +153,37 @@ class FenixDualShock(DualShock):
         self.command_writer.write_command('none', 250)
     
     def on_R3_up(self, value):
-        #if self.mode in [FenixModes.ONE_LEGGED, FenixModes.TWO_LEGGED]:
+        #if self.mode in [FenixModes.WALKING, FenixModes.RUN]:
         #    self.command_writer.write_command('up', self.convert_value_to_speed(value))
-        if self.mode == FenixModes.STATIONARY:
+        if self.mode == FenixModes.SENTRY:
             self.command_writer.write_command('look_up', 1000)
         elif self.mode == FenixModes.BATTLE:
             self.command_writer.write_command('hit_1', 500)
     
     def on_R3_down(self, value):
-        #if self.mode in [FenixModes.ONE_LEGGED, FenixModes.TWO_LEGGED]:
+        #if self.mode in [FenixModes.WALKING, FenixModes.RUN]:
         #    self.command_writer.write_command('down', self.convert_value_to_speed(value))
-        if self.mode == FenixModes.STATIONARY:
+        if self.mode == FenixModes.SENTRY:
             self.command_writer.write_command('look_down', 1000)
     
     def on_R3_left(self, value):
-        if self.mode == FenixModes.TWO_LEGGED:
+        if self.mode == FenixModes.RUN:
             self.command_writer.write_command('turn_left_two_legged', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.ONE_LEGGED:
-            self.command_writer.write_command('turn_left_one_legged', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.STATIONARY:
+        elif self.mode == FenixModes.WALKING:
+            self.command_writer.write_command('turn_left_two_legged', self.convert_value_to_speed(value))
+        elif self.mode == FenixModes.SENTRY:
             self.command_writer.write_command('look_left', 1000)
     
     def on_R3_right(self, value):
-        if self.mode == FenixModes.TWO_LEGGED:
+        if self.mode == FenixModes.RUN:
             self.command_writer.write_command('turn_right_two_legged', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.ONE_LEGGED:
-            self.command_writer.write_command('turn_right_one_legged', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.STATIONARY:
+        elif self.mode == FenixModes.WALKING:
+            self.command_writer.write_command('turn_left_two_legged', self.convert_value_to_speed(value))
+        elif self.mode == FenixModes.SENTRY:
             self.command_writer.write_command('look_right', 1000)
 
     def on_R3_press(self):
-        if self.mode == FenixModes.STATIONARY:
+        if self.mode == FenixModes.SENTRY:
             self.command_writer.write_command('sight_to_normal', 1000)
     
     def on_R3_y_at_rest(self):
@@ -214,22 +214,22 @@ class FenixDualShock(DualShock):
         print('Switched mode to BATTLE')
 
     def on_triangle_press(self):
-        self.mode = FenixModes.TWO_LEGGED
+        self.mode = FenixModes.RUN
         self.neopixel.issue_command('steady', color='red')
         self.command_writer.write_command('run_mode', 1000)
-        print('Switched mode to TWO_LEGGED')
+        print('Switched mode to RUN')
 
     def on_circle_press(self):
-        self.mode = FenixModes.STATIONARY
+        self.mode = FenixModes.SENTRY
         self.neopixel.issue_command('steady', color='cyan')
-        self.command_writer.write_command('stationary_mode', 1000)
-        print('Switched mode to STATIONARY')
+        self.command_writer.write_command('sentry_mode', 1000)
+        print('Switched mode to SENTRY')
 
     def on_square_press(self):
-        self.mode = FenixModes.ONE_LEGGED
+        self.mode = FenixModes.WALKING
         self.neopixel.issue_command('steady', color='blue')
         self.command_writer.write_command('one_legged_mode', 1000)
-        print('Switched mode to ONE_LEGGED')
+        print('Switched mode to WALKING')
 
 if __name__ == '__main__':
     FenixDualShock().start()

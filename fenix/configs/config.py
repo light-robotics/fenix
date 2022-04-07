@@ -21,10 +21,16 @@ start = {
 }
 
 modes = {
-    "run" : {
+    "run_mode" : {
         "horizontal_xy" : 16,
     },
-    "one_legged" : {
+    "sentry_mode" : {
+        "horizontal_xy" : 16,
+    },
+    "walking_mode" : {
+        "horizontal_xy" : 17,
+    },
+    "battle_mode" : {
         "horizontal_xy" : 17,
     }
 }
