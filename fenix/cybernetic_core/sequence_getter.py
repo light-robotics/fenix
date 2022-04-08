@@ -121,9 +121,9 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         pass    
     
     elif command == 'look_up':
-        fk.look_on_angle(-20) # this should be iterative P.S.: or not    
+        fk.look_on_angle(-VERTICAL_LOOK_ANGLE) # this should be iterative P.S.: or not    
     elif command == 'look_down':
-        fk.look_on_angle(20) # this should be iterative P.S.: or not
+        fk.look_on_angle(VERTICAL_LOOK_ANGLE) # this should be iterative P.S.: or not
     elif command == 'look_left':
         fk.turn(-12, only_body=True)
     elif command == 'look_right':

@@ -24,10 +24,13 @@ class CommandsWriter:
         self.command_id = 1
 
     def write_command(self, command: str, speed: int) -> None:
-        print('writing {0} to command file'.format(command))
-        with open(self.command_file, 'w') as f:
-            f.write(f'{self.command_id},{command},{speed}')
-            self.command_id += 1
+        if speed > 1000:
+            print(f'Ignoring command {command}, {speed}')
+        else:
+            print(f'writing {command}, {speed} to command file')
+            with open(self.command_file, 'w') as f:
+                f.write(f'{self.command_id},{command},{speed}')
+                self.command_id += 1
     
     def initiate_local_writer(self) -> None:
         try:

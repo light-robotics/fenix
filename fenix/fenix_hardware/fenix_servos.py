@@ -236,7 +236,7 @@ class FenixServos:
         time.sleep(rate / 1000)
             
     def set_servo_values_not_paced(self, angles):
-        self.send_command_to_servos(angles, self.speed)
+        self.send_command_to_servos(angles, self.speed * 1.05)
         wait_time = max(0, self.speed / 1000 - config.fenix['movement_command_advance_ms'])
         time.sleep(wait_time)
 

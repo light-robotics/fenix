@@ -37,12 +37,12 @@ modes = {
 
 moves = {
     "up_or_down_cm"         : 2,
-    "move_body_cm"          : 4,
+    "move_body_cm"          : 2,
     "forward_body_1_leg_cm" : 8,
     "forward_body_2_leg_cm" : 4,    
     "reposition_cm"         : 1,
     "side_look_angle"       : 12,
-    "vertical_look_angle"   : 20,
+    "vertical_look_angle"   : 30,
 }
 
 
@@ -51,7 +51,7 @@ limits = {
     "body_backward"       : 7,
     "body_sideways"       : 7,
     "side_look_angle"     : 24,
-    "vertical_look_angle" : 20,
+    "vertical_look_angle" : 30,
 }
 
 angles = {
@@ -135,7 +135,7 @@ fenix = {
     },
     # issue next command a little faster, than previous is finished executing
     # when moving without feedback
-    "movement_command_advance_ms" : 0.05,
+    "movement_command_advance_ms" : 0.15,
     "movement_overshoot_coefficient" : 0.2,
 }
 

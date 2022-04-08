@@ -94,19 +94,19 @@ class FenixDualShock(DualShock):
         max_speed = 100, min_speed = 2000
         abs(value) from 0 to 32768
         """
-        return 1000
+        
         value = abs(value)
-        if value < 4000:
-            return 700
         if value < 12000:
-            return 500
+            return 1500 # > 1000 will be ignored for moving
+        """
         if value < 20000:
             return 400
         if value < 25000:
             return 300
         if value < 30000:
             return 250
-        return 120
+        """
+        return 1000
     
     def on_L3_up(self, value):
         if self.mode == FenixModes.RUN:
