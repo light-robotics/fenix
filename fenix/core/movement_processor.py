@@ -118,20 +118,12 @@ class MovementProcessor:
                     self.run_sequence(command)
 
     def move_function_dispatch(self, command: str) -> Callable:
-        if command in ['hit_1', 'hit_4']:
+        if command in ['hit_1', 'hit_4', 'forward_one_legged']:
             self.logger.info('Using function set_servo_values_paced')
             return self.fs.set_servo_values_paced
         else:
             self.logger.info('Using function set_servo_values_not_paced_v2')
             return self.fs.set_servo_values_not_paced_v2
-        """
-        if command in ['forward_1', 'forward_2', 'forward_22', 'forward_3', 'forward_32']:
-            self.logger.info('Using function set_servo_values_not_paced_v2')
-            return self.fs.set_servo_values_not_paced_v2
-        else:
-            self.logger.info('Using function set_servo_values_paced')
-            return self.fs.set_servo_values_paced
-        """
                         
     def run_sequence(self, command: str) -> None:
         try:            
@@ -148,7 +140,7 @@ class MovementProcessor:
         except Exception as e:
             print(f'MOVE Failed. Could not process command - {str(e)}')
             self.logger.info(f'MOVE Failed. Could not process command - {str(e)}')
-            time.sleep(2.0)
+            time.sleep(0.3)
             return
         self.logger.info(f'MOVE Started')    
         start_time = datetime.datetime.now()

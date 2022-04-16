@@ -150,8 +150,8 @@ class LX16A:
                     self.logger.info(f'Id : {id}. Target required : {position}. Target real : {target}')
                     continue
                 break
-            except:
-                self.logger.info(f'{i} attempt failed for servo {id}')
+            except Exception as e:
+                self.logger.info(f'{i} attempt failed for servo {id}.\n{e}')
       
     # read target position and rate
     def read_servo_target(self, id: int) -> Union[int, int]:

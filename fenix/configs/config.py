@@ -1,3 +1,11 @@
+from enum import Enum
+
+class LEGS_MODE(Enum):
+    STAR    = 1
+    POINTER = 2
+
+legs_mode = LEGS_MODE.STAR
+
 obstacle = {
     "danger_offset": 1.0,
     "outer_danger_offset": 2.0,
@@ -20,30 +28,109 @@ start = {
     "initial_z_position_delta" : 5, # 3
 }
 
-modes = {
-    "run_mode" : {
-        "horizontal_xy" : 16,
-    },
-    "sentry_mode" : {
-        "horizontal_xy" : 16,
-    },
-    "walking_mode" : {
-        "horizontal_xy" : 17,
-    },
-    "battle_mode" : {
-        "horizontal_xy" : 17,
+if legs_mode == LEGS_MODE.POINTER:
+    modes = {
+        "run_mode" : {
+            "horizontal_xy" : 16,
+        },
+        "sentry_mode" : {
+            "horizontal_xy" : 16,
+        },
+        "walking_mode" : {
+            "horizontal_xy" : 17,
+        },
+        "battle_mode" : {
+            "horizontal_xy" : 17,
+        }
     }
-}
 
-moves = {
-    "up_or_down_cm"         : 2,
-    "move_body_cm"          : 2,
-    "forward_body_1_leg_cm" : 8,
-    "forward_body_2_leg_cm" : 4,    
-    "reposition_cm"         : 1,
-    "side_look_angle"       : 12,
-    "vertical_look_angle"   : 30,
-}
+    speed = {
+        "run" : 350,
+        "hit" : 500,
+    }
+
+    moves = {
+        "up_or_down_cm"         : 2,
+        "move_body_cm"          : 2,
+        "forward_body_1_leg_cm" : 8,
+        "forward_body_2_leg_cm" : 4,    
+        "reposition_cm"         : 1,
+        "side_look_angle"       : 12,
+        "vertical_look_angle"   : 30,
+    }
+
+    fenix = {
+        "margin": {
+            1: 5,
+            2: 6
+        },
+        "leg_up": {
+            1: 7,
+            2: 3
+        },
+        # parameters for moving further, when moving with feedback
+        "servos": {
+            "diff_from_target_limit": 3.5,
+            "diff_from_prev_limit": 0.5
+        },
+        # issue next command a little faster, than previous is finished executing
+        # when moving without feedback
+        "movement_command_advance_ms" : 0.05,
+        "movement_overshoot_coefficient" : 0.2,
+    }
+
+else:
+    modes = {
+        "run_mode" : {
+            "horizontal_xy" : 16,
+        },
+        "sentry_mode" : {
+            "horizontal_xy" : 16,
+        },
+        "walking_mode" : {
+            "horizontal_xy" : 17,
+        },
+        "battle_mode" : {
+            "horizontal_xy" : 17,
+        }
+    }
+
+    speed = {
+        "run" : 250,
+        "hit" : 500,
+    }
+
+    moves = {
+        "up_or_down_cm"         : 2,
+        "move_body_cm"          : 2,
+        "forward_body_1_leg_cm" : 8,
+        "forward_body_2_leg_cm" : 6,    
+        "reposition_cm"         : 1,
+        "side_look_angle"       : 12,
+        "vertical_look_angle"   : 30,
+    }
+
+    fenix = {
+        "margin": {
+            1: 5,
+            2: 6
+        },
+        "leg_up": {
+            1: 7,
+            2: 3
+        },
+        # parameters for moving further, when moving with feedback
+        "servos": {
+            "diff_from_target_limit": 3.5,
+            "diff_from_prev_limit": 0.5
+        },
+        # issue next command a little faster, than previous is finished executing
+        # when moving without feedback
+        "movement_command_advance_ms" : 0.05,
+        "movement_overshoot_coefficient" : 0.2,
+    }
+
+
 
 
 limits = {
@@ -117,26 +204,6 @@ angles = {
             "max": 170 + leg["phi_angle"]
         }
     }
-}
-
-fenix = {
-    "margin": {
-        1: 5,
-        2: 6
-    },
-    "leg_up": {
-        1: 7,
-        2: 3
-    },
-    # parameters for moving further, when moving with feedback
-    "servos": {
-        "diff_from_target_limit": 3.5,
-        "diff_from_prev_limit": 0.5
-    },
-    # issue next command a little faster, than previous is finished executing
-    # when moving without feedback
-    "movement_command_advance_ms" : 0.15,
-    "movement_overshoot_coefficient" : 0.2,
 }
 
 mode = 90

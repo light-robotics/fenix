@@ -6,13 +6,14 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from hardware.dualshock import DualShock
 from fenix_hardware.neopixel_commands_setter import NeopixelCommandsSetter
 from core.commands_writer import CommandsWriter
+import configs.config as cfg
 
 
 class FenixModes(Enum):
     WALKING = 1
-    RUN = 2
-    SENTRY = 3
-    BATTLE     = 4
+    RUN     = 2
+    SENTRY  = 3
+    BATTLE  = 4
 
 class FenixDualShock(DualShock):
     """
@@ -110,17 +111,17 @@ class FenixDualShock(DualShock):
     
     def on_L3_up(self, value):
         if self.mode == FenixModes.RUN:
-            self.command_writer.write_command('forward_two_legged', self.convert_value_to_speed(value))
+            self.command_writer.write_command('forward_two_legged', cfg.speed["run"])
         elif self.mode == FenixModes.WALKING:
             self.command_writer.write_command('forward_one_legged', self.convert_value_to_speed(value))
         elif self.mode == FenixModes.SENTRY:
             self.command_writer.write_command('body_forward', 1000)
         elif self.mode == FenixModes.BATTLE:
-            self.command_writer.write_command('hit_4', 500)
+            self.command_writer.write_command('hit_4', cfg.speed["hit"])
     
     def on_L3_down(self, value):
         if self.mode == FenixModes.RUN:
-            self.command_writer.write_command('backward_two_legged', self.convert_value_to_speed(value))
+            self.command_writer.write_command('backward_two_legged', cfg.speed["run"])
         elif self.mode == FenixModes.WALKING:
             self.command_writer.write_command('backward_one_legged', self.convert_value_to_speed(value))
         elif self.mode == FenixModes.SENTRY:
@@ -128,7 +129,7 @@ class FenixDualShock(DualShock):
 
     def on_L3_left(self, value):
         if self.mode == FenixModes.RUN:
-            self.command_writer.write_command('strafe_left_two_legged', self.convert_value_to_speed(value))
+            self.command_writer.write_command('strafe_left_two_legged', cfg.speed["run"])
         elif self.mode == FenixModes.WALKING:
             self.command_writer.write_command('strafe_left_one_legged', self.convert_value_to_speed(value))
         elif self.mode == FenixModes.SENTRY:
@@ -136,7 +137,7 @@ class FenixDualShock(DualShock):
 
     def on_L3_right(self, value):
         if self.mode == FenixModes.RUN:
-            self.command_writer.write_command('strafe_right_two_legged', self.convert_value_to_speed(value))
+            self.command_writer.write_command('strafe_right_two_legged', cfg.speed["run"])
         elif self.mode == FenixModes.WALKING:
             self.command_writer.write_command('strafe_right_one_legged', self.convert_value_to_speed(value))
         elif self.mode == FenixModes.SENTRY:
@@ -158,7 +159,7 @@ class FenixDualShock(DualShock):
         if self.mode == FenixModes.SENTRY:
             self.command_writer.write_command('look_up', 1000)
         elif self.mode == FenixModes.BATTLE:
-            self.command_writer.write_command('hit_1', 500)
+            self.command_writer.write_command('hit_1', cfg.speed["hit"])
     
     def on_R3_down(self, value):
         #if self.mode in [FenixModes.WALKING, FenixModes.RUN]:

@@ -236,11 +236,14 @@ class FenixServos:
         time.sleep(rate / 1000)
             
     def set_servo_values_not_paced(self, angles):
-        self.send_command_to_servos(angles, self.speed * 1.05)
+        # every command is executed over fixed time (1 sec for speed = 1000)
+        self.send_command_to_servos(angles, int(self.speed * 0.9))
         wait_time = max(0, self.speed / 1000 - config.fenix['movement_command_advance_ms'])
+        self.logger.info(f'Wait time : {wait_time}, speed : {int(self.speed * 0.9)}')
         time.sleep(wait_time)
 
     def set_servo_values_not_paced_v2(self, angles, prev_angles=None):
+        # every command is executed over a computed time, depending on the angle
         _, max_angle_diff = self.get_angles_diff(angles, prev_angles)
         rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
         wait_time = max(0, rate / 1000 - config.fenix['movement_command_advance_ms'])
