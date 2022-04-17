@@ -112,11 +112,11 @@ else:
 
     fenix = {
         "margin": {
-            1: 5,
+            1: 0,
             2: 6
         },
         "leg_up": {
-            1: 7,
+            1: 5,
             2: 3
         },
         # parameters for moving further, when moving with feedback

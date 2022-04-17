@@ -885,6 +885,26 @@ class FenixKinematics:
             leg.move_mount_point(delta_x, delta_y, 0)
         self.add_angles_snapshot()
     """
+
+    def look_on_angle_new(self, up):
+        angle = cfg.moves['vertical_look_angle']
+        x = cfg.leg["mount_point_offset"] * math.cos(math.radians(angle))
+        z = cfg.leg["mount_point_offset"] * math.sin(math.radians(angle))
+        
+        for leg in [self.legs[1], self.legs[4]]:
+            if up:
+                leg.move_mount_point(0, -x, z)
+            else:
+                leg.move_mount_point(0, x, -z)
+        for leg in [self.legs[2], self.legs[3]]:
+            if up:
+                leg.move_mount_point(0, x, -z)
+            else:
+                leg.move_mount_point(0, -x, z)
+
+        self.add_angles_snapshot('body')
+
+    # looks like this is bugged in cached kinematics, cuz current angle not working well
     def look_on_angle(self, angle):
         current_angle = self.current_angle
 
