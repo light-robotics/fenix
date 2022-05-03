@@ -4,7 +4,8 @@ class LEGS_MODE(Enum):
     STAR    = 1
     POINTER = 2
 
-legs_mode = LEGS_MODE.STAR
+#legs_mode = LEGS_MODE.STAR
+legs_mode = LEGS_MODE.POINTER
 
 obstacle = {
     "danger_offset": 1.0,
