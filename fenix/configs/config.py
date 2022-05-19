@@ -67,7 +67,7 @@ if legs_mode == LEGS_MODE.POINTER:
         },
         "leg_up": {
             1: 7,
-            2: 3
+            2: 4
         },
         # parameters for moving further, when moving with feedback
         "servos": {

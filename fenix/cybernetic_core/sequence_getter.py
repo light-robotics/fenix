@@ -56,7 +56,7 @@ class VirtualFenix():
         return sequence, new_position
 
 
-#@memory.cache
+@memory.cache
 def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> Sequence:
     fk = FenixKinematics(fenix_position=fenix_position)
     
