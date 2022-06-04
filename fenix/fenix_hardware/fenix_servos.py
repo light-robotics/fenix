@@ -274,6 +274,14 @@ class FenixServos:
         time.sleep(wait_time)
         self.logger.info(f'[DIFF] Diff from target:')
         self.get_angles_diff(angles)
+    
+    def set_servo_values_for_running(self, angles, rate=config.speed["run"]):
+        wait_time = max(0, rate / 1000 - config.fenix['movement_command_advance_ms'])
+        self.logger.info(f'Wait time : {wait_time}')
+        
+        self.send_command_to_servos(angles, rate)
+        
+        time.sleep(wait_time)
 
     def get_angles_diff(self, target_angles, test_angles=None):
         if test_angles is None:

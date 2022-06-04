@@ -159,20 +159,6 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.hit(1)
     elif command == 'hit_4':
         fk.hit(4)
-    elif command == 'check_leg':
-        fk.check_leg_2(1)
-    #elif command == 'check_leg_4':
-        fk.check_leg_2(4)
-    elif command == 'check_leg_2':
-        fk.body_movement(0, 0, UP_OR_DOWN_CM)
-        fk.demo11()
-        fk.demo12()
-        fk.demo13()
-        fk.check_leg_2(1)
-        fk.check_leg_2(4)            
-        fk.body_movement(0, -3*FORWARD_BODY_CM, 0)
-        fk.body_movement(0, 3*FORWARD_BODY_CM, 0)
-        fk.body_movement(0, 0, -UP_OR_DOWN_CM)
     elif command == 'battle_stance':
         fk.battle_stance()
     elif command == 'normal_stance':

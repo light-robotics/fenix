@@ -7,6 +7,7 @@ from hardware.dualshock import DualShock
 from fenix_hardware.neopixel_commands_setter import NeopixelCommandsSetter
 from core.commands_writer import CommandsWriter
 import configs.config as cfg
+from configs.modes import NIGHT_MODE
 
 
 class FenixModes(Enum):
@@ -80,9 +81,14 @@ class FenixDualShock(DualShock):
         print('Flashlight off')
 
     def on_L1_press(self):
-        self.light_on = True
-        self.neopixel.issue_command('activation')
-        print('Activation')
+        if self.light_on:
+            self.light_on = False
+            self.neopixel.issue_command('light_off')
+            print('Turn the lights off')
+        else:
+            self.light_on = True
+            self.neopixel.issue_command('dipped_headlights')
+            print('Turn the dim lights on')   
     
     def on_L2_press(self, value):
         self.light_on = True
@@ -210,25 +216,29 @@ class FenixDualShock(DualShock):
         
     def on_x_press(self):
         self.mode = FenixModes.BATTLE
-        self.neopixel.issue_command('steady', color='purple')
+        if not NIGHT_MODE:
+            self.neopixel.issue_command('steady', color='purple')
         self.command_writer.write_command('battle_mode', 1000)
         print('Switched mode to BATTLE')
 
     def on_triangle_press(self):
         self.mode = FenixModes.RUN
-        self.neopixel.issue_command('steady', color='red')
+        if not NIGHT_MODE:
+            self.neopixel.issue_command('steady', color='red')
         self.command_writer.write_command('run_mode', 1000)
         print('Switched mode to RUN')
 
     def on_circle_press(self):
         self.mode = FenixModes.SENTRY
-        self.neopixel.issue_command('steady', color='cyan')
+        if not NIGHT_MODE:
+            self.neopixel.issue_command('steady', color='cyan')
         self.command_writer.write_command('sentry_mode', 1000)
         print('Switched mode to SENTRY')
 
     def on_square_press(self):
         self.mode = FenixModes.WALKING
-        self.neopixel.issue_command('steady', color='blue')
+        if not NIGHT_MODE:
+            self.neopixel.issue_command('steady', color='blue')
         self.command_writer.write_command('one_legged_mode', 1000)
         print('Switched mode to WALKING')
 

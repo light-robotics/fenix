@@ -1,11 +1,4 @@
-from enum import Enum
-
-class LEGS_MODE(Enum):
-    STAR    = 1
-    POINTER = 2
-
-#legs_mode = LEGS_MODE.STAR
-legs_mode = LEGS_MODE.POINTER
+from configs.modes import STAR_LEGS
 
 obstacle = {
     "danger_offset": 1.0,
@@ -29,7 +22,7 @@ start = {
     "initial_z_position_delta" : 5, # 3
 }
 
-if legs_mode == LEGS_MODE.POINTER:
+if not STAR_LEGS:
     modes = {
         "run_mode" : {
             "horizontal_xy" : 16,
@@ -52,7 +45,7 @@ if legs_mode == LEGS_MODE.POINTER:
 
     moves = {
         "up_or_down_cm"         : 2,
-        "move_body_cm"          : 2,
+        "move_body_cm"          : 7,
         "forward_body_1_leg_cm" : 8,
         "forward_body_2_leg_cm" : 4,    
         "reposition_cm"         : 1,
@@ -103,7 +96,7 @@ else:
 
     moves = {
         "up_or_down_cm"         : 2,
-        "move_body_cm"          : 2,
+        "move_body_cm"          : 7,
         "forward_body_1_leg_cm" : 8,
         "forward_body_2_leg_cm" : 6,    
         "reposition_cm"         : 1,
