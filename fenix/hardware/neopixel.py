@@ -1,10 +1,7 @@
-#!/usr/bin/env python3
-
 """
 A version of neopixel led strip for Fenix quadruped robot
 This file written by Light Robotics (light.robotics.2020@gmail.com)
 Used library written by Tony DiCola (tony@tonydicola.com)
-
 !!! Script should be run with sudo !!!
 """
 
@@ -14,7 +11,7 @@ from rpi_ws281x import PixelStrip, Color
 
 class Neopixel:
     # LED strip configuration:
-    LED_COUNT = 18        # Number of LED pixels.
+    LED_COUNT = 17        # Number of LED pixels.
     LED_PIN = 18          # GPIO pin connected to the pixels (18 uses PWM!).
     # LED_PIN = 10        # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
     LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
@@ -28,10 +25,15 @@ class Neopixel:
         'green'  : Color(0, 255, 0),
         'blue'   : Color(0, 0, 255),
         'white'  : Color(255, 255, 255),
+        'none'   : Color(0, 0, 0),
 
         'yellow' : Color(204, 102, 0),        
         'cyan'   : Color(0, 255, 255),
         'purple' : Color(218, 112, 214),
+        'orange' : Color(255, 140, 0),
+        'redfox' : Color(195, 88, 23),
+        'midred' : Color(148, 56, 58),
+        'test'   : Color(130, 70, 50),
 
         'dim-white'    : Color(125, 125, 125),
         'dim-blue'     : Color(0, 0, 125),
@@ -50,39 +52,56 @@ class Neopixel:
         # Intialize the library (must be called once before other functions).
         self.strip.begin()        
 
-    def activate_mode(self, mode: str, color_str: str, brigthness: int) -> None:
-        try:
-            color = self.colors[color_str]
-            while True:
-                self.strip.setBrightness(brigthness)
-                if mode == 'steady':
-                    self.steady_color(color)
-                if mode == 'blink':
-                    self.blink(color)
-                if mode == 'flashlight':
-                    self.flashlight(color)
-                if mode == 'rainbow':
-                    self.rainbow()
-                if mode == 'theater':
-                    self.theater_chase(color)
-                if mode == 'rainbow_cycle':
-                    self.rainbow_cycle()
-                if mode == 'theater_rainbow':
-                    self.theater_chase_rainbow()
-                time.sleep(1)
-        except KeyboardInterrupt:
-            self.strip.setBrightness(0)
-            self.strip.show()
+    def activate_mode(self, mode: str, color_str: str, brightness: int) -> None:
+        print(f'Activating mode {mode} - {color_str} - {brightness}')
+        color = self.colors[color_str]
+        #self.strip.setBrightness(brigthness)
 
-    def steady_color(self, color: Color, wait_ms: int = 0) -> None:
+        if mode == 'shutdown':
+            self.shutdown()
+        
+        if mode == 'steady':
+            self.steady_color(color, brightness)
+        if mode == 'blink':
+            self.blink(color, brightness)
+        if mode == 'flashlight':
+            self.flashlight(color, brightness)
+        if mode == 'rainbow':
+            self.rainbow(brightness)
+        if mode == 'theater':
+            self.theater_chase(color, brightness)
+        if mode == 'rainbow_cycle':
+            self.rainbow_cycle(brightness)
+        if mode == 'theater_rainbow':
+            self.theater_chase_rainbow(brightness)
+        if mode == 'activation':
+            self.activation(color, brightness)
+
+    def mode_cycle(self, mode: str, color_str: str, brightness: int) -> None:
+        while True:
+            self.activate_mode(mode, color_str, brightness)
+            time.sleep(1.0)
+    
+    def shutdown(self):
+        self.strip.setBrightness(0)
+        self.strip.show()
+
+    def steady_color(self, color: Color, brightness: int = 255, wait_ms: int = 0) -> None:
         # wait_ms introduces delay between pixels turning on
+        self.strip.setBrightness(brightness)
+        #print(f'Setting brightness to {brightness}')
+
         for i in range(self.strip.numPixels()):
             self.strip.setPixelColor(i, color)
+            #print(f'Pixel {i} color set to {color}')
             self.strip.show()
             time.sleep(wait_ms / 1000.0)
     
-    def blink(self, color: Color, wait_ms: int = 10) -> None:
+    def blink(self, color: Color, brightness: int = 255, wait_ms: int = 10) -> None:
         self.steady_color(color)
+        self.strip.setBrightness(brightness)
+        #print(f'Setting brightness to {brightness}')
+
         for j in range(255):
             self.strip.setBrightness(255-j)
             self.strip.show()
@@ -90,17 +109,46 @@ class Neopixel:
         for j in range(255):
             self.strip.setBrightness(j)
             self.strip.show()
-            time.sleep(wait_ms / 1000.0)
-        
+            time.sleep(wait_ms / 1000.0)        
     
-    def flashlight(self, color: Color = colors['white']) -> None:
-        self.strip.setBrightness(255)
-        for i in range(0, 6):
-            self.strip.setPixelColor(i, color)
+    def flashlight(self, color: Color = colors['white'], brightness: int = 255) -> None:
+        self.strip.setBrightness(brightness)
+        #print(f'Setting brightness to {brightness}')
+
+        for i in range(0, self.LED_COUNT):
+            if i < 11: # first 6 are front flashlight
+                self.strip.setPixelColor(i, color)
+            else:
+                self.strip.setPixelColor(i, self.colors['none'])
+        self.strip.show()
+
+    def activation(self, color: Color = colors['white'], brightness: int = 255) -> None:
+        self.steady_color(self.colors['none'], 0)
+        self.strip.setBrightness(0)
+        #print(f'Setting brightness to 0')
+        time.sleep(1.0)
+
+        self.strip.setBrightness(brightness)
+        #print(f'Setting brightness to {brightness}')
+        for pixels in [[0, 4], [1, 5], [2, 6], [3, 7]]:
+            self.strip.setPixelColor(pixels[0], color)
+            self.strip.setPixelColor(pixels[1], color)
+            self.strip.show()
+            time.sleep(1.0)        
+
+        time.sleep(1.0)
+
+        for pixels in [8, 9, 10, 11, 12, 13, 14, 15, 16]:
+            self.strip.setPixelColor(pixels, color)
+            #time.sleep(0.3)
             self.strip.show()
 
-    def rainbow(self, wait_ms: int = 20, iterations: int = 1) -> None:
+
+    def rainbow(self, brightness: int = 255, wait_ms: int = 20, iterations: int = 2) -> None:
         """Draw rainbow that fades across all pixels at once."""
+        self.strip.setBrightness(brightness)
+        #print(f'Setting brightness to {brightness}')
+
         for j in range(256 * iterations):
             for i in range(self.strip.numPixels()):
                 self.strip.setPixelColor(i, self._wheel((i + j) & 255))
@@ -110,6 +158,7 @@ class Neopixel:
     @staticmethod
     def _wheel(pos: int) -> Color:
         """Generate rainbow colors across 0-255 positions."""
+        
         if pos < 85:
             return Color(pos * 3, 255 - pos * 3, 0)
         elif pos < 170:
@@ -119,8 +168,11 @@ class Neopixel:
             pos -= 170
             return Color(0, pos * 3, 255 - pos * 3)
     
-    def theater_chase(self, color: Color, wait_ms:int = 50, iterations:int = 10) -> None:
+    def theater_chase(self, color: Color, brightness: int = 255, wait_ms:int = 50, iterations:int = 10) -> None:
         """Movie theater light style chaser animation."""
+        self.strip.setBrightness(brightness)
+        #print(f'Setting brightness to {brightness}')
+
         for _ in range(iterations):
             for q in range(3):
                 for i in range(0, self.strip.numPixels(), 3):
@@ -130,8 +182,11 @@ class Neopixel:
                 for i in range(0, self.strip.numPixels(), 3):
                     self.strip.setPixelColor(i + q, 0)
 
-    def rainbow_cycle(self, wait_ms: int = 20, iterations: int = 5) -> None:
+    def rainbow_cycle(self, brightness: int = 255, wait_ms: int = 20, iterations: int = 5) -> None:
         """Draw rainbow that uniformly distributes itself across all pixels."""
+        self.strip.setBrightness(brightness)
+        print(f'Setting brightness to {brightness}')
+
         for j in range(256 * iterations):
             for i in range(self.strip.numPixels()):
                 self.strip.setPixelColor(i, self._wheel(
@@ -139,8 +194,11 @@ class Neopixel:
             self.strip.show()
             time.sleep(wait_ms / 1000.0)
 
-    def theater_chase_rainbow(self, wait_ms: int = 50) -> None:
+    def theater_chase_rainbow(self, brightness: int = 255, wait_ms: int = 50) -> None:
         """Rainbow movie theater light style chaser animation."""
+        self.strip.setBrightness(brightness)
+        print(f'Setting brightness to {brightness}')
+
         for j in range(256):
             for q in range(3):
                 for i in range(0, self.strip.numPixels(), 3):
@@ -161,5 +219,8 @@ if __name__ == '__main__':
     assert 50 <= args.brightness <= 255
 
     fenix_neopixel = Neopixel()
-    fenix_neopixel.activate_mode(args.mode, args.color, args.brightness)
+    try:
+        fenix_neopixel.mode_cycle(args.mode, args.color, args.brightness)
+    except KeyboardInterrupt:
+        fenix_neopixel.shutdown()
     
