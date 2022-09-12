@@ -101,7 +101,7 @@ else:
         "forward_body_2_leg_cm" : 6,    
         "reposition_cm"         : 1,
         "side_look_angle"       : 12,
-        "vertical_look_angle"   : 30,
+        "vertical_look_angle"   : 45,
     }
 
     fenix = {
@@ -111,7 +111,7 @@ else:
         },
         "leg_up": {
             1: 6,
-            2: 3
+            2: 5
         },
         # parameters for moving further, when moving with feedback
         "servos": {

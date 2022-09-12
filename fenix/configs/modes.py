@@ -1,2 +1,2 @@
 NIGHT_MODE = False
-STAR_LEGS = False
+STAR_LEGS = True

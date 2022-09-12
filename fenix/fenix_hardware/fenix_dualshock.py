@@ -174,19 +174,15 @@ class FenixDualShock(DualShock):
             self.command_writer.write_command('look_down', 1000)
     
     def on_R3_left(self, value):
-        if self.mode == FenixModes.RUN:
+        if self.mode in [FenixModes.RUN, FenixModes.WALKING]:
             self.command_writer.write_command('turn_left_two_legged', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.WALKING:
-            self.command_writer.write_command('turn_left_two_legged', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.SENTRY:
+        elif self.mode in [FenixModes.SENTRY, FenixModes.BATTLE]:
             self.command_writer.write_command('look_left', 1000)
     
     def on_R3_right(self, value):
-        if self.mode == FenixModes.RUN:
+        if self.mode in [FenixModes.RUN, FenixModes.WALKING]:
             self.command_writer.write_command('turn_right_two_legged', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.WALKING:
-            self.command_writer.write_command('turn_left_two_legged', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.SENTRY:
+        elif self.mode in [FenixModes.SENTRY, FenixModes.BATTLE]:
             self.command_writer.write_command('look_right', 1000)
 
     def on_R3_press(self):
@@ -206,10 +202,16 @@ class FenixDualShock(DualShock):
         pass
       
     def on_up_arrow_press(self):
-        self.command_writer.write_command('up', 1000)
+        if self.mode in [FenixModes.RUN, FenixModes.WALKING, FenixModes.SENTRY]:
+            self.command_writer.write_command('up', 1000)
+        elif self.mode == FenixModes.BATTLE:
+            self.command_writer.write_command('nano_demo_1', 1000)
 
     def on_down_arrow_press(self):
-        self.command_writer.write_command('down', 1000)
+        if self.mode in [FenixModes.RUN, FenixModes.WALKING, FenixModes.SENTRY]:
+            self.command_writer.write_command('down', 1000)
+        elif self.mode == FenixModes.BATTLE:
+            self.command_writer.write_command('nano_demo_2', 1000)
 
     def on_up_down_arrow_release(self):
         self.command_writer.write_command('none', 500)

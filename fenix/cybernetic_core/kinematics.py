@@ -1050,6 +1050,22 @@ class FenixKinematics:
         self.check_leg(4)
         self.check_leg(1)
         self.battle_stance()
+    
+    def nano_demo_1(self):
+        """
+        self.body_movement(0, -2, 0)
+        self.move_leg_endpoint(1, [0, 4, self.leg_up_single + 5])
+        self.move_leg_endpoint(1, [0, 0, -self.leg_up_single - 5])
+        self.move_leg_endpoint(4, [0, 4, self.leg_up_single + 5])
+        self.move_leg_endpoint(4, [0, 0, -self.leg_up_single - 5])
+        self.body_movement(0, 6, 8)
+        """
+        self.body_movement(0, 6, 2)
+        self.look_on_angle_new(up=False)        
+
+    def nano_demo_2(self):
+        self.look_on_angle_new(up=True)
+        self.body_movement(0, -6, -2)
 
     # dance moves
     def opposite_legs_up(self, leg_up, leg_forward):

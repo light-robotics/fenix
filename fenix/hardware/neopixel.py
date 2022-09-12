@@ -144,7 +144,7 @@ class Neopixel:
             self.strip.show()
 
 
-    def rainbow(self, brightness: int = 255, wait_ms: int = 20, iterations: int = 1) -> None:
+    def rainbow(self, brightness: int = 255, wait_ms: int = 20, iterations: int = 2) -> None:
         """Draw rainbow that fades across all pixels at once."""
         self.strip.setBrightness(brightness)
         #print(f'Setting brightness to {brightness}')

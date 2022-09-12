@@ -56,7 +56,7 @@ class VirtualFenix():
         return sequence, new_position
 
 
-@memory.cache
+#@memory.cache
 def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> Sequence:
     fk = FenixKinematics(fenix_position=fenix_position)
     
@@ -127,9 +127,9 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         #fk.look_on_angle(VERTICAL_LOOK_ANGLE) # this should be iterative P.S.: or not
         fk.look_on_angle_new(up=False)
     elif command == 'look_left':
-        fk.turn(-12, only_body=True)
+        fk.turn(-24, only_body=True)
     elif command == 'look_right':
-        fk.turn(12, only_body=True)
+        fk.turn(24, only_body=True)
     elif command == 'sight_to_normal':
         fk.look_on_angle(0)
         fk.turn(-fk.side_look_angle, only_body=True)
@@ -179,6 +179,10 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.body_movement(0, -3*FORWARD_BODY_CM, 0)
     elif command == 'demo_sequence':
         fk.demo_sequence()
+    elif command == 'nano_demo_1':
+        fk.nano_demo_1()
+    elif command == 'nano_demo_2':
+        fk.nano_demo_2()
     else:
         print(f'Unknown command')
     

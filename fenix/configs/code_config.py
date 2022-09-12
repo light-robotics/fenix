@@ -1,7 +1,7 @@
 import os
 
 
-DEBUG = True # in DEBUG mode command to servos is not issued
+DEBUG = False # in DEBUG mode command to servos is not issued
 
 project_dir = os.path.join(os.path.dirname(__file__), '..')
 main_log_file = os.path.join(project_dir, 'logs', 'main.log')
