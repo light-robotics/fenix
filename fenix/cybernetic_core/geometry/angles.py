@@ -38,124 +38,60 @@ def calculate_leg_angles(O: Point, C: Point, logger):
     A = Point(O.x + cfg.leg["d"] * math.cos(tetta),
                 O.y + cfg.leg["d"] * math.sin(tetta),
                 O.z)
-    logger.info(math.degrees(tetta), A)
+    logger.info(f'{math.degrees(tetta)}, {A}')
 
     l = round(math.sqrt((C.x - A.x) ** 2 + (C.y - A.y) ** 2), 2)
     delta_z = round(C.z - O.z, 2)
     logger.info(f'Trying l {l} and delta_z {delta_z}')
-    alpha, beta = find_angles(l, delta_z)
+    alpha, beta = find_angles(l, delta_z, logger)
     logger.info(f'Success : {math.degrees(alpha)}, {math.degrees(beta)}')
 
     return tetta, alpha, beta
-
-def convert_gamma(gamma: float) -> float:
-    gamma_converted = round(math.degrees(gamma) - cfg.leg["phi_angle"], 2)
-    return gamma_converted
-
-def convert_gamma_back(gamma_converted: float) -> float:
-    gamma_initial = round(math.radians(gamma_converted + cfg.leg["phi_angle"]), 4)
-    return gamma_initial
 
 def convert_alpha(alpha: float) -> float:
     alpha_converted = round(math.degrees(alpha), 2)
     return alpha_converted
 
-def convert_alpha_back(alpha_converted: float) -> float:
-    alpha_initial = round(math.radians(alpha_converted), 4)
-    return alpha_initial
-
 def convert_beta(beta: float) -> float:
-    beta_converted = -round(math.degrees(beta), 2)
+    beta_converted = round(math.degrees(beta) - 90, 2)
     return beta_converted
-
-def convert_beta_back(beta_converted: float) -> float:
-    beta_initial = -round(math.radians(beta_converted), 4)
-    return beta_initial
 
 def convert_tetta(tetta: float, leg_number: int) -> float:
     # virtual model to real servos
     tetta_degrees = math.degrees(tetta)
+    
     if leg_number == 1:
         tetta_degrees -= 45
     elif leg_number == 2:
-        #tetta_degrees -= 135
         tetta_degrees += 45
     elif leg_number == 3:
         tetta_degrees += 135
-        #tetta_degrees -= 45
     elif leg_number == 4:
-        #tetta_degrees += 45
         tetta_degrees -= 135
     
     return round(tetta_degrees, 2)
 
-def convert_tetta_back(tetta_degrees: float, leg_number: int) -> float:
-    # real servos to virtual model    
-    if leg_number == 1:
-        tetta_degrees += 45
-    elif leg_number == 2:
-        #tetta_degrees += 135
-        tetta_degrees -= 45
-    elif leg_number == 3:
-        tetta_degrees -= 135
-        #tetta_degrees += 45
-    elif leg_number == 4:
-        #tetta_degrees -= 45
-        tetta_degrees += 135
-    
-    return round(math.radians(tetta_degrees), 4)
-    
 def convert_legs_angles(legs_angles: List[float]) -> List[float]:
     # input: 16 angles in RADIANS
     # output: 16 converted angles in DEGREES
     # was gamma, beta, alpha, tetta one leg after another
     # now tetta, alpha, beta, gamma one leg after another
     angles_converted = [
-        convert_tetta(legs_angles[0], 1),
-        convert_alpha(legs_angles[1]),
         convert_beta(legs_angles[2]),
-        convert_gamma(legs_angles[3]),
-        convert_tetta(legs_angles[4], 2),
-        convert_alpha(legs_angles[5]),
-        convert_beta(legs_angles[6]),
-        convert_gamma(legs_angles[7]),
-        convert_tetta(legs_angles[8], 3),
-        convert_alpha(legs_angles[9]),
-        convert_beta(legs_angles[10]),
-        convert_gamma(legs_angles[11]),
-        convert_tetta(legs_angles[12], 4),
-        convert_alpha(legs_angles[13]),
-        convert_beta(legs_angles[14]),
-        convert_gamma(legs_angles[15]),
+        convert_alpha(legs_angles[1]),
+        convert_tetta(legs_angles[0], 1),
+        convert_beta(legs_angles[5]),
+        convert_alpha(legs_angles[4]),
+        convert_tetta(legs_angles[3], 2),
+        convert_beta(legs_angles[8]),
+        convert_alpha(legs_angles[7]),
+        convert_tetta(legs_angles[6], 3),
+        convert_beta(legs_angles[11]),
+        convert_alpha(legs_angles[10]),
+        convert_tetta(legs_angles[9], 4),
     ]
 
     return angles_converted
-
-def convert_legs_angles_back(legs_angles_converted: List[float]) -> List[float]:
-    # input: 16 angles in RADIANS
-    # output: 16 converted angles in DEGREES
-    # was gamma, beta, alpha, tetta one leg after another
-    # now tetta, alpha, beta, gamma one leg after another
-    angles_initial = [
-        convert_tetta_back(legs_angles_converted[0], 1),
-        convert_alpha_back(legs_angles_converted[1]),
-        convert_beta_back(legs_angles_converted[2]),
-        convert_gamma_back(legs_angles_converted[3]),
-        convert_tetta_back(legs_angles_converted[4], 2),
-        convert_alpha_back(legs_angles_converted[5]),
-        convert_beta_back(legs_angles_converted[6]),
-        convert_gamma_back(legs_angles_converted[7]),
-        convert_tetta_back(legs_angles_converted[8], 3),
-        convert_alpha_back(legs_angles_converted[9]),
-        convert_beta_back(legs_angles_converted[10]),
-        convert_gamma_back(legs_angles_converted[11]),
-        convert_tetta_back(legs_angles_converted[12], 4),
-        convert_alpha_back(legs_angles_converted[13]),
-        convert_beta_back(legs_angles_converted[14]),
-        convert_gamma_back(legs_angles_converted[15]),
-    ]
-
-    return angles_initial
 
 # ----------------------
 # moves for Fenix
@@ -189,9 +125,9 @@ if __name__ == '__main__':
     #print(calculate_leg_angles(Point(x=3.8, y=-3.8, z=0), Point(x=18.0, y=-21.0, z=-11.0), 'rear_leg', logger))
     # [2022-03-09 23:22:21,571][INFO] Trying l 3.46 and delta_z -14.22
     O = Point(x=3.8, y=-3.8, z=0)
-    D = Point(x=7.24, y=-3.69, z=-14.22)
+    C = Point(x=7.24, y=-3.69, z=-14.22)
     leg_tag = 'rear_leg'
-    calculate_leg_angles(O, D, leg_tag, logger)
+    calculate_leg_angles(O, C, logger)
 
     # D initial : Point(x=7.24, y=-3.69, z=-14.22)
     # D calcula : Point(x=14.15, y=-3.47, z=-14.22)

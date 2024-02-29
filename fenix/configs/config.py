@@ -14,10 +14,10 @@ leg = {
 }
 
 start = {
-    "vertical"                 : 11,
-    "horizontal_x"             : 17, # 18
-    "horizontal_y"             : 17, # 18
-    "y_offset_body"            : 3,
+    "vertical"                 : 8,
+    "horizontal_x"             : 15, # 18
+    "horizontal_y"             : 15, # 18
+    "y_offset_body"            : 0,
     "initial_z_position_delta" : 5, # 3
 }
 
@@ -150,8 +150,8 @@ angles = {
         "max": -10
     },
     "gamma": {
-        "min": -100 + leg["phi_angle"],
-        "max": -15 + leg["phi_angle"]
+        "min": -100,
+        "max": -15
     },
     "front_leg": {
         "alpha": {
@@ -163,16 +163,16 @@ angles = {
             "max": 0
         },
         "gamma": {
-            "min": -100 + leg["phi_angle"],
-            "max": -12 + leg["phi_angle"]
+            "min": -100,
+            "max": -12
         },
         "tetta": {
             "min": -27,
             "max": 27
         },
         "beta-gamma": {
-            "min": 20 + leg["phi_angle"],
-            "max": 170 + leg["phi_angle"]
+            "min": 20,
+            "max": 170
         }
     },
     "rear_leg": {
@@ -185,16 +185,16 @@ angles = {
             "max": 0
         },
         "gamma": {
-            "min": -100 + leg["phi_angle"],
-            "max": -12 + leg["phi_angle"]
+            "min": -100,
+            "max": -12
         },
         "tetta": {
             "min": -20,
             "max": 20
         },
         "beta-gamma": {
-            "min": 20 + leg["phi_angle"],
-            "max": 170 + leg["phi_angle"]
+            "min": 20,
+            "max": 170
         }
     }
 }
