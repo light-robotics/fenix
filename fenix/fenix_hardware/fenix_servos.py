@@ -45,12 +45,24 @@ class FenixServos:
     #@timing
     def get_current_angles(self):
         current_angles = []
+        
+        for i in [3, 4, 5]:
+            current_angles.append(self.m1.read_angle(i))
+            time.sleep(0.0002)
+        for i in [9, 10, 11, 15, 16, 17]:
+            current_angles.append(self.m4.read_angle(i))
+            time.sleep(0.0002)
+        for i in [21, 22, 23]:
+            current_angles.append(self.m1.read_angle(i))
+            time.sleep(0.0002)
+        """
         j = 1
         for m in [self.m1, self.m2, self.m3, self.m4]:            
             for _ in range(4):
                 current_angles.append(m.read_angle(j))
                 time.sleep(0.0002)
                 j += 1
+        """
         self.logger.info(f'Read current angles : {current_angles}')
         
         return current_angles

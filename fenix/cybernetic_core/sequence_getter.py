@@ -105,8 +105,10 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.body_movement(0, 0, UP_OR_DOWN_CM)
     elif command == 'down':
         fk.body_movement(0, 0, -UP_OR_DOWN_CM)
-    elif command == 'backward_two_legged':
-        pass
+    elif command == 'climb':
+        fk.body_movement(0, 0, 12)
+        fk.body_movement(-10, 0, 0)
+        fk.leg_movement(1, [5, 0, 15])
     elif command == 'backward_one_legged':
         pass
     

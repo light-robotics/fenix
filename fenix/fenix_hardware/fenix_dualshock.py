@@ -196,7 +196,9 @@ class FenixDualShock(DualShock):
         self.command_writer.write_command('none', 250)
 
     def on_right_arrow_press(self):
-        pass
+        self.command_writer.write_command('climb', 1000)
+        time.sleep(0.5)
+        self.command_writer.write_command('none', 1000)
 
     def on_left_arrow_press(self):
         pass

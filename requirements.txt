@@ -1,3 +1,4 @@
 rpi-ws281x==4.2.4
 pyserial==3.4
 pyPS4Controller==1.2.5
+joblib

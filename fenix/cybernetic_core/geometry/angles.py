@@ -93,6 +93,22 @@ def convert_legs_angles(legs_angles: List[float]) -> List[float]:
 
     return angles_converted
 
+def calculate_C_point(O: Point, tetta: float, alpha: float, beta: float) -> Point:
+    A = Point(O.x + cfg.leg["d"] * math.cos(tetta),
+                O.y + cfg.leg["d"] * math.sin(tetta),
+                O.z)
+    
+    B_xz = [cfg.leg["a"] * math.cos(alpha),
+            cfg.leg["a"] * math.sin(alpha)]
+    C_xz = [B_xz[0] + cfg.leg["b"] * math.cos(alpha - beta),
+            B_xz[1] + cfg.leg["b"] * math.sin(alpha - beta)]
+
+    C = Point(round(A.x + C_xz[0] * math.cos(tetta), 2),
+                    round(A.y + C_xz[0] * math.sin(tetta), 2),
+                    round(A.z + C_xz[1], 2))
+
+    return C
+
 # ----------------------
 # moves for Fenix
 def get_angle_by_coords(x1, y1):
