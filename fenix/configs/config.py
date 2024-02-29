@@ -6,12 +6,11 @@ obstacle = {
 }
 
 leg = {
-    "a": 7.4,    # PointA to PointB - femur
-    "b": 6.9,    # PointB to PointC - femur-tibia
-    "c": 14.7,   # PointC to PointD - tibia / point toe length
-    "d": 6.9,    # PointO to PointA - trochanter-coxa
+    "a": 15,    # PointA to PointB - femur
+    "b": 18,    # PointB to PointC - femur-tibia
+    "d": 6.5,    # PointO to PointA - trochanter-coxa
     "mount_point_offset": 3.8, # ???
-    "phi_angle" : -22.5 # angle fix due to leg not being straight
+    #"phi_angle" : -22.5 # angle fix due to leg not being straight
 }
 
 start = {
