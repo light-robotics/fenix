@@ -47,15 +47,6 @@ def calculate_leg_angles(O: Point, C: Point, logger):
     logger.info(f'Success : {math.degrees(alpha)}, {math.degrees(beta)}')
 
     return tetta, alpha, beta
-    if not leg_angles_correct(
-            alpha=convert_alpha(alpha),
-            beta=convert_beta(beta),
-            #tetta=convert_tetta(math.degrees(tetta)),
-            logger=logger
-        ):
-        raise ValueError(f'Bad angles:alpha {convert_alpha(alpha)}, beta {convert_beta(beta)}')
-
-    return tetta, alpha, beta
 
 def convert_alpha(alpha: float) -> float:
     alpha_converted = round(math.degrees(alpha), 2)
@@ -80,11 +71,10 @@ def convert_tetta(tetta: float, leg_number: int) -> float:
     
     return round(tetta_degrees, 2)
 
-def convert_legs_angles(legs_angles: List[float]) -> List[float]:
+def convert_legs_angles(legs_angles: List[float], logger) -> List[float]:
     # input: 16 angles in RADIANS
     # output: 16 converted angles in DEGREES
-    # was gamma, beta, alpha, tetta one leg after another
-    # now tetta, alpha, beta, gamma one leg after another
+    # now tetta, alpha, beta one leg after another
     angles_converted = [
         convert_beta(legs_angles[2]),
         convert_alpha(legs_angles[1]),
@@ -99,6 +89,18 @@ def convert_legs_angles(legs_angles: List[float]) -> List[float]:
         convert_alpha(legs_angles[10]),
         convert_tetta(legs_angles[9], 4),
     ]
+
+    for i in range(4):
+        alpha_converted = angles_converted[3*i+1]
+        beta_converted = angles_converted[3*i+2]
+        tetta_converted = angles_converted[3*i]
+        if not leg_angles_correct(
+                alpha=alpha_converted,
+                beta=beta_converted,
+                tetta=tetta_converted,
+                logger=logger
+            ):
+            raise ValueError(f'Leg {i+1}. Bad angles:alpha {alpha_converted}, beta {beta_converted}, tetta {tetta_converted}')
 
     return angles_converted
 

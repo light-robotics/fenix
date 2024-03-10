@@ -111,7 +111,7 @@ class FenixKinematics:
     def sequence(self):
         sequence = []
         for move in self.angles_history:
-            sequence.append(MoveSnapshot(move.move_type, convert_legs_angles(move.angles_snapshot)))
+            sequence.append(MoveSnapshot(move.move_type, convert_legs_angles(move.angles_snapshot, self.logger)))
         return sequence
         #return self.angles_history
     

@@ -140,7 +140,7 @@ class MovementProcessor:
                 return
             self.logger.info(f'[TIMING] Sequence calculation took : {datetime.datetime.now() - before_sequence_time}')
             self.fenix_position = new_position[:]
-        except Exception as e:
+        except ValueError as e:
             print(f'MOVE Failed. Could not process command - {str(e)}')
             self.logger.info(f'MOVE Failed. Could not process command - {str(e)}')
             time.sleep(0.3)
