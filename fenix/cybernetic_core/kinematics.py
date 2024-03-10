@@ -6,7 +6,7 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from configs import config as cfg
-from cybernetic_core.geometry.angles import calculate_leg_angles, calculate_D_point, turn_on_angle, convert_legs_angles, convert_legs_angles_back
+from cybernetic_core.geometry.angles import calculate_leg_angles, turn_on_angle, convert_legs_angles, calculate_C_point
 from cybernetic_core.geometry.lines import Point, LinearFunc, calculate_intersection, move_on_a_line
 import configs.code_config as code_config
 import logging.config
@@ -14,26 +14,26 @@ from cybernetic_core.cybernetic_utils.moves import Move, MoveSnapshot
 
 
 class Leg:
-    def __init__(self, O: Point, D: Point, leg_tag: str):
+    def __init__(self, O: Point, C: Point, leg_tag: str):
         logging.config.dictConfig(code_config.logger_config)
         self.logger = logging.getLogger('angles_logger') #logging.getLogger('main_logger')
         self.O = O
-        self.D = D
+        self.C = C
         self.leg_tag = leg_tag
         self.update_angles()
 
     def update_angles(self):
         # tetta is not fully correct, because it uses atan2
         # tetta is corrected via convert_tetta function
-        calculated_angles = calculate_leg_angles(self.O, self.D, self.leg_tag, self.logger)
-        self.tetta, self.alpha, self.beta, self.gamma = calculated_angles
+        calculated_angles = calculate_leg_angles(self.O, self.C, self.logger)
+        self.tetta, self.alpha, self.beta = calculated_angles
 
     def move_mount_point(self, delta_x, delta_y, delta_z):
         self.O.move(delta_x, delta_y, delta_z)
         self.update_angles()
     
     def move_end_point(self, delta_x, delta_y, delta_z):
-        self.D.move(delta_x, delta_y, delta_z)
+        self.C.move(delta_x, delta_y, delta_z)
         self.update_angles()
 
 class FenixKinematics:
@@ -42,16 +42,11 @@ class FenixKinematics:
     or provide horizontal x, y and vertical v
     or provide exact angles to create a kinematic model
     """
-    def __init__(self, initial_position: Dict[str, int] = None, fenix_position: List[int] = None):
+    def __init__(self, fenix_position: List[int] = None):
         logging.config.dictConfig(code_config.logger_config)
         self.logger = logging.getLogger('main_logger')
-        
-        if initial_position is not None:
-            self.legs_offset_v = initial_position['vertical']
-            self.legs_offset_h_x = initial_position['horizontal_x']
-            self.legs_offset_h_y = initial_position['horizontal_y']
-            self.legs = self.initiate_legs()
-        elif fenix_position is None:
+
+        if fenix_position is None:
             self.legs_offset_v = cfg.start['vertical']
             self.legs_offset_h_x = cfg.start['horizontal_x']
             self.legs_offset_h_y = cfg.start['horizontal_y']
@@ -59,9 +54,9 @@ class FenixKinematics:
         else:
             self.legs = self.build_legs_from_angles(fenix_position)
             # only correct when all leg's D's are equidistant from center
-            self.legs_offset_v = self.legs[1].O.z - self.legs[1].D.z
-            self.legs_offset_h_x = round((self.legs[1].D.x - self.legs[4].D.x)/2.0, 2)
-            self.legs_offset_h_y = round((self.legs[1].D.y - self.legs[2].D.y)/2.0, 2)
+            self.legs_offset_v = self.legs[1].O.z - self.legs[1].C.z
+            self.legs_offset_h_x = round((self.legs[1].C.x - self.legs[4].C.x)/2.0, 2)
+            self.legs_offset_h_y = round((self.legs[1].C.y - self.legs[2].C.y)/2.0, 2)
             
         print(f"""
             Kinematics created with 
@@ -94,10 +89,10 @@ class FenixKinematics:
 
     def add_angles_snapshot(self, move_type: str = 'unknown'):
         angles_in = [
-                        self.legs[1].tetta, self.legs[1].alpha, self.legs[1].beta, self.legs[1].gamma,   
-                        self.legs[2].tetta, self.legs[2].alpha, self.legs[2].beta, self.legs[2].gamma,
-                        self.legs[3].tetta, self.legs[3].alpha, self.legs[3].beta, self.legs[3].gamma,
-                        self.legs[4].tetta, self.legs[4].alpha, self.legs[4].beta, self.legs[4].gamma,
+                        self.legs[1].tetta, self.legs[1].alpha, self.legs[1].beta,   
+                        self.legs[2].tetta, self.legs[2].alpha, self.legs[2].beta,
+                        self.legs[3].tetta, self.legs[3].alpha, self.legs[3].beta,
+                        self.legs[4].tetta, self.legs[4].alpha, self.legs[4].beta,
                     ]
 
         #new_move = MoveSnapshot(move_type, convert_legs_angles(angles_in))
@@ -106,10 +101,10 @@ class FenixKinematics:
         
         self.D_points_history.append(
             [
-                copy.deepcopy(self.legs[1].D),
-                copy.deepcopy(self.legs[2].D),
-                copy.deepcopy(self.legs[3].D),
-                copy.deepcopy(self.legs[4].D)
+                copy.deepcopy(self.legs[1].C),
+                copy.deepcopy(self.legs[2].C),
+                copy.deepcopy(self.legs[3].C),
+                copy.deepcopy(self.legs[4].C)
             ])
 
     @property
@@ -120,6 +115,48 @@ class FenixKinematics:
         return sequence
         #return self.angles_history
     
+    def build_legs_from_angles(self, fenix_position: List[int]):
+        O1 = Point(cfg.leg["mount_point_offset"],
+                   cfg.leg["mount_point_offset"],
+                   0)
+        tetta1, alpha1, beta1 = fenix_position[0:3]
+        #print(f'Leg1 : {[round(math.degrees(x), 2) for x in [tetta1, alpha1, beta1, gamma1]]}')
+        D1 = calculate_C_point(O1, tetta1, alpha1, beta1)
+        self.logger.info('[Init] Building leg 1')
+        Leg1 = Leg(O1, D1, 'front_leg')
+
+        O2 = Point(cfg.leg["mount_point_offset"],
+                   -cfg.leg["mount_point_offset"],
+                   0)
+        tetta2, alpha2, beta2 = fenix_position[3:6]
+        #print(f'Leg2 : {[round(math.degrees(x), 2) for x in [tetta2, alpha2, beta2, gamma2]]}')
+        D2 = calculate_C_point(O2, tetta2, alpha2, beta2)
+        self.logger.info('[Init] Building leg 2')
+        Leg2 = Leg(O2, D2, 'rear_leg')
+        #print(f'Leg2.2:{[round(math.degrees(x), 2) for x in [Leg2.tetta, Leg2.alpha, Leg2.beta, Leg2.gamma]]}')
+
+        O3 = Point(-cfg.leg["mount_point_offset"],
+                   -cfg.leg["mount_point_offset"],
+                   0)
+        tetta3, alpha3, beta3 = fenix_position[6:9]
+        #print(f'Leg3 : {[round(math.degrees(x), 2) for x in [tetta3, alpha3, beta3, gamma3]]}')
+        D3 = calculate_C_point(O3, tetta3, alpha3, beta3)
+        self.logger.info('[Init] Building leg 3')
+        Leg3 = Leg(O3, D3, 'rear_leg')
+
+        O4 = Point(-cfg.leg["mount_point_offset"],
+                   cfg.leg["mount_point_offset"],
+                   0)
+        tetta4, alpha4, beta4 = fenix_position[9:12]
+        #print(f'Leg4 : {[round(math.degrees(x), 2) for x in [tetta4, alpha4, beta4, gamma4]]}')
+        D4 = calculate_C_point(O4, tetta4, alpha4, beta4)
+        self.logger.info('[Init] Building leg 4')
+        Leg4 = Leg(O4, D4, 'front_leg')
+
+        self.logger.info('[Init] Build successful')
+
+        return {1: Leg1, 2: Leg2, 3: Leg3, 4: Leg4}
+
     @property
     def current_position(self):
         #return convert_legs_angles_back(self.sequence[-1].angles_snapshot)
@@ -166,48 +203,6 @@ class FenixKinematics:
 
         return {1: Leg1, 2: Leg2, 3: Leg3, 4: Leg4}
     
-    def build_legs_from_angles(self, fenix_position: List[int]):
-        O1 = Point(cfg.leg["mount_point_offset"],
-                   cfg.leg["mount_point_offset"],
-                   0)
-        tetta1, alpha1, beta1, gamma1 = fenix_position[0:4]
-        #print(f'Leg1 : {[round(math.degrees(x), 2) for x in [tetta1, alpha1, beta1, gamma1]]}')
-        D1 = calculate_D_point(O1, tetta1, alpha1, beta1, gamma1)
-        self.logger.info('[Init] Building leg 1')
-        Leg1 = Leg(O1, D1, 'front_leg')
-
-        O2 = Point(cfg.leg["mount_point_offset"],
-                   -cfg.leg["mount_point_offset"],
-                   0)
-        tetta2, alpha2, beta2, gamma2 = fenix_position[4:8]
-        #print(f'Leg2 : {[round(math.degrees(x), 2) for x in [tetta2, alpha2, beta2, gamma2]]}')
-        D2 = calculate_D_point(O2, tetta2, alpha2, beta2, gamma2)
-        self.logger.info('[Init] Building leg 2')
-        Leg2 = Leg(O2, D2, 'rear_leg')
-        #print(f'Leg2.2:{[round(math.degrees(x), 2) for x in [Leg2.tetta, Leg2.alpha, Leg2.beta, Leg2.gamma]]}')
-
-        O3 = Point(-cfg.leg["mount_point_offset"],
-                   -cfg.leg["mount_point_offset"],
-                   0)
-        tetta3, alpha3, beta3, gamma3 = fenix_position[8:12]
-        #print(f'Leg3 : {[round(math.degrees(x), 2) for x in [tetta3, alpha3, beta3, gamma3]]}')
-        D3 = calculate_D_point(O3, tetta3, alpha3, beta3, gamma3)
-        self.logger.info('[Init] Building leg 3')
-        Leg3 = Leg(O3, D3, 'rear_leg')
-
-        O4 = Point(-cfg.leg["mount_point_offset"],
-                   cfg.leg["mount_point_offset"],
-                   0)
-        tetta4, alpha4, beta4, gamma4 = fenix_position[12:16]
-        #print(f'Leg4 : {[round(math.degrees(x), 2) for x in [tetta4, alpha4, beta4, gamma4]]}')
-        D4 = calculate_D_point(O4, tetta4, alpha4, beta4, gamma4)
-        self.logger.info('[Init] Building leg 4')
-        Leg4 = Leg(O4, D4, 'front_leg')
-
-        self.logger.info('[Init] Build successful')
-
-        return {1: Leg1, 2: Leg2, 3: Leg3, 4: Leg4}
-
     ################## MOVEMENTS START HERE ##################
     def leg_movement(self, leg_num, leg_delta):
         leg = self.legs[leg_num]
@@ -240,7 +235,7 @@ class FenixKinematics:
         self.logger.info('Processing reset command')
         self.body_to_center()
         #delta_z = self.current_body_delta[2]
-        delta_z = self.legs[1].O.z - self.legs[1].D.z - cfg.start["vertical"]
+        delta_z = self.legs[1].O.z - self.legs[1].C.z - cfg.start["vertical"]
         self.body_movement(0, 0, -delta_z)
 
     # ?
@@ -250,8 +245,8 @@ class FenixKinematics:
                                   cfg.start["initial_z_position_delta"])
             
     def legs_D_offsets(self):
-        x_offset = abs(round((self.legs[1].D.x - self.legs[4].D.x)/2))
-        y_offset = abs(round((self.legs[1].D.y - self.legs[2].D.y)/2))
+        x_offset = abs(round((self.legs[1].C.x - self.legs[4].C.x)/2))
+        y_offset = abs(round((self.legs[1].C.y - self.legs[2].C.y)/2))
         return [x_offset, y_offset]
     
     def switch_mode(self, mode: str):
@@ -270,8 +265,8 @@ class FenixKinematics:
         for leg in self.legs.values():
             avg_o_x += leg.O.x
             avg_o_y += leg.O.y
-            avg_d_x += leg.D.x
-            avg_d_y += leg.D.y
+            avg_d_x += leg.C.x
+            avg_d_y += leg.C.y
 
         avg_o_x /= 4
         avg_o_y /= 4
@@ -299,15 +294,15 @@ class FenixKinematics:
         """
 
         # find intersection point of basement lines
-        func1 = LinearFunc(self.legs[1].D, self.legs[3].D)
-        func2 = LinearFunc(self.legs[2].D, self.legs[4].D)
+        func1 = LinearFunc(self.legs[1].C, self.legs[3].C)
+        func2 = LinearFunc(self.legs[2].C, self.legs[4].C)
         intersection = Point(*calculate_intersection(func1, func2), 0)
 
         target_leg_number_by_air_leg_number = {1: 3, 2: 4, 3: 1, 4: 2}
         target_leg_number = target_leg_number_by_air_leg_number[leg_in_the_air_number]
         target_leg = self.legs[target_leg_number]
         body_target_point = move_on_a_line(intersection,
-                                           target_leg.D,
+                                           target_leg.C,
                                            self.margin)
 
         return body_target_point
@@ -819,9 +814,9 @@ class FenixKinematics:
         center_y = round((self.legs[2].O.y + self.legs[4].O.y) / 2, 2)
 
         for leg in [self.legs[2], self.legs[4]]:
-            x_new, y_new = turn_on_angle(center_x, center_y, leg.D.x, leg.D.y, angle)
-            delta_x = x_new - leg.D.x
-            delta_y = y_new - leg.D.y
+            x_new, y_new = turn_on_angle(center_x, center_y, leg.C.x, leg.C.y, angle)
+            delta_x = x_new - leg.C.x
+            delta_y = y_new - leg.C.y
 
             leg.move_end_point(delta_x, delta_y, self.leg_up)
 
@@ -835,9 +830,9 @@ class FenixKinematics:
             self.add_angles_snapshot()
 
         for leg in [self.legs[1], self.legs[3]]:
-            x_new, y_new = turn_on_angle(center_x, center_y, leg.D.x, leg.D.y, angle)
-            delta_x = x_new - leg.D.x
-            delta_y = y_new - leg.D.y
+            x_new, y_new = turn_on_angle(center_x, center_y, leg.C.x, leg.C.y, angle)
+            delta_x = x_new - leg.C.x
+            delta_y = y_new - leg.C.y
 
             leg.move_end_point(delta_x, delta_y, self.leg_up)
 
@@ -1143,8 +1138,8 @@ class FenixKinematics:
         for leg_number in [1, 4, 2, 3]:
             deltas = move.target_legs_position[leg_number]
             self.logger.info(f'Move. Deltas : {deltas}')
-            D = self.legs[leg_number].D
-            diff = [deltas[0] - D.x, deltas[1] - D.y, deltas[2] - D.z]
+            C = self.legs[leg_number].C
+            diff = [deltas[0] - C.x, deltas[1] - C.y, deltas[2] - C.z]
             self.logger.info(f'Move. Diff : {diff}')
             self.leg_move_with_compensation_obstacled(leg_number, *diff, move_type=2)
         self.body_to_center()
@@ -1153,8 +1148,5 @@ if __name__ == '__main__':
     fk = FenixKinematics()
     #fk.body_movement(0, 0, 5)
     angles = fk.current_position #sequence[-1].angles_snapshot
-    print(angles)
-    fenix_position = convert_legs_angles_back(angles)
-    print(f'FP : {fenix_position}')
-    fk2 = FenixKinematics(fenix_position=fenix_position)
-    print(fk2.sequence)
+    print([math.degrees(angle) for angle in angles])
+    print(fk.sequence)

@@ -12,10 +12,10 @@ logging.config.dictConfig(code_config.logger_config)
 
 class FenixServos:
     def __init__(self):
-        self.m1 = LX16A(Port='/dev/ttyAMA0') # 5-8   # 1-4
-        self.m2 = LX16A(Port='/dev/ttyAMA2') # 9-12  # 5-8
-        self.m3 = LX16A(Port='/dev/ttyAMA3') # 13-16 # 9-12
-        self.m4 = LX16A(Port='/dev/ttyAMA1') # 1-4   # 13-16
+        self.m1 = LX16A(Port='/dev/ttyAMA3') # 5-8   # 1-4
+        #self.m2 = LX16A(Port='/dev/ttyAMA2') # 9-12  # 5-8
+        #self.m3 = LX16A(Port='/dev/ttyAMA3') # 13-16 # 9-12
+        self.m4 = LX16A(Port='/dev/ttyAMA0') # 1-4   # 13-16
         self.speed = 500
         self.min_speed = 700
         self.max_speed = 0 # 130 # 0 is instant, 10000 is very slow
@@ -45,12 +45,22 @@ class FenixServos:
     #@timing
     def get_current_angles(self):
         current_angles = []
+        
+        for i in [3, 4, 5, 9, 10, 11]:
+            current_angles.append(self.m1.read_angle(i))
+            time.sleep(0.0002)
+        for i in [15, 16, 17, 21, 22, 23]:
+            current_angles.append(self.m4.read_angle(i))
+            time.sleep(0.0002)
+
+        """
         j = 1
         for m in [self.m1, self.m2, self.m3, self.m4]:            
             for _ in range(4):
                 current_angles.append(m.read_angle(j))
                 time.sleep(0.0002)
                 j += 1
+        """
         self.logger.info(f'Read current angles : {current_angles}')
         
         return current_angles
@@ -95,13 +105,15 @@ class FenixServos:
                 j += 1
     #@timing
     def send_command_to_servos(self, angles, rate):
-        j = 1
-        for m in [self.m1, self.m2, self.m3, self.m4]:
-        #for m in [self.m1]: # WTF 4 -> 1
-            for _ in range(4): 
-                m.move_servo_to_angle(j, angles[j-1], rate)
-                time.sleep(0.0002)
-                j += 1
+        j = 0
+        for i in [3, 4, 5, 9, 10, 11]:
+            self.m1.move_servo_to_angle(i, angles[j], rate)
+            time.sleep(0.0002)
+            j += 1
+        for i in [15, 16, 17, 21, 22, 23]:
+            self.m4.move_servo_to_angle(i, angles[j], rate)
+            time.sleep(0.0002)
+            j += 1
     
     def log_servo_data(self):
         j = 1

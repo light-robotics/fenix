@@ -62,21 +62,21 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
     
     if command == 'forward_1':
         # Legs 1 and 3 moved x1
-        fk.move_2_legs_phased_13(0, FORWARD_LEGS_2LEG_CM)
+        fk.move_2_legs_phased_13(FORWARD_LEGS_2LEG_CM, 0)
     elif command == 'forward_2':
         # Legs 2 and 4 moved x2
-        fk.move_2_legs_phased_24(0, 2 * FORWARD_LEGS_2LEG_CM)
+        fk.move_2_legs_phased_24(2 * FORWARD_LEGS_2LEG_CM, 0)
     elif command == 'forward_22':
         # Legs 2 and 4 moved x1
-        fk.move_2_legs_phased_24(0, FORWARD_LEGS_2LEG_CM)
+        fk.move_2_legs_phased_24(FORWARD_LEGS_2LEG_CM, 0)
     elif command == 'forward_3':
         # Legs 1 and 3 moved x2
-        fk.move_2_legs_phased_13(0, 2 * FORWARD_LEGS_2LEG_CM)
+        fk.move_2_legs_phased_13(2 * FORWARD_LEGS_2LEG_CM, 0)
     elif command == 'forward_32':
         # Legs 1 and 3 moved x1
-        fk.move_2_legs_phased_13(0, FORWARD_LEGS_2LEG_CM)
+        fk.move_2_legs_phased_13(FORWARD_LEGS_2LEG_CM, 0)
     elif command == 'forward_one_legged':
-        fk.move_body_straight(0, FORWARD_LEGS_1LEG_CM)
+        fk.move_body_straight(0, -FORWARD_LEGS_1LEG_CM)
     elif command in ['battle_mode', 'sentry_mode', 'walking_mode', 'run_mode']:
         fk.switch_mode(command)
     elif command == 'body_forward':
@@ -105,8 +105,89 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.body_movement(0, 0, UP_OR_DOWN_CM)
     elif command == 'down':
         fk.body_movement(0, 0, -UP_OR_DOWN_CM)
-    elif command == 'backward_two_legged':
-        pass
+    elif command == 'climb':
+        fk.body_movement(0, 0, 12)
+        fk.body_movement(-10, 0, 0)
+        
+        fk.leg_movement(1, [5, 0, 25])
+
+        #fk.leg_movement(1, [10, 0, 0])
+        fk.leg_movement(1, [5, 10, 0])
+
+        fk.leg_movement(1, [0, 0, -5])
+        fk.leg_movement(2, [5, 0, 25])
+        
+        #fk.leg_movement(2, [10, 0, 0])
+        fk.leg_movement(2, [5, -10, 0])
+
+        fk.leg_movement(2, [0, 0, -5])
+        fk.body_movement(25, 0, 0)
+        fk.leg_movement(3, [20, 0, 5])
+        fk.leg_movement(3, [0, 0, -5])
+        fk.leg_movement(4, [20, 0, 5])
+        fk.leg_movement(4, [0, 0, -5])
+        fk.body_movement(0, 0, 5)
+        #fk.body_movement(15, 0, 0)
+        fk.body_movement(10, 0, 0)
+        fk.body_movement(0, 0, -5)
+        fk.leg_movement(3, [10, 0, 5])
+        #fk.leg_movement(3, [10, -10, 5])
+
+        fk.leg_movement(3, [0, 0, -5])
+        fk.leg_movement(4, [10, 0, 5])
+        #fk.leg_movement(4, [10, 10, 5])
+
+        fk.leg_movement(4, [0, 0, -5])
+        fk.leg_movement(1, [15, 0, 5])
+        fk.leg_movement(1, [0, 0, -5])
+        fk.leg_movement(2, [15, 0, 5])
+        fk.leg_movement(2, [0, 0, -5])
+        fk.leg_movement(3, [0, 0, 25])
+        
+        #fk.leg_movement(3, [10, 0, 0])
+        fk.leg_movement(3, [10, -10, 0])
+
+        fk.leg_movement(3, [0, 0, -5])
+        fk.leg_movement(4, [0, 0, 25])
+
+        #fk.leg_movement(4, [10, 0, 0])
+        fk.leg_movement(4, [10, 10, 0])
+
+        fk.leg_movement(4, [0, 0, -5])
+        fk.body_movement(0, 0, 10)
+        fk.body_to_center()
+    elif command == 'climb_2':
+        fk.body_movement(0, 0, 12)
+        fk.body_movement(-10, 0, 0)
+
+        fk.leg_movement(1, [5, 0, 25])
+        fk.leg_movement(1, [10, 0, 0])
+        fk.leg_movement(1, [0, 0, -5])
+
+        """
+        fk.leg_movement(2, [5, 0, 5])
+        fk.leg_movement(2, [10, 0, 0])
+        fk.leg_movement(2, [0, 0, -5])
+        """
+
+        """
+        fk.body_movement(-15, 0, 0)
+        fk.body_movement(0, 0, -5)
+        fk.leg_movement(3, [-20, 0, 5])
+        fk.leg_movement(3, [0, 0, -5])
+        fk.leg_movement(4, [-20, 0, 5])
+        fk.leg_movement(4, [0, 0, -5])
+        fk.body_movement(-25, 0, 0)
+        fk.leg_movement(2, [0, 0, 5])
+        fk.leg_movement(2, [-15, 0, 0])
+        fk.leg_movement(2, [0, 0, -25])
+        fk.leg_movement(1, [0, 0, 5])
+        fk.leg_movement(1, [-15, 0, 0])
+        fk.leg_movement(1, [0, 0, -25])
+        fk.body_movement(10, 0, 0)
+        fk.body_movement(0, 0, -12)
+        """
+
     elif command == 'backward_one_legged':
         pass
     
