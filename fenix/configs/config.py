@@ -24,10 +24,10 @@ start = {
 if not STAR_LEGS:
     modes = {
         "run_mode" : {
-            "horizontal_xy" : 16,
+            "horizontal_xy" : 15,
         },
         "sentry_mode" : {
-            "horizontal_xy" : 16,
+            "horizontal_xy" : 18,
         },
         "walking_mode" : {
             "horizontal_xy" : 17,
@@ -38,7 +38,7 @@ if not STAR_LEGS:
     }
 
     speed = {
-        "run" : 350,
+        "run" : 150,
         "hit" : 500,
     }
 
@@ -59,7 +59,7 @@ if not STAR_LEGS:
         },
         "leg_up": {
             1: 7,
-            2: 4
+            2: 5
         },
         # parameters for moving further, when moving with feedback
         "servos": {
@@ -75,10 +75,10 @@ if not STAR_LEGS:
 else:
     modes = {
         "run_mode" : {
-            "horizontal_xy" : 16,
+            "horizontal_xy" : 17,
         },
         "sentry_mode" : {
-            "horizontal_xy" : 16,
+            "horizontal_xy" : 15,
         },
         "walking_mode" : {
             "horizontal_xy" : 17,
@@ -135,68 +135,17 @@ limits = {
 }
 
 angles = {
-    "to_surface": {
-        "min" : -90,
-        "max" : 90,
-        "step": 1,
-        "ideal": 20
-    },
     "alpha": {
-        "min": -30,
-        "max": 55
+        "min": -70,
+        "max": 90
     },
     "beta": {
-        "min": -120,
-        "max": -10
+        "min": -85,
+        "max": 65
     },
-    "gamma": {
-        "min": -100,
-        "max": -15
-    },
-    "front_leg": {
-        "alpha": {
-            "min": -30,
-            "max": 78
+    "tetta": {
+            "min": -40,
+            "max": 40
         },
-        "beta": {
-            "min": -115,
-            "max": 0
-        },
-        "gamma": {
-            "min": -100,
-            "max": -12
-        },
-        "tetta": {
-            "min": -27,
-            "max": 27
-        },
-        "beta-gamma": {
-            "min": 20,
-            "max": 170
-        }
-    },
-    "rear_leg": {
-        "alpha": {
-            "min": -30,
-            "max": 60
-        },
-        "beta": {
-            "min": -105,
-            "max": 0
-        },
-        "gamma": {
-            "min": -100,
-            "max": -12
-        },
-        "tetta": {
-            "min": -20,
-            "max": 20
-        },
-        "beta-gamma": {
-            "min": 20,
-            "max": 170
-        }
-    }
 }
 
-mode = 90

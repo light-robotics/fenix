@@ -46,15 +46,13 @@ class FenixServos:
     def get_current_angles(self):
         current_angles = []
         
-        for i in [3, 4, 5]:
+        for i in [3, 4, 5, 9, 10, 11]:
             current_angles.append(self.m1.read_angle(i))
             time.sleep(0.0002)
-        for i in [9, 10, 11, 15, 16, 17]:
+        for i in [15, 16, 17, 21, 22, 23]:
             current_angles.append(self.m4.read_angle(i))
             time.sleep(0.0002)
-        for i in [21, 22, 23]:
-            current_angles.append(self.m1.read_angle(i))
-            time.sleep(0.0002)
+
         """
         j = 1
         for m in [self.m1, self.m2, self.m3, self.m4]:            
@@ -108,16 +106,12 @@ class FenixServos:
     #@timing
     def send_command_to_servos(self, angles, rate):
         j = 0
-        for i in [3, 4, 5]:
+        for i in [3, 4, 5, 9, 10, 11]:
             self.m1.move_servo_to_angle(i, angles[j], rate)
             time.sleep(0.0002)
             j += 1
-        for i in [9, 10, 11, 15, 16, 17]:
+        for i in [15, 16, 17, 21, 22, 23]:
             self.m4.move_servo_to_angle(i, angles[j], rate)
-            time.sleep(0.0002)
-            j += 1
-        for i in [21, 22, 23]:
-            self.m1.move_servo_to_angle(i, angles[j], rate)
             time.sleep(0.0002)
             j += 1
     

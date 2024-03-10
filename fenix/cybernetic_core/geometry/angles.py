@@ -47,6 +47,15 @@ def calculate_leg_angles(O: Point, C: Point, logger):
     logger.info(f'Success : {math.degrees(alpha)}, {math.degrees(beta)}')
 
     return tetta, alpha, beta
+    if not leg_angles_correct(
+            alpha=convert_alpha(alpha),
+            beta=convert_beta(beta),
+            #tetta=convert_tetta(math.degrees(tetta)),
+            logger=logger
+        ):
+        raise ValueError(f'Bad angles:alpha {convert_alpha(alpha)}, beta {convert_beta(beta)}')
+
+    return tetta, alpha, beta
 
 def convert_alpha(alpha: float) -> float:
     alpha_converted = round(math.degrees(alpha), 2)
