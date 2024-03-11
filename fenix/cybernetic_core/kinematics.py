@@ -204,11 +204,13 @@ class FenixKinematics:
         return {1: Leg1, 2: Leg2, 3: Leg3, 4: Leg4}
     
     ################## MOVEMENTS START HERE ##################
-    def leg_movement(self, leg_num, leg_delta):
+    def leg_movement(self, leg_num, leg_delta, snapshot=True):
+        self.logger.info(f'Leg move {leg_num}: {leg_delta}')
         leg = self.legs[leg_num]
 
         leg.move_end_point(leg_delta[0], leg_delta[1], leg_delta[2])
-        self.add_angles_snapshot('endpoint')
+        if snapshot:
+            self.add_angles_snapshot('endpoint')
 
     def body_movement(self, delta_x, delta_y, delta_z, snapshot=True):
         self.logger.info(f'Body movement [{delta_x}, {delta_y}, {delta_z}]')
@@ -247,17 +249,18 @@ class FenixKinematics:
     def legs_D_offsets(self):
         x_offset = abs(round((self.legs[1].C.x - self.legs[4].C.x)/2))
         y_offset = abs(round((self.legs[1].C.y - self.legs[2].C.y)/2))
-        return [x_offset, y_offset]
+        return {"x": x_offset, "y": y_offset}
     
     def switch_mode(self, mode: str):
         self.logger.info(f'Switching mode to {mode}')
         self.reset()
-        required_xy = cfg.modes[mode]["horizontal_xy"]
+        required_xy = cfg.modes[mode]
         current_xy = self.legs_D_offsets()
         # for now we suppose that x = y
-        delta = required_xy - current_xy[0]
-        if delta != 0:
-            self.reposition_legs(delta, delta)
+        delta_x = current_xy["x"] - required_xy["x"]
+        delta_y = current_xy["y"] - required_xy["y"]
+        if abs(delta_x) + abs(delta_y) != 0:
+            self.reposition_legs(delta_x, delta_y)
     
     def body_delta_xy(self, delta_y=cfg.start["y_offset_body"], delta_x=0):
         # move body to center

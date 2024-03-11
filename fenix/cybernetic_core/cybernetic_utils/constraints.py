@@ -16,7 +16,7 @@ def leg_angles_correct(
     logger = None
     ) -> bool:
     
-    logger.info(f'Trying angles {[alpha, beta, tetta]}')
+    #logger.info(f'Trying angles {[alpha, beta, tetta]}')
 
     if alpha is None and beta is None and tetta is None:
         logger.info('All angles provided are None')
@@ -48,5 +48,5 @@ def leg_angles_correct(
             logger.info(f'Bad beta : {beta}')
             return False
     
-    logger.info(f'Good angles : {alpha}, {beta}')
+    #logger.info(f'Good angles : {alpha}, {beta}')
     return True

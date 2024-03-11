@@ -177,8 +177,17 @@ class MovementProcessor:
                 command, speed = command_read
                 if command == 'exit':
                     break
-                
-                self.execute_command(command, speed)
+
+                if command == 'disable_torque':
+                    self.fs.disable_torque()
+                elif command == 'enable_torque':
+                    self.fs.enable_torque()
+                else:
+                    try:
+                        self.execute_command(command, speed)
+                    except Exception as e:
+                        self.fs.disable_torque()
+                        raise Exception
 
         except KeyboardInterrupt:
             print('Movement stopped')

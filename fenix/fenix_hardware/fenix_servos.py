@@ -12,10 +12,10 @@ logging.config.dictConfig(code_config.logger_config)
 
 class FenixServos:
     def __init__(self):
-        self.m1 = LX16A(Port='/dev/ttyAMA3') # 5-8   # 1-4
+        self.m1 = LX16A(port='/dev/ttyAMA3') # 5-8   # 1-4
         #self.m2 = LX16A(Port='/dev/ttyAMA2') # 9-12  # 5-8
         #self.m3 = LX16A(Port='/dev/ttyAMA3') # 13-16 # 9-12
-        self.m4 = LX16A(Port='/dev/ttyAMA0') # 1-4   # 13-16
+        self.m4 = LX16A(port='/dev/ttyAMA0') # 1-4   # 13-16
         self.speed = 500
         self.min_speed = 700
         self.max_speed = 0 # 130 # 0 is instant, 10000 is very slow
@@ -28,6 +28,7 @@ class FenixServos:
         # 0.18 sec / 60 degrees for 6V+
         # my max speed is for 45 degrees
         # that means that max speed should be 120 for 7.4V+ and 135 for 6V+
+        self.servos = [3, 4, 5, 9, 10, 11, 15, 16, 17, 21, 22, 23]
 
     def print_status(self):
         j = 1
@@ -53,14 +54,6 @@ class FenixServos:
             current_angles.append(self.m4.read_angle(i))
             time.sleep(0.0002)
 
-        """
-        j = 1
-        for m in [self.m1, self.m2, self.m3, self.m4]:            
-            for _ in range(4):
-                current_angles.append(m.read_angle(j))
-                time.sleep(0.0002)
-                j += 1
-        """
         self.logger.info(f'Read current angles : {current_angles}')
         
         return current_angles
@@ -94,6 +87,22 @@ class FenixServos:
                 return False
 
         return True
+
+    def get_board_by_id(self, id):
+        if id in [3, 4, 5, 9, 10, 11]:
+            return self.m1
+        elif id in [15, 16, 17, 21, 22, 23]:
+            return self.m4
+        else:
+            raise ValueError(f'Bad id: {id}')
+
+    def enable_torque(self):
+        for id in self.servos:
+            self.get_board_by_id(id).enable_torque(id)
+
+    def disable_torque(self):
+        for id in self.servos:
+            self.get_board_by_id(id).disable_torque(id)
 
     def set_servo_values(self, angles, rate=0):
         print('Sending values \n{0}'.format(angles))

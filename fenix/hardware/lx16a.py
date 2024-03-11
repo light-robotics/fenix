@@ -70,17 +70,17 @@ class LX16A:
     SERVO_LED_ERROR_WRITE      = 35
     SERVO_LED_ERROR_READ       = 36
 
-    def __init__(self, Port: str = "/dev/ttyUSB0", Baudrate: int = 115200, Timeout: float = 0.001):
+    def __init__(self, port: str = "/dev/ttyUSB0", Baudrate: int = 115200, Timeout: float = 0.001):
         logging.config.dictConfig(code_config.logger_config)
         self.logger = logging.getLogger('main_logger')
-        self.serial = Serial(Port, baudrate=Baudrate, timeout=Timeout)
+        self.serial = Serial(port, baudrate=Baudrate, timeout=Timeout)
         self.serial.setDTR(1)
         self.TX_DELAY_TIME = 0.00002 
         self.Header = struct.pack("<BB",0x55,0x55)
-        self.Port = Port
+        self.port = port
 
     def reset(self) -> None:
-        self.serial = Serial(self.Port, baudrate=115200, timeout=0.001)
+        self.serial = Serial(self.port, baudrate=115200, timeout=0.001)
         self.serial.setDTR(1)     
 
     # send the packet with header and checksum
@@ -498,6 +498,27 @@ class LX16A:
                   .format(pos, target[0], target[1], temp, volt, id))
         except:
             print('Could not read values from servo {0}'.format(id))
+
+    @staticmethod
+    def _checksum(packet: list[int]) -> int:
+        s = ~sum(packet[2:])
+        return s % 256
+    
+    def _send_packet(self, packet: list[int]) -> None:
+        packet = [0x55, 0x55, *packet]
+        packet.append(self._checksum(packet))
+        self.serial.write(packet)
+
+    def enable_torque(self, id) -> None:
+        packet = [id, 4, 31, 1]
+        self._send_packet(packet)
+        self._torque_enabled = True
+
+    def disable_torque(self, id) -> None:
+        packet = [id, 4, 31, 0]
+        self._send_packet(packet)
+        self._torque_enabled = False
+
 
 def get_position(servo, id):
     pos = servo.read_position(id)

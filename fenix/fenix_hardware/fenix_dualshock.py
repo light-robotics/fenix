@@ -41,12 +41,12 @@ class FenixDualShock(DualShock):
         super().listen()
 
     def on_playstation_button_press(self):
-        if self.started:
-            self.started = False
-            self.command_writer.write_command('end', 1000)
-        else:
-            self.started = True
-            self.command_writer.write_command('start', 1000)
+        #if self.started:
+        #    self.started = False
+        #    self.command_writer.write_command('enable_torque', 1000)
+        #else:
+        #    self.started = True
+            self.command_writer.write_command('disable_torque', 1000)
     
     def on_options_press(self):
         self.command_writer.write_command('exit', 0)
