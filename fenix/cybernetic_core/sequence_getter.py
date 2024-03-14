@@ -161,14 +161,14 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.body_movement(-5, 0, 0)
         
         
-        fk.leg_movement(1, [5, 0, 25])
-        fk.leg_movement(1, [15, 0, 0])
+        fk.leg_movement(1, [-5, 10, 25])
+        fk.leg_movement(1, [25, -10, 0])
         fk.leg_movement(1, [0, 0, -5])
 
         
-        fk.leg_movement(2, [5, 0, 25])
-        fk.leg_movement(2, [15, 0, 0])
-        fk.leg_movement(2, [0, 0, -5])
+        fk.leg_movement(2, [-5, -10, 27])
+        fk.leg_movement(2, [25, 10, 0])
+        fk.leg_movement(2, [0, 0, -7])
         
         fk.body_movement(15, 5, 5)
 
@@ -190,13 +190,13 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.leg_movement(2, [15, 0, 5])
         fk.leg_movement(2, [0, 0, -5])
 
-        fk.body_movement(20, 0, 0)
+        fk.body_movement(15, 0, 0)
         fk.body_movement(0, 0, -5)
 
-        fk.leg_movement(3, [15, 0, 5])
+        fk.leg_movement(3, [15, -5, 5])
         fk.leg_movement(3, [0, 0, -5])
 
-        fk.leg_movement(4, [15, 0, 5])
+        fk.leg_movement(4, [15, 5, 5])
         fk.leg_movement(4, [0, 0, -5])
 
         
@@ -204,12 +204,15 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         #fk.body_movement(0, 0, -5)
 
         fk.leg_movement(3, [0, 0, 25])
-        fk.leg_movement(3, [10, 0, 0])
+        fk.leg_movement(3, [10, 5, 0])
         fk.leg_movement(3, [0, 0, -5])
 
         fk.leg_movement(4, [0, 0, 25])
-        fk.leg_movement(4, [10, 0, 0])
+        fk.leg_movement(4, [10, -5, 0])
         fk.leg_movement(4, [0, 0, -5])
+
+        fk.body_movement(0, 0, 1)
+        fk.body_to_center()
         
 
         """

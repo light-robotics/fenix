@@ -87,7 +87,7 @@ angles_limits = {
     "tetta": 65,
     "tetta_alpha": {
         "tetta": 45,
-        "alpha": 80,
+        "alpha": 85,
     },
     "alpha": {
         "min": -70,
