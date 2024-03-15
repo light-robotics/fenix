@@ -303,6 +303,8 @@ class FenixServos:
         self.send_command_to_servos(angles, rate)
         
         time.sleep(wait_time)
+        self.logger.info(f'[DIFF] Diff from target:')
+        self.get_angles_diff(angles)
 
     def get_angles_diff(self, target_angles, test_angles=None):
         if test_angles is None:

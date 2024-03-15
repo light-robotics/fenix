@@ -4,7 +4,7 @@ YouTube channel: https://www.youtube.com/channel/UC5iMcYcLpUnzzhuc-a_uPiQ
 Email: light.robotics.2020@gmail.com
 
 To run fenix:
-- run sudo python3 fenix/run/neopixel_commands_reader.py
+- run sudo /fenix/venv/bin/python fenix/run/neopixel_commands_reader.py
 - run python fenix/fenix_hardware/fenix_dualshock.py
 - run python fenix/core/movement_processor.py
 - to stream video:

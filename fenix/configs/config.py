@@ -41,7 +41,7 @@ modes = {
 }
 
 speed = {
-    "run" : 150,
+    "run" : 250,
     "hit" : 500,
 }
 
@@ -62,7 +62,7 @@ fenix = {
     },
     "leg_up": {
         1: 7,
-        2: 5
+        2: 4
     },
     # parameters for moving further, when moving with feedback
     "servos": {
@@ -71,7 +71,7 @@ fenix = {
     },
     # issue next command a little faster, than previous is finished executing
     # when moving without feedback
-    "movement_command_advance_ms" : 0.05,
+    "movement_command_advance_ms" : -0.05,
     "movement_overshoot_coefficient" : 0.2,
 }
 
