@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import time
-from serial import Serial
+from serial import Serial, SerialException
 import struct
 from typing import Union, List
 import sys
@@ -89,7 +89,14 @@ class LX16A:
         for item in packet:
             sum = sum + item
         full_packet = bytearray(self.Header + packet + struct.pack("<B",(~sum) & 0xff))
-        self.serial.write(full_packet)
+        try:
+            self.serial.write(full_packet)
+        except SerialException as e:
+            print('!!!!!!!!!!!!!!!!!!! Serial ALARM !!!!!!!!!!!!!!!!!!!!!')
+            print(f'Serial exception: {e}')
+            os.system("sudo chmod 666 /dev/ttyAMA0")
+            time.sleep(1)
+            self.serial.write(full_packet)
 
         time.sleep(self.TX_DELAY_TIME)
 
@@ -507,7 +514,14 @@ class LX16A:
     def _send_packet(self, packet: list[int]) -> None:
         packet = [0x55, 0x55, *packet]
         packet.append(self._checksum(packet))
-        self.serial.write(packet)
+        try:
+            self.serial.write(packet)        
+        except SerialException as e:
+            print('!!!!!!!!!!!!!!!!!!! Serial ALARM !!!!!!!!!!!!!!!!!!!!!')
+            print(f'Serial exception: {e}')
+            os.system("sudo chmod 666 /dev/ttyAMA0")
+            time.sleep(1)
+            self.serial.write(packet)
 
     def enable_torque(self, id) -> None:
         packet = [id, 4, 31, 1]

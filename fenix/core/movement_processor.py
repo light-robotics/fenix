@@ -2,8 +2,8 @@ import time
 import datetime
 import copy
 from typing import Callable, Optional, Union
-import sys
 import os
+import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from cybernetic_core.kinematics import FenixKinematics
 from cybernetic_core.sequence_getter import get_sequence_for_command_cached, VirtualFenix
@@ -145,6 +145,7 @@ class MovementProcessor:
             self.logger.info(f'MOVE Failed. Could not process command - {str(e)}')
             time.sleep(0.3)
             return
+        
         self.logger.info(f'MOVE Started')    
         start_time = datetime.datetime.now()
         #prev_angles = None
@@ -153,8 +154,8 @@ class MovementProcessor:
 
         for move_snapshot in sequence:
             angles = move_snapshot.angles_snapshot[:]
-            #if move_snapshot.move_type == 'body' and self.speed != self.body_speed:
-            #    self.fs.set_speed(self.body_speed)
+            if move_snapshot.move_type == 'body' and self.speed != self.body_speed:
+                self.fs.set_speed(self.body_speed)
             self.logger.info(f'Moving to {angles}. Move type: {move_snapshot.move_type}')
             if not code_config.DEBUG:
                 move_function(angles)

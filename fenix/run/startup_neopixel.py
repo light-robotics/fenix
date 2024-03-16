@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from hardware.neopixel import Neopixel
 
 
-# @reboot sudo python3 /fnx/fenix/run/startup_neopixel.py &
+# @reboot sudo /fenix/venv/bin/python /fenix/fenix/run/startup_neopixel.py &
 if __name__ == '__main__':
     time.sleep(10.0)
     neopixel = Neopixel()

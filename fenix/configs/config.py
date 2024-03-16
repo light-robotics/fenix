@@ -15,8 +15,8 @@ leg = {
 
 start = {
     "vertical"                 : 8,
-    "horizontal_x"             : 15, # 18
-    "horizontal_y"             : 15, # 18
+    "horizontal_x"             : 15, # 15
+    "horizontal_y"             : 15, # 15
     "y_offset_body"            : 0,
     "initial_z_position_delta" : 5, # 3
 }
@@ -27,12 +27,12 @@ modes = {
         "y": 15,
     },
     "sentry_mode" : {
-        "x": 22,
-        "y": 12,
+        "x": 12,
+        "y": 22,
     },
     "walking_mode" : {
-        "x": 16,
-        "y": 16,
+        "x": 18,
+        "y": 18,
     },
     "battle_mode" : {
         "x": 16,

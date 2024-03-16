@@ -256,9 +256,10 @@ class FenixKinematics:
         self.reset()
         required_xy = cfg.modes[mode]
         current_xy = self.legs_D_offsets()
-        # for now we suppose that x = y
-        delta_x = current_xy["x"] - required_xy["x"]
-        delta_y = current_xy["y"] - required_xy["y"]
+
+        print(f'Current_xy: {current_xy}. Required: {required_xy}')
+        delta_x = required_xy["x"] - current_xy["x"]
+        delta_y = required_xy["y"] - current_xy["y"]
         if abs(delta_x) + abs(delta_y) != 0:
             self.reposition_legs(delta_x, delta_y)
     
@@ -379,11 +380,27 @@ class FenixKinematics:
         #    print(f'Delta {leg_num} : [{round(leg.D.x - leg.O.x, 2)}, {round(leg.D.y - leg.O.y, 2)}, {round(leg.D.z - leg.O.z, 2)}]')
         
     # 1-legged movements
+    """
     def move_body_straight(self, delta_x, delta_y, leg_seq=[1, 3, 4, 2]):
         for leg_number in leg_seq:
             self.logger.info(f'Processing leg {leg_number} with compensation')
             self.leg_move_with_compensation(leg_number, delta_x, delta_y)
         self.logger.info(f'Processing body to center')
+        self.body_to_center()
+    """
+    def move_body_straight(self, delta_x, delta_y, leg_seq=[1, 3, 4, 2]):
+        self.body_movement(5, 0, 0)
+        self.move_leg_endpoint(3, [delta_x, delta_y, cfg.fenix["leg_up"][1]])
+        self.move_leg_endpoint(3, [0, 0, -cfg.fenix["leg_up"][1]])
+        self.move_leg_endpoint(4, [delta_x, delta_y, cfg.fenix["leg_up"][1]])
+        self.move_leg_endpoint(4, [0, 0, -cfg.fenix["leg_up"][1]])
+
+        self.body_movement(-10, 0, 0)
+        self.move_leg_endpoint(1, [delta_x, delta_y, cfg.fenix["leg_up"][1]])
+        self.move_leg_endpoint(1, [0, 0, -cfg.fenix["leg_up"][1]])
+        self.move_leg_endpoint(2, [delta_x, delta_y, cfg.fenix["leg_up"][1]])
+        self.move_leg_endpoint(2, [0, 0, -cfg.fenix["leg_up"][1]])
+        
         self.body_to_center()
 
     """
