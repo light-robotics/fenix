@@ -245,7 +245,7 @@ class FenixDualShock(DualShock):
         self.mode = FenixModes.WALKING
         if not NIGHT_MODE:
             self.neopixel.issue_command('steady', color='blue')
-        self.command_writer.write_command('one_legged_mode', 1000)
+        self.command_writer.write_command('walking_mode', 1000)
         print('Switched mode to WALKING')
 
 if __name__ == '__main__':
