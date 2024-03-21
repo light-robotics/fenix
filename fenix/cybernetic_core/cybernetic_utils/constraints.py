@@ -26,8 +26,8 @@ def leg_angles_correct(
     
     if tetta is not None:
         #if not rule_followed(leg_constraints["tetta"], tetta):
-        if alpha > 85:
-            if abs(tetta) > 45:
+        if alpha > 90:
+            if abs(tetta) > 50:
                 logger.info(f'Bad alpha + tetta up : {alpha}, {tetta}')
                 return False
         elif alpha > 30:
