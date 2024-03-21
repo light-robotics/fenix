@@ -11,7 +11,7 @@ from rpi_ws281x import PixelStrip, Color
 
 class Neopixel:
     # LED strip configuration:
-    LED_COUNT = 17        # Number of LED pixels.
+    LED_COUNT = 8        # Number of LED pixels.
     LED_PIN = 18          # GPIO pin connected to the pixels (18 uses PWM!).
     # LED_PIN = 10        # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
     LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
@@ -71,7 +71,7 @@ class Neopixel:
         if mode == 'theater':
             self.theater_chase(color, brightness)
         if mode == 'rainbow_cycle':
-            self.rainbow_cycle(brightness)
+            self.rainbow_cycle(brightness, wait_ms=2, iterations=20)
         if mode == 'theater_rainbow':
             self.theater_chase_rainbow(brightness)
         if mode == 'activation':
