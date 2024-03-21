@@ -116,12 +116,12 @@ class FenixDualShock(DualShock):
         return 1000
     
     def on_L3_up(self, value):
-        if self.mode == FenixModes.RUN:
+        if self.mode in [FenixModes.RUN, FenixModes.SENTRY]:
             self.command_writer.write_command('forward_two_legged', cfg.speed["run"])
         elif self.mode == FenixModes.WALKING:
             self.command_writer.write_command('forward_one_legged', self.convert_value_to_speed(value))
-        elif self.mode == FenixModes.SENTRY:
-            self.command_writer.write_command('body_forward', 1000)
+        #elif self.mode == FenixModes.SENTRY:
+        #    self.command_writer.write_command('body_forward', 1000)
         elif self.mode == FenixModes.BATTLE:
             self.command_writer.write_command('hit_4', cfg.speed["hit"])
     

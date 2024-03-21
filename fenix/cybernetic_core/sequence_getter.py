@@ -162,26 +162,7 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
 
         fk.body_movement(0, 0, 1)
         fk.body_to_center()
-        
-
-        """
-        fk.body_movement(-15, 0, 0)
-        fk.body_movement(0, 0, -5)
-        fk.leg_movement(3, [-20, 0, 5])
-        fk.leg_movement(3, [0, 0, -5])
-        fk.leg_movement(4, [-20, 0, 5])
-        fk.leg_movement(4, [0, 0, -5])
-        fk.body_movement(-25, 0, 0)
-        fk.leg_movement(2, [0, 0, 5])
-        fk.leg_movement(2, [-15, 0, 0])
-        fk.leg_movement(2, [0, 0, -25])
-        fk.leg_movement(1, [0, 0, 5])
-        fk.leg_movement(1, [-15, 0, 0])
-        fk.leg_movement(1, [0, 0, -25])
-        fk.body_movement(10, 0, 0)
-        fk.body_movement(0, 0, -12)
-        """
-
+    
     elif command == 'backward_one_legged':
         pass
     

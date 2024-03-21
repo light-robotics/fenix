@@ -27,8 +27,8 @@ modes = {
         "y": 15,
     },
     "sentry_mode" : {
-        "x": 12,
-        "y": 22,
+        "x": 7,
+        "y": 20,
     },
     "walking_mode" : {
         "x": 18,
@@ -83,12 +83,19 @@ limits = {
     "vertical_look_angle" : 30,
 }
 
+"""
+"tetta": 80,
+"tetta_alpha_down": {
+    "tetta": 90,
+    "alpha": 30,
+},
+"tetta_alpha_up": {
+    "tetta": 45,
+    "alpha": 85,
+},
+"""
 angles_limits = {
-    "tetta": 65,
-    "tetta_alpha": {
-        "tetta": 45,
-        "alpha": 85,
-    },
+    
     "alpha": {
         "min": -70,
         "max": 90

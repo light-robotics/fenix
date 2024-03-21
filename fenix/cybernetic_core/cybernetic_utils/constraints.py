@@ -26,15 +26,34 @@ def leg_angles_correct(
     
     if tetta is not None:
         #if not rule_followed(leg_constraints["tetta"], tetta):
+        if alpha > 85:
+            if abs(tetta) > 45:
+                logger.info(f'Bad alpha + tetta up : {alpha}, {tetta}')
+                return False
+        elif alpha > 30:
+            if abs(tetta) > 70:
+                logger.info(f'Bad alpha + tetta normal : {alpha}, {tetta}')
+                return False
+        else:
+            if abs(tetta) > 90:
+                logger.info(f'Bad alpha + tetta down : {alpha}, {tetta}')
+                return False
+        
+        """
+        if abs(tetta) > cfg.angles_limits["tetta_alpha_down"]["tetta"] and \
+            alpha > cfg.angles_limits["tetta_alpha_down"]["alpha"]:
+            logger.info(f'Bad alpha + tetta down : {alpha}, {tetta}')
+            return False
+        
         if abs(tetta) > cfg.angles_limits["tetta"]:
             logger.info(f'Bad tetta : {tetta}')
             return False
         
-        if abs(tetta) > cfg.angles_limits["tetta_alpha"]["tetta"] and \
-            alpha > cfg.angles_limits["tetta_alpha"]["alpha"]:
-            logger.info(f'Bad alpha + tetta : {alpha}, {tetta}')
+        if abs(tetta) > cfg.angles_limits["tetta_alpha_up"]["tetta"] and \
+            alpha > cfg.angles_limits["tetta_alpha_up"]["alpha"]:
+            logger.info(f'Bad alpha + tetta up : {alpha}, {tetta}')
             return False
-    
+        """
     if alpha is not None:
         #if not rule_followed(leg_constraints["alpha"], alpha):
         if alpha > cfg.angles_limits["alpha"]["max"] or \
