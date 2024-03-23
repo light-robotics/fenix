@@ -558,6 +558,9 @@ class FenixKinematics:
         self.add_angles_snapshot('endpoints')
 
     def climb_2_legs(self, delta_z, steps_arr=[8, 12, 12, 12, 8, 12, 8]): #steps_arr=[8, 16, 16, 6, 6, 8]
+        
+        steps_arr=[12, 12, 6, 12, 6, 6, 6, 12, 12]
+        self.body_movement(0, 0, delta_z)
         positive_delta_z = 0 # for climbing up
         negative_delta_z = 0 # for climbing down
         if delta_z > 0:
@@ -566,7 +569,7 @@ class FenixKinematics:
             negative_delta_z = delta_z
 
         #tst_leg_up = round(self.leg_up/2)
-        tst_leg_up = 6 # 6 #5
+        tst_leg_up = 3 # 6 #5
 
         legs_z_up_delta = {1: tst_leg_up, 
                            2: tst_leg_up,
@@ -579,6 +582,7 @@ class FenixKinematics:
                              4: -tst_leg_up}
 
         sum_even, sum_odd, sum_body_movement = 0, 0, 0
+        self.body_movement(-3, 0, 0)
         for step, value in enumerate(steps_arr):
             current_delta_z_up = {key: value for key, value in legs_z_up_delta.items()}
             current_delta_z_down = {key: value for key, value in legs_z_down_delta.items()}
@@ -599,30 +603,33 @@ class FenixKinematics:
             
             sum_body_movement += body_movement_value
 
+            
             if step == 0:
                 # print('Leg with delta z is 4')
-                current_delta_z_up[4] += positive_delta_z
-                current_delta_z_down[4] += negative_delta_z
-            if step == 1:
-                # print('Leg with delta z id 1')
                 current_delta_z_up[1] += positive_delta_z
                 current_delta_z_down[1] += negative_delta_z
+            if step == 1:
+                # print('Leg with delta z id 1')
+                current_delta_z_up[2] += positive_delta_z
+                current_delta_z_down[2] += negative_delta_z
 
+            if step == 2:
+                self.body_movement(6, 0, 0)
             if step % 2 == 0:
                 sum_even += value
                 if step >= len(steps_arr) - 2:
                     # print('Leg with delta z is 2')
-                    current_delta_z_up[2] += positive_delta_z
-                    current_delta_z_down[2] += negative_delta_z
+                    current_delta_z_up[3] += positive_delta_z
+                    current_delta_z_down[3] += negative_delta_z
                 # print('Moving legs 2, 4')
-                legs_to_move = [2, 4]                
+                legs_to_move = [1, 3]                
             else:
                 sum_odd += value
                 if step >= len(steps_arr) - 2:
                     # print('Leg with delta z is 3')
-                    current_delta_z_up[3] += positive_delta_z
-                    current_delta_z_down[3] += negative_delta_z
-                legs_to_move = [1, 3]
+                    current_delta_z_up[4] += positive_delta_z
+                    current_delta_z_down[4] += negative_delta_z
+                legs_to_move = [2, 4]
                 # print('Moving legs 1, 3')
             
             # up
@@ -634,7 +641,7 @@ class FenixKinematics:
             # forward
             for leg_number in legs_to_move:
                 #self.legs[leg_number].move_end_point(0, value + 2, 0)
-                self.legs[leg_number].move_end_point(0, value, 0)
+                self.legs[leg_number].move_end_point(value, 0, 0)
             self.add_angles_snapshot('endpoint')
 
             # down
@@ -642,8 +649,9 @@ class FenixKinematics:
                 self.legs[leg_number].move_end_point(0, 0, current_delta_z_down[leg_number])
             self.add_angles_snapshot('endpoint')
 
-            self.body_movement(0, body_movement_value, 0) # it adds snapshot itself
+            self.body_movement(body_movement_value, 0, 0) # it adds snapshot itself
         
+        self.body_movement(-3, 0, 0)
         if sum_even != sum_odd or sum_even != sum_body_movement:
             raise Exception(f'Bad step lengths: odd ({sum_odd}) and even ({sum_even}) and body({sum_body_movement}) not equal')
     
@@ -908,12 +916,12 @@ class FenixKinematics:
         x = cfg.leg["mount_point_offset"] * math.cos(math.radians(angle))
         z = cfg.leg["mount_point_offset"] * math.sin(math.radians(angle))
         
-        for leg in [self.legs[1], self.legs[4]]:
+        for leg in [self.legs[1], self.legs[2]]:
             if up:
                 leg.move_mount_point(0, -x, z)
             else:
                 leg.move_mount_point(0, x, -z)
-        for leg in [self.legs[2], self.legs[3]]:
+        for leg in [self.legs[3], self.legs[4]]:
             if up:
                 leg.move_mount_point(0, x, -z)
             else:

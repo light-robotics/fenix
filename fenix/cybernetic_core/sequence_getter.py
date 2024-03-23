@@ -105,6 +105,37 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.body_movement(0, 0, UP_OR_DOWN_CM)
     elif command == 'down':
         fk.body_movement(0, 0, -UP_OR_DOWN_CM)
+    elif command == 'climb_2_legs':
+        #fk.climb_2_legs(15)
+        fk.body_movement(0, 0, 15)
+        fk.body_movement(-5, 0, 0)
+
+        fk.leg_movement(1, [-5, 10, 20])
+        fk.leg_movement(1, [30, -10, 0])
+        fk.leg_movement(1, [0, 0, -5])
+
+        
+        fk.leg_movement(2, [-5, -10, 20])
+        fk.leg_movement(2, [30, 10, 0])
+        fk.leg_movement(2, [0, 0, -5])
+
+        fk.body_movement(25, 0, 0)
+        fk.body_movement(0, 0, -5)
+
+        fk.leg_movement(3, [0, 0, 10], snapshot=False)
+        fk.leg_movement(4, [0, 0, 10])
+
+        """
+        fk.leg_movement(3, [15, -5, 25], snapshot=False)
+        fk.leg_movement(4, [15, 5, 25])
+
+        fk.leg_movement(3, [10, 0, 0], snapshot=False)
+        fk.leg_movement(4, [10, 0, 0])
+
+        fk.leg_movement(3, [0, 5, -5], snapshot=False)
+        fk.leg_movement(4, [0, -5, -5])
+        """
+
     elif command == 'climb_2':
         fk.body_movement(0, 0, 14)
         fk.body_movement(-5, 0, 0)
@@ -143,12 +174,13 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.body_movement(23, 0, -2)
         fk.body_movement(0, 0, -3)
 
-        fk.leg_movement(3, [15, -5, 25])
-        fk.leg_movement(3, [10, 0, 0])
-        fk.leg_movement(3, [0, 5, -5])
-
+        fk.leg_movement(3, [15, -5, 25], snapshot=False)
         fk.leg_movement(4, [15, 5, 25])
+
+        fk.leg_movement(3, [10, 0, 0], snapshot=False)
         fk.leg_movement(4, [10, 0, 0])
+
+        fk.leg_movement(3, [0, 5, -5], snapshot=False)
         fk.leg_movement(4, [0, -5, -5])
 
         fk.body_movement(3, 0, 0)
