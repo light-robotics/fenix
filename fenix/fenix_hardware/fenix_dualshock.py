@@ -224,28 +224,28 @@ class FenixDualShock(DualShock):
         self.mode = FenixModes.BATTLE
         if not NIGHT_MODE:
             self.neopixel.issue_command('steady', color='purple')
-        self.command_writer.write_command('battle_mode', 1000)
+        self.command_writer.write_command('battle_mode', 500)
         print('Switched mode to BATTLE')
 
     def on_triangle_press(self):
         self.mode = FenixModes.RUN
         if not NIGHT_MODE:
             self.neopixel.issue_command('steady', color='red')
-        self.command_writer.write_command('run_mode', 1000)
+        self.command_writer.write_command('run_mode', 500)
         print('Switched mode to RUN')
 
     def on_circle_press(self):
         self.mode = FenixModes.SENTRY
         if not NIGHT_MODE:
             self.neopixel.issue_command('steady', color='cyan')
-        self.command_writer.write_command('sentry_mode', 1000)
+        self.command_writer.write_command('sentry_mode', 500)
         print('Switched mode to SENTRY')
 
     def on_square_press(self):
         self.mode = FenixModes.WALKING
         if not NIGHT_MODE:
             self.neopixel.issue_command('steady', color='blue')
-        self.command_writer.write_command('walking_mode', 1000)
+        self.command_writer.write_command('walking_mode', 500)
         print('Switched mode to WALKING')
 
 if __name__ == '__main__':

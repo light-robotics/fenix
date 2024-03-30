@@ -124,11 +124,13 @@ class MovementProcessor:
         elif command in ['forward_1', 'forward_2', 'forward_3', 'forward_22', 'forward_32']:
             self.logger.info('Using function set_servo_values_for_running')
             return self.fs.set_servo_values_for_running
+            #return self.fs.set_servo_values_overshoot
         else:
             self.logger.info('Using function set_servo_values_not_paced_v2')
             return self.fs.set_servo_values_not_paced_v2
                         
     def run_sequence(self, command: str) -> None:
+        self.logger.info(f'[MOVE] Started run_sequence : {datetime.datetime.now()}')
         try:            
             self.logger.info(f'MOVE. Trying command {command}')
             before_sequence_time = datetime.datetime.now()
@@ -146,7 +148,7 @@ class MovementProcessor:
             time.sleep(0.3)
             return
         
-        self.logger.info(f'MOVE Started')    
+        self.logger.info(f'[MOVE] Started: {datetime.datetime.now()}')    
         start_time = datetime.datetime.now()
         #prev_angles = None
         if not code_config.DEBUG:
@@ -154,9 +156,14 @@ class MovementProcessor:
 
         for move_snapshot in sequence:
             angles = move_snapshot.angles_snapshot[:]
-            if move_snapshot.move_type == 'body' and self.speed != self.body_speed:
+            #if move_snapshot.move_type == 'body' and self.speed != self.body_speed:
+            #    self.fs.set_speed(self.body_speed)
+            if move_snapshot.move_type == 'body':
                 self.fs.set_speed(self.body_speed)
+            else:
+                self.fs.set_speed(self.speed)
             self.logger.info(f'Moving to {angles}. Move type: {move_snapshot.move_type}')
+            self.logger.info(f'Speed: {self.fs.speed}')
             if not code_config.DEBUG:
                 move_function(angles)
                 #self.fs.set_servo_values_not_paced_v2(angles, prev_angles)
@@ -164,6 +171,7 @@ class MovementProcessor:
                 #prev_angles = angles[:]
             else:
                 time.sleep(1.0)
+        self.logger.info(f'[MOVE] finished: {datetime.datetime.now()}')
         self.logger.info(f'[TIMING] Step took : {datetime.datetime.now() - start_time}')
 
     def move(self):

@@ -71,8 +71,8 @@ fenix = {
     },
     # issue next command a little faster, than previous is finished executing
     # when moving without feedback
-    "movement_command_advance_ms" : -0.05,
-    "movement_overshoot_coefficient" : 0.2,
+    "movement_command_advance_ms" : 0.0,
+    "movement_overshoot_coefficient" : 0.0,
 }
 
 limits = {

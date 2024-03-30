@@ -278,7 +278,7 @@ class FenixServos:
         self.logger.info(f'[DIFF] Diff with target:')
         self.get_angles_diff(angles)
 
-    def set_servo_values_not_paced_v3(self, angles, prev_angles=None):
+    def set_servo_values_overshoot(self, angles, prev_angles=None):
         angles_diff, max_angle_diff = self.get_angles_diff(angles, prev_angles)
         rate = round(max(self.speed * (1 + config.fenix['movement_overshoot_coefficient']) * max_angle_diff / 45, self.max_speed)) # speed is normalized
         wait_time = max(0, rate / 1000 - config.fenix['movement_command_advance_ms'])
