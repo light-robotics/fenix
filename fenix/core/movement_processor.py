@@ -31,8 +31,8 @@ class MovementProcessor:
         if not code_config.DEBUG:
             self.fs = FenixServos()
         
-        self.speed = 500
-        self.body_speed = 1000        
+        self.speed = 400
+        self.body_speed = 800        
 
         # state is used for multi-phased moves
         # state 0 means start position

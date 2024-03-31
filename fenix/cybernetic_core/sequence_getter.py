@@ -8,6 +8,7 @@ from configs import config as cfg
 from configs import code_config
 from cybernetic_core.cybernetic_utils.moves import Sequence
 
+#from functools import cache
 memory = Memory(code_config.cache_dir, verbose=0)
 
 UP_OR_DOWN_CM   = cfg.moves["up_or_down_cm"]
@@ -56,6 +57,7 @@ class VirtualFenix():
         return sequence, new_position
 
 
+#@cache
 #@memory.cache
 def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> Sequence:
     fk = FenixKinematics(fenix_position=fenix_position)
@@ -71,6 +73,9 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.move_2_legs_phased_24(FORWARD_LEGS_2LEG_CM, 0)
     elif command == 'forward_3':
         # Legs 1 and 3 moved x2
+        for _ in range(3):
+            fk.move_2_legs_phased_13(2 * FORWARD_LEGS_2LEG_CM, 0)
+            fk.move_2_legs_phased_24(2 * FORWARD_LEGS_2LEG_CM, 0)
         fk.move_2_legs_phased_13(2 * FORWARD_LEGS_2LEG_CM, 0)
     elif command == 'forward_32':
         # Legs 1 and 3 moved x1
