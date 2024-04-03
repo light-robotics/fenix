@@ -1,12 +1,12 @@
 import copy
 from typing import List, Dict
 from dataclasses import dataclass
-
+from cybernetic_core.geometry.angles import FenixPosition
 
 @dataclass
 class MoveSnapshot:
     move_type: str
-    angles_snapshot: List[float]
+    angles_snapshot: FenixPosition
 
 class Sequence:
     def __init__(self, moves: List[MoveSnapshot]):

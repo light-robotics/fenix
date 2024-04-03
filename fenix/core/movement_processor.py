@@ -141,7 +141,7 @@ class MovementProcessor:
                 self.logger.info(f'MOVE. Command aborted')
                 return
             self.logger.info(f'[TIMING] Sequence calculation took : {datetime.datetime.now() - before_sequence_time}')
-            self.fenix_position = new_position[:]
+            self.fenix_position = new_position
         except ValueError as e:
             print(f'MOVE Failed. Could not process command - {str(e)}')
             self.logger.info(f'MOVE Failed. Could not process command - {str(e)}')
@@ -155,7 +155,7 @@ class MovementProcessor:
             move_function = self.move_function_dispatch(command)
 
         for move_snapshot in sequence:
-            angles = move_snapshot.angles_snapshot[:]
+            angles = move_snapshot.angles_snapshot.angles
             #if move_snapshot.move_type == 'body' and self.speed != self.body_speed:
             #    self.fs.set_speed(self.body_speed)
             if move_snapshot.move_type == 'body':

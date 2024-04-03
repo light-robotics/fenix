@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from functools import cache
 import sys
 import os
 from joblib import Memory
@@ -7,9 +7,9 @@ from cybernetic_core.kinematics import FenixKinematics
 from configs import config as cfg
 from configs import code_config
 from cybernetic_core.cybernetic_utils.moves import Sequence
+from cybernetic_core.geometry.angles import FenixPosition
 
-#from functools import cache
-memory = Memory(code_config.cache_dir, verbose=0)
+#memory = Memory(code_config.cache_dir, verbose=0)
 
 UP_OR_DOWN_CM   = cfg.moves["up_or_down_cm"]
 FORWARD_BODY_CM = cfg.moves["move_body_cm"]
@@ -30,8 +30,8 @@ class VirtualFenix():
         self.logger = logger
         self.side_look_angle = 0
         self.vertical_look_angle = 0
-
-    def get_sequence(self, command: str, fenix_position: List[int]):
+    
+    def get_sequence(self, command: str, fenix_position: FenixPosition):
         if command == 'look_left':
             if self.side_look_angle <= -cfg.limits['side_look_angle']:
                 self.logger.info(f'Look left limit reached')
@@ -57,9 +57,8 @@ class VirtualFenix():
         return sequence, new_position
 
 
-#@cache
-#@memory.cache
-def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> Sequence:
+@cache
+def get_sequence_for_command_cached(command: str, fenix_position: FenixPosition) -> Sequence:
     fk = FenixKinematics(fenix_position=fenix_position)
     
     if command == 'forward_1':

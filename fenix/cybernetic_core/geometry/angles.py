@@ -1,5 +1,5 @@
 import math
-from functools import lru_cache
+from functools import lru_cache, cache
 from typing import List
 
 import sys
@@ -7,11 +7,75 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from cybernetic_core.geometry.lines import Point
-from cybernetic_core.cybernetic_utils.constraints import leg_angles_correct
+from cybernetic_core.cybernetic_utils.constraints import leg_angles_correct, tettas_correct
 
 import configs.config as cfg
 import configs.code_config as code_config
 import logging.config
+
+
+class FenixPosition:
+    def __init__(self, 
+            beta1, alpha1, tetta1,
+            beta2, alpha2, tetta2,
+            beta3, alpha3, tetta3,
+            beta4, alpha4, tetta4,
+            logger,
+        ):
+        self.beta1 = beta1
+        self.alpha1 = alpha1
+        self.tetta1 = tetta1
+        self.beta2 = beta2
+        self.alpha2 = alpha2
+        self.tetta2 = tetta2
+        self.beta3 = beta3
+        self.alpha3 = alpha3
+        self.tetta3 = tetta3
+        self.beta4 = beta4
+        self.alpha4 = alpha4
+        self.tetta4 = tetta4
+        self.logger = logger
+        self.angles = [
+            self.beta1, self.alpha1, self.tetta1,
+            self.beta2, self.alpha2, self.tetta2,
+            self.beta3, self.alpha3, self.tetta3,
+            self.beta4, self.alpha4, self.tetta4
+        ]
+
+    def convert_to_servo_angles(self):
+        self.beta1 = convert_beta(self.beta1)
+        self.alpha1 = convert_alpha(self.alpha1)
+        self.tetta1 = convert_tetta(self.tetta1, 1)
+        self.beta2 = convert_beta(self.beta2)
+        self.alpha2 = convert_alpha(self.alpha2)
+        self.tetta2 = convert_tetta(self.tetta2, 2)
+        self.beta3 = convert_beta(self.beta3)
+        self.alpha3 = convert_alpha(self.alpha3)
+        self.tetta3 = convert_tetta(self.tetta3, 3)
+        self.beta4 = convert_beta(self.beta4)
+        self.alpha4 = convert_alpha(self.alpha4)
+        self.tetta4 = convert_tetta(self.tetta4, 4)
+
+    def check_angles(self):
+        if not tettas_correct([self.tetta1, self.tetta2, self.tetta3, self.tetta4], self.logger):
+            raise ValueError(f'Bad tettas : {self.tetta1, self.tetta2, self.tetta3, self.tetta4}')
+
+        for index, leg in enumerate([
+            [self.alpha1, self.beta1, self.tetta1],
+            [self.alpha2, self.beta2, self.tetta2],
+            [self.alpha3, self.beta3, self.tetta3],
+            [self.alpha4, self.beta4, self.tetta4]]
+            ):
+            if not leg_angles_correct(leg[0], leg[1], leg[2], logger=self.logger):
+                raise ValueError(f'Leg {index+1}. Bad angles:alpha {leg[0]}, beta {leg[1]}, tetta {leg[2]}')
+
+    def __hash__(self):
+        i = 1
+        result = 0
+        for item in self.angles:
+            result += round(item*10)*i
+            i *= 100
+        return result
 
 
 @lru_cache(maxsize=None)
@@ -71,36 +135,13 @@ def convert_tetta(tetta: float, leg_number: int) -> float:
     
     return round(tetta_degrees, 2)
 
-def convert_legs_angles(legs_angles: List[float], logger) -> List[float]:
+@cache
+def convert_legs_angles(legs_angles: FenixPosition) -> List[float]:
     # input: 16 angles in RADIANS
     # output: 16 converted angles in DEGREES
-    # now tetta, alpha, beta one leg after another
-    angles_converted = [
-        convert_beta(legs_angles[2]),
-        convert_alpha(legs_angles[1]),
-        convert_tetta(legs_angles[0], 1),
-        convert_beta(legs_angles[5]),
-        convert_alpha(legs_angles[4]),
-        convert_tetta(legs_angles[3], 2),
-        convert_beta(legs_angles[8]),
-        convert_alpha(legs_angles[7]),
-        convert_tetta(legs_angles[6], 3),
-        convert_beta(legs_angles[11]),
-        convert_alpha(legs_angles[10]),
-        convert_tetta(legs_angles[9], 4),
-    ]
-
-    for i in range(4):
-        alpha_converted = angles_converted[3*i+1]
-        beta_converted = angles_converted[3*i+2]
-        tetta_converted = angles_converted[3*i]
-        if not leg_angles_correct(
-                alpha=alpha_converted,
-                beta=beta_converted,
-                tetta=tetta_converted,
-                logger=logger
-            ):
-            raise ValueError(f'Leg {i+1}. Bad angles:alpha {alpha_converted}, beta {beta_converted}, tetta {tetta_converted}')
+    angles_converted = legs_angles
+    angles_converted.convert_to_servo_angles()
+    angles_converted.check_angles()
 
     return angles_converted
 
