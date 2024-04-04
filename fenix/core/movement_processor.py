@@ -7,6 +7,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from cybernetic_core.kinematics import FenixKinematics
 from cybernetic_core.sequence_getter import get_sequence_for_command_cached, VirtualFenix
+from core.utils.multiphase_moves import CommandsForwarder
 import configs.code_config as code_config
 import configs.config as config
 import logging.config
@@ -26,6 +27,7 @@ class MovementProcessor:
         
         fk = FenixKinematics()
         self.vf = VirtualFenix(self.logger)
+        self.cf = CommandsForwarder()
         self.fenix_position = fk.current_position
 
         if not code_config.DEBUG:
@@ -84,38 +86,20 @@ class MovementProcessor:
             print(f'Setting speed to {speed}')
 
         # first we finish movements that are in progress
-        if self.state == 'f1':
-            if command == 'forward_two_legged':
-                print(f'Forward 2. Legs 2 and 4 moved x2. {speed}')
-                self.state = 'f2'
-                self.run_sequence('forward_2')
-            else:
-                print(f'Forward 22. Legs 2 and 4 moved x1. {speed}')
-                self.state = '0'
-                self.run_sequence('forward_22')
-        elif self.state == 'f2':
-            if command == 'forward_two_legged':
-                print(f'Forward 3. Legs 1 and 3 moved x2. {speed}')
-                self.state = 'f1'
-                self.run_sequence('forward_3')
-            else:
-                print(f'Forward 32. Legs 1 and 3 moved x1. {speed}')
-                self.state = '0'
-                self.run_sequence('forward_32')
-        
-        # then we make the next move
-        if self.state == '0':
-            if command == 'forward_two_legged':
-                print(f'Forward 1. Legs 1 and 3 moved x1. {speed}')
-                self.state = 'f1'
-                self.run_sequence('forward_1')
-            else:
-                print(f'Executing command {command}')
-                self.logger.info(f'Executing command {command}')
-                if command == 'none':
-                    time.sleep(0.1)
-                else:    
-                    self.run_sequence(command)
+        if command in self.cf.moves:
+            next_move = self.cf.get_move(command)
+            print(f'Executing move: {next_move}')
+            self.run_sequence(next_move)
+        else:
+            if self.cf.current_status:
+                next_move = self.cf.get_move(command)
+                print(f'Status: {self.cf.current_status}. Executing move: {next_move}')
+                self.run_sequence(next_move)
+            print(f'Executing move: {command}')
+            if command == 'none':
+                time.sleep(0.1)
+            else:    
+                self.run_sequence(command)
 
     def move_function_dispatch(self, command: str) -> Callable:
         if command in ['hit_1', 'hit_4', 'forward_one_legged']:
