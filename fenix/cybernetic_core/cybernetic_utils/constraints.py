@@ -9,6 +9,21 @@ def rule_followed(constraint: Dict, value: float) -> bool:
         return False
     return True
 
+def tettas_correct(tettas: list[float], logger = None) -> bool:
+    for idx, value in enumerate(tettas):
+        if idx + 1 > len(tettas) - 1:
+            plus_index = 0
+            plus_value = tettas[0]
+        else:
+            plus_index = idx + 1
+            plus_value = tettas[idx + 1]
+        
+        if value - plus_value > 90:
+            logger.info(f'Bad value: {value - plus_value} for {(idx + 1, plus_index + 1)}')
+            return False
+
+    return True
+
 def leg_angles_correct(
     alpha: Optional[float] = None, 
     beta: Optional[float] = None,

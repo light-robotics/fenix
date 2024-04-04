@@ -7,7 +7,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from cybernetic_core.geometry.lines import Point
-from cybernetic_core.cybernetic_utils.constraints import leg_angles_correct
+from cybernetic_core.cybernetic_utils.constraints import leg_angles_correct, tettas_correct
 
 import configs.config as cfg
 import configs.code_config as code_config
@@ -89,6 +89,15 @@ def convert_legs_angles(legs_angles: List[float], logger) -> List[float]:
         convert_alpha(legs_angles[10]),
         convert_tetta(legs_angles[9], 4),
     ]
+
+    if not tettas_correct([
+        angles_converted[2], 
+        angles_converted[5], 
+        angles_converted[8], 
+        angles_converted[11]
+        ], 
+        logger=logger):
+        raise ValueError('Bad tettas')
 
     for i in range(4):
         alpha_converted = angles_converted[3*i+1]
