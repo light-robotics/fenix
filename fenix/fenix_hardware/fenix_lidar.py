@@ -12,6 +12,8 @@ class FenixLidar(RPLidar):
 
     def scan_front(self, iterations=1):
         print('Scanning started')
+        self.connect()
+        self.reset()
         self.clean_input()
         for i, scan in enumerate(self.iter_scans()):            
             for value in scan:
@@ -25,9 +27,11 @@ class FenixLidar(RPLidar):
             
             if i > iterations:
                 break
-
+        self.disconnect()
         #self.motor_speed = 0
         print('Scanning finished')
+        self.save_data()
+        del self
     
     def save_data(self):
         print('Saving data')
@@ -38,11 +42,11 @@ class FenixLidar(RPLidar):
 
 if __name__ == '__main__':
     import time
-    lidar = FenixLidar('/dev/ttyUSB0')
+    
     for j in range(2):
-        try:
-            lidar.scan_front()
-        except:
-            lidar.scan_front()
+        lidar = FenixLidar('/dev/ttyUSB0')
+        lidar.scan_front()
+        #del lidar
         time.sleep(3)
-    lidar.save_data()
+        
+    #lidar.save_data()

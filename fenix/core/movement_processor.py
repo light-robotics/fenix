@@ -28,7 +28,7 @@ class MovementProcessor:
         fk = FenixKinematics()
         self.vf = VirtualFenix(self.logger)
         self.cf = CommandsForwarder()
-        #self.fl = FenixLidar()
+        
         self.fenix_position = fk.current_position
 
         if not code_config.DEBUG:
@@ -171,11 +171,10 @@ class MovementProcessor:
                     self.fs.disable_torque()
                 elif command == 'enable_torque':
                     self.fs.enable_torque()
-                #elif command == 'lidar_scan':
-                #    self.fl.current_height = self.vf.get_height(self.fenix_position)
-                #    self.fl.scan_front()
-                #elif command == 'save_lidar_data':
-                #    self.fl.save_data()
+                elif command == 'lidar_scan':
+                    self.fl = FenixLidar()
+                    self.fl.current_height = self.vf.get_height(self.fenix_position)
+                    self.fl.scan_front()
                 else:
                     try:
                         self.execute_command(command, speed)
