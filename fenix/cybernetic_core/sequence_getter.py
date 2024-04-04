@@ -56,6 +56,9 @@ class VirtualFenix():
         sequence, new_position = get_sequence_for_command_cached(command, fenix_position)
         return sequence, new_position
 
+    def get_height(self, fenix_position: List[float]):
+        fk = FenixKinematics(fenix_position=fenix_position)
+        return fk.current_legs_offset_v + 13
 
 #@cache
 #@memory.cache

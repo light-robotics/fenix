@@ -6,8 +6,9 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from cybernetic_core.kinematics import FenixKinematics
-from cybernetic_core.sequence_getter import get_sequence_for_command_cached, VirtualFenix
+from cybernetic_core.sequence_getter import VirtualFenix
 from core.utils.multiphase_moves import CommandsForwarder
+from fenix_hardware.fenix_lidar import FenixLidar
 import configs.code_config as code_config
 import configs.config as config
 import logging.config
@@ -23,23 +24,18 @@ class MovementProcessor:
         self.logger.info('==================START==================')
 
         self.max_processed_command_id = 0
-        self.state = '0'
         
         fk = FenixKinematics()
         self.vf = VirtualFenix(self.logger)
         self.cf = CommandsForwarder()
+        #self.fl = FenixLidar()
         self.fenix_position = fk.current_position
 
         if not code_config.DEBUG:
             self.fs = FenixServos()
         
         self.speed = 400
-        self.body_speed = 800        
-
-        # state is used for multi-phased moves
-        # state 0 means start position
-        # state f1 means legs 1 and 3 had been moved forward
-        # state f2 means legs 2 and 4 had been moved forward
+        self.body_speed = 800
 
     def read_command(self) -> Optional[Union[str, int]]:        
         with open(code_config.movement_command_file, 'r') as f:
@@ -175,6 +171,11 @@ class MovementProcessor:
                     self.fs.disable_torque()
                 elif command == 'enable_torque':
                     self.fs.enable_torque()
+                #elif command == 'lidar_scan':
+                #    self.fl.current_height = self.vf.get_height(self.fenix_position)
+                #    self.fl.scan_front()
+                #elif command == 'save_lidar_data':
+                #    self.fl.save_data()
                 else:
                     try:
                         self.execute_command(command, speed)

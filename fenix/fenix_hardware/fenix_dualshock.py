@@ -103,16 +103,14 @@ class FenixDualShock(DualShock):
         """
         
         value = abs(value)
-        if value < 12000:
-            return 1500 # > 1000 will be ignored for moving
-        """
+        #if value < 12000:
+        #    return 1500 # > 1000 will be ignored for moving
         if value < 20000:
             return 400
         if value < 25000:
             return 300
         if value < 30000:
             return 250
-        """
         return 1000
     
     def on_L3_up(self, value):
@@ -196,26 +194,28 @@ class FenixDualShock(DualShock):
         self.command_writer.write_command('none', 250)
 
     def on_right_arrow_press(self):
-        self.command_writer.write_command('climb_2_legs', 500)
-        time.sleep(0.5)
-        self.command_writer.write_command('none', 1000)
+        if self.mode in [FenixModes.BATTLE]:
+            self.command_writer.write_command('save_lidar_data', 1000)
+        else:
+            self.command_writer.write_command('climb_2_legs', 500)
+            time.sleep(0.5)
+            self.command_writer.write_command('none', 1000)
 
     def on_left_arrow_press(self):
-        self.command_writer.write_command('climb_2', 500)
-        time.sleep(0.5)
-        self.command_writer.write_command('none', 1000)
+        if self.mode in [FenixModes.BATTLE]:
+            self.command_writer.write_command('lidar_scan', 1000)
+        else:
+            self.command_writer.write_command('climb_2', 500)
+            time.sleep(0.5)
+            self.command_writer.write_command('none', 1000)
       
     def on_up_arrow_press(self):
-        if self.mode in [FenixModes.RUN, FenixModes.WALKING, FenixModes.SENTRY]:
-            self.command_writer.write_command('up', 1000)
-        elif self.mode == FenixModes.BATTLE:
-            self.command_writer.write_command('nano_demo_1', 1000)
+        #if self.mode in [FenixModes.RUN, FenixModes.WALKING, FenixModes.SENTRY]:
+        self.command_writer.write_command('up', 1000)
 
     def on_down_arrow_press(self):
-        if self.mode in [FenixModes.RUN, FenixModes.WALKING, FenixModes.SENTRY]:
-            self.command_writer.write_command('down', 1000)
-        elif self.mode == FenixModes.BATTLE:
-            self.command_writer.write_command('nano_demo_2', 1000)
+        #if self.mode in [FenixModes.RUN, FenixModes.WALKING, FenixModes.SENTRY]:
+        self.command_writer.write_command('down', 1000)
 
     def on_up_down_arrow_release(self):
         self.command_writer.write_command('none', 500)

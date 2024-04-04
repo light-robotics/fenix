@@ -14,6 +14,7 @@ print(info)
 health = lidar.get_health()
 print(health)
 
+"""
 for i, scan in enumerate(lidar.iter_scans()):
     with open('/fenix/fenix/wrk/lidar_data.txt', 'a') as f:
         f.write(f'{scan}\n')
@@ -29,7 +30,11 @@ for i, scan in enumerate(lidar.iter_scans()):
     
     if i > 100:
         break
+"""
+#lidar.motor_speed = 0
+import time
 
 lidar.stop()
 lidar.stop_motor()
 lidar.disconnect()
+time.sleep(3)
