@@ -7,6 +7,8 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from cybernetic_core.kinematics import FenixKinematics
 from cybernetic_core.sequence_getter import get_sequence_for_command_cached, VirtualFenix
+from cybernetic_core.geometry.angles import convert_to_servo_angles
+from cybernetic_core.cybernetic_utils.moves import MoveSnapshot
 import configs.code_config as code_config
 import configs.config as config
 import logging.config
@@ -87,28 +89,28 @@ class MovementProcessor:
         if self.state == 'f1':
             if command == 'forward_two_legged':
                 print(f'Forward 2. Legs 2 and 4 moved x2. {speed}')
-                self.state = 'f2'
                 self.run_sequence('forward_2')
+                self.state = 'f2'
             else:
                 print(f'Forward 22. Legs 2 and 4 moved x1. {speed}')
-                self.state = '0'
                 self.run_sequence('forward_22')
+                self.state = '0'
         elif self.state == 'f2':
             if command == 'forward_two_legged':
                 print(f'Forward 3. Legs 1 and 3 moved x2. {speed}')
-                self.state = 'f1'
                 self.run_sequence('forward_3')
+                self.state = 'f1'
             else:
                 print(f'Forward 32. Legs 1 and 3 moved x1. {speed}')
-                self.state = '0'
                 self.run_sequence('forward_32')
+                self.state = '0'
         
         # then we make the next move
         if self.state == '0':
             if command == 'forward_two_legged':
                 print(f'Forward 1. Legs 1 and 3 moved x1. {speed}')
-                self.state = 'f1'
                 self.run_sequence('forward_1')
+                self.state = 'f1'
             else:
                 print(f'Executing command {command}')
                 self.logger.info(f'Executing command {command}')
@@ -140,6 +142,14 @@ class MovementProcessor:
             if sequence is None:
                 self.logger.info(f'MOVE. Command aborted')
                 return
+            sequence_converted = []
+            for move_snapshot in sequence:
+                converted_move = MoveSnapshot(
+                    move_snapshot.move_type, 
+                    convert_to_servo_angles(move_snapshot.angles_snapshot)
+                )
+                sequence_converted.append(converted_move)
+                
             self.logger.info(f'[TIMING] Sequence calculation took : {datetime.datetime.now() - before_sequence_time}')
             self.fenix_position = new_position
         except ValueError as e:
@@ -154,10 +164,8 @@ class MovementProcessor:
         if not code_config.DEBUG:
             move_function = self.move_function_dispatch(command)
 
-        for move_snapshot in sequence:
+        for move_snapshot in sequence_converted:
             angles = move_snapshot.angles_snapshot.angles
-            #if move_snapshot.move_type == 'body' and self.speed != self.body_speed:
-            #    self.fs.set_speed(self.body_speed)
             if move_snapshot.move_type == 'body':
                 self.fs.set_speed(self.body_speed)
             else:

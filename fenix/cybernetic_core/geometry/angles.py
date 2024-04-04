@@ -42,19 +42,13 @@ class FenixPosition:
             self.beta4, self.alpha4, self.tetta4
         ]
 
-    def convert_to_servo_angles(self):
-        self.beta1 = convert_beta(self.beta1)
-        self.alpha1 = convert_alpha(self.alpha1)
-        self.tetta1 = convert_tetta(self.tetta1, 1)
-        self.beta2 = convert_beta(self.beta2)
-        self.alpha2 = convert_alpha(self.alpha2)
-        self.tetta2 = convert_tetta(self.tetta2, 2)
-        self.beta3 = convert_beta(self.beta3)
-        self.alpha3 = convert_alpha(self.alpha3)
-        self.tetta3 = convert_tetta(self.tetta3, 3)
-        self.beta4 = convert_beta(self.beta4)
-        self.alpha4 = convert_alpha(self.alpha4)
-        self.tetta4 = convert_tetta(self.tetta4, 4)
+    def __hash__(self):
+        i = 1
+        result = 0
+        for item in self.angles:
+            result += round(item*10)*i
+            i *= 100
+        return result
 
     def check_angles(self):
         if not tettas_correct([self.tetta1, self.tetta2, self.tetta3, self.tetta4], self.logger):
@@ -69,14 +63,32 @@ class FenixPosition:
             if not leg_angles_correct(leg[0], leg[1], leg[2], logger=self.logger):
                 raise ValueError(f'Leg {index+1}. Bad angles:alpha {leg[0]}, beta {leg[1]}, tetta {leg[2]}')
 
-    def __hash__(self):
-        i = 1
-        result = 0
-        for item in self.angles:
-            result += round(item*10)*i
-            i *= 100
-        return result
 
+@cache
+def convert_to_servo_angles(fp: FenixPosition) -> FenixPosition:
+    #print(f'Converted from {fp.angles}')
+    beta1 = convert_beta(fp.beta1)
+    alpha1 = convert_alpha(fp.alpha1)
+    tetta1 = convert_tetta(fp.tetta1, 1)
+    beta2 = convert_beta(fp.beta2)
+    alpha2 = convert_alpha(fp.alpha2)
+    tetta2 = convert_tetta(fp.tetta2, 2)
+    beta3 = convert_beta(fp.beta3)
+    alpha3 = convert_alpha(fp.alpha3)
+    tetta3 = convert_tetta(fp.tetta3, 3)
+    beta4 = convert_beta(fp.beta4)
+    alpha4 = convert_alpha(fp.alpha4)
+    tetta4 = convert_tetta(fp.tetta4, 4)
+
+    new_fp = FenixPosition(beta1, alpha1, tetta1,
+            beta2, alpha2, tetta2,
+            beta3, alpha3, tetta3,
+            beta4, alpha4, tetta4,
+            fp.logger,)
+   
+    #print(f'Converted to {new_fp.angles}')
+    new_fp.check_angles()
+    return new_fp
 
 @lru_cache(maxsize=None)
 def find_angles(Cx, Cy, logger):
@@ -135,16 +147,17 @@ def convert_tetta(tetta: float, leg_number: int) -> float:
     
     return round(tetta_degrees, 2)
 
+"""
 @cache
 def convert_legs_angles(legs_angles: FenixPosition) -> List[float]:
     # input: 16 angles in RADIANS
     # output: 16 converted angles in DEGREES
-    angles_converted = legs_angles
+    angles_converted = FenixPosition(legs_angles)
     angles_converted.convert_to_servo_angles()
     angles_converted.check_angles()
 
-    return angles_converted
-
+    return angles_converted.angles
+"""
 def calculate_C_point(O: Point, tetta: float, alpha: float, beta: float) -> Point:
     A = Point(O.x + cfg.leg["d"] * math.cos(tetta),
                 O.y + cfg.leg["d"] * math.sin(tetta),
@@ -199,3 +212,6 @@ if __name__ == '__main__':
 
     # D initial : Point(x=7.24, y=-3.69, z=-14.22)
     # D calcula : Point(x=14.15, y=-3.47, z=-14.22)
+
+    # Moving to [44.75, 41.68, 30.47, 44.75, 41.68, -30.47, 44.75, 41.68, 30.47, 44.75, 41.68, -30.47]
+    # Moving to [44.75, 41.68, 30.47, 44.75, 41.68, -30.47, 44.75, 41.68, 30.47, 44.75, 41.68, -30.47]. Move type: init

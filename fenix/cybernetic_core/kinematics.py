@@ -5,7 +5,7 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from configs import config as cfg
-from cybernetic_core.geometry.angles import FenixPosition, calculate_leg_angles, turn_on_angle, convert_legs_angles, calculate_C_point
+from cybernetic_core.geometry.angles import FenixPosition, calculate_leg_angles, turn_on_angle, calculate_C_point
 from cybernetic_core.geometry.lines import Point, LinearFunc, calculate_intersection, move_on_a_line
 import configs.code_config as code_config
 import logging.config
@@ -110,7 +110,7 @@ class FenixKinematics:
     def sequence(self):
         sequence = []
         for move in self.angles_history:
-            sequence.append(MoveSnapshot(move.move_type, convert_legs_angles(move.angles_snapshot)))
+            sequence.append(MoveSnapshot(move.move_type, move.angles_snapshot))
         return sequence
         #return self.angles_history
     
