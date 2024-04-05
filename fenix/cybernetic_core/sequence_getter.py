@@ -140,7 +140,18 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
     elif command == 'strafe_left_32':
         # Legs 1 and 3 moved x1
         fk.move_2_legs_phased_13(0, FORWARD_LEGS_2LEG_CM)
-
+    elif command == 'diagonal_forward_right':
+        fk.move_2_legs_phased_13(FORWARD_LEGS_2LEG_CM, -FORWARD_LEGS_2LEG_CM)
+        fk.move_2_legs_phased_24(FORWARD_LEGS_2LEG_CM, -FORWARD_LEGS_2LEG_CM)
+    elif command == 'diagonal_forward_left':
+        fk.move_2_legs_phased_13(FORWARD_LEGS_2LEG_CM, FORWARD_LEGS_2LEG_CM)
+        fk.move_2_legs_phased_24(FORWARD_LEGS_2LEG_CM, FORWARD_LEGS_2LEG_CM)
+    elif command == 'diagonal_backward_right':
+        fk.move_2_legs_phased_13(-FORWARD_LEGS_2LEG_CM, -FORWARD_LEGS_2LEG_CM)
+        fk.move_2_legs_phased_24(-FORWARD_LEGS_2LEG_CM, -FORWARD_LEGS_2LEG_CM)
+    elif command == 'diagonal_backward_left':
+        fk.move_2_legs_phased_13(-FORWARD_LEGS_2LEG_CM, FORWARD_LEGS_2LEG_CM)
+        fk.move_2_legs_phased_24(-FORWARD_LEGS_2LEG_CM, FORWARD_LEGS_2LEG_CM)
     elif command == 'forward_one_legged':
         fk.move_body_straight(FORWARD_LEGS_1LEG_CM, 0)
     elif command in ['battle_mode', 'sentry_mode', 'walking_mode', 'run_mode']:

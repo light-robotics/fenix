@@ -1,1 +1,1 @@
-steady,purple,255
+steady,red,255
