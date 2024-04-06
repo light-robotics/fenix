@@ -124,13 +124,15 @@ class FenixDualShock(DualShock):
             elif self.left_x < -20000 and abs(self.left_y) < 10000:
                 self.command_writer.write_command('strafe_left_two_legged', cfg.speed["run"])
                 
-            elif self.left_x > 20000 and self.left_y > 20000:
-                self.command_writer.write_command('diagonal_forward_right', cfg.speed["run"])
-            elif self.left_x < -20000 and self.left_y > 20000:
-                self.command_writer.write_command('diagonal_forward_left', cfg.speed["run"])
-            elif self.left_x < -20000 and self.left_y < -20000:
+            elif self.left_x > 15000 and self.left_y > 15000:
+                #self.command_writer.write_command('diagonal_forward_right', cfg.speed["run"])
+                self.command_writer.write_command('right_turn_in_move', cfg.speed["run"])                
+            elif self.left_x < -15000 and self.left_y > 15000:
+                #self.command_writer.write_command('diagonal_forward_left', cfg.speed["run"])
+                self.command_writer.write_command('left_turn_in_move', cfg.speed["run"])   
+            elif self.left_x < -15000 and self.left_y < -15000:
                 self.command_writer.write_command('diagonal_back_left', cfg.speed["run"])
-            elif self.left_x > 20000 and self.left_y < -20000:
+            elif self.left_x > 15000 and self.left_y < -15000:
                 self.command_writer.write_command('diagonal_back_right', cfg.speed["run"])
             else:
                 self.command_writer.write_command('none', 250)

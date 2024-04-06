@@ -514,7 +514,7 @@ class FenixKinematics:
         d12 = math.sqrt((x2-x1)**2 + (y2-y1)**2)
         d23 = math.sqrt((x2-x3)**2 + (y2-y3)**2)
         d34 = math.sqrt((x4-x3)**2 + (y4-y3)**2)
-        print(f'Distances: {d12}, {d23}, {d34}')
+        
         x1_delta = x1 - self.legs[1].C.x
         y1_delta = y1 - self.legs[1].C.y
 
@@ -526,8 +526,6 @@ class FenixKinematics:
 
         x4_delta = x4 - self.legs[4].C.x
         y4_delta = y4 - self.legs[4].C.y
-
-        print(f'Move for ({x1_delta, y1_delta}), ({x2_delta, y2_delta}), ({x3_delta, y3_delta}), ({x4_delta, y4_delta})')
 
         self.legs[2].move_end_point(x2_delta, y2_delta, leg_up)
         self.legs[4].move_end_point(x4_delta, y4_delta, leg_up)
