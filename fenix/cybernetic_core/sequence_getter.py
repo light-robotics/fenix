@@ -156,6 +156,10 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.move_body_straight(FORWARD_LEGS_1LEG_CM, 0)
     elif command in ['battle_mode', 'sentry_mode', 'walking_mode', 'run_mode']:
         fk.switch_mode(command)
+    elif command == "left_turn_in_move":
+        fk.turn_in_move(20)
+    elif command == "right_turn_in_move":
+        fk.turn_in_move(-20)
     elif command == 'body_forward':
         if fk.body_delta_xy()[1] > cfg.limits["body_forward"]:
             print('Forward body limit reached')

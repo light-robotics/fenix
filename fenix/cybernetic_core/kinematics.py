@@ -13,6 +13,65 @@ import logging.config
 from cybernetic_core.cybernetic_utils.moves import Move, MoveSnapshot
 
 
+def get_turn_coords(between_legs, angle, x0=0, y0=0, x_delta=0, y_delta=0):
+
+    x3, y3 = x0 + x_delta, y0 + y_delta
+
+    a = between_legs
+    alpha = math.radians(angle)
+    beta = math.radians(90 - angle)
+
+    x4 = x3 + a*math.cos(alpha)
+    y4 = y3 + a*math.sin(alpha)
+
+    x2 = x3 - a*math.cos(beta)
+    y2 = y3 + a*math.sin(beta)
+
+    x1 = x4 - a*math.sin(alpha)
+    y1 = y4 + a*math.cos(alpha)
+
+    print(f'{between_legs}, {x0}, {y0}, ({x1, y1}), ({x2, y2}), ({x3, y3}), ({x4, y4})')
+
+    return x1, y1, x2, y2, x3, y3, x4, y4
+
+import numpy as np
+
+def rotate_point(x, y, angle):
+    # Convert angle from degrees to radians
+    angle_rad = np.radians(angle)
+    
+    # Rotation matrix
+    rotation_matrix = np.array([[np.cos(angle_rad), -np.sin(angle_rad)],
+                                 [np.sin(angle_rad), np.cos(angle_rad)]])
+    
+    # Coordinates after rotation
+    new_x, new_y = np.dot(rotation_matrix, np.array([x, y]))
+    
+    return new_x, new_y
+
+def move_forward(x, y, angle, move_distance):
+    # Calculate the new coordinates after moving forward
+    new_x = x + move_distance * np.cos(np.radians(angle))
+    new_y = y + move_distance * np.sin(np.radians(angle))
+    
+    return new_x, new_y
+
+def move_robot_legs(leg1_x, leg1_y, leg2_x, leg2_y, leg3_x, leg3_y, leg4_x, leg4_y, angle, move_distance):
+    # Rotate the legs by the given angle
+    print(leg1_x, leg1_y, leg2_x, leg2_y, leg3_x, leg3_y, leg4_x, leg4_y, angle, move_distance)
+    leg1_x, leg1_y = rotate_point(leg1_x, leg1_y, angle)
+    leg2_x, leg2_y = rotate_point(leg2_x, leg2_y, angle)
+    leg3_x, leg3_y = rotate_point(leg3_x, leg3_y, angle)
+    leg4_x, leg4_y = rotate_point(leg4_x, leg4_y, angle)
+
+    # Move the legs forward
+    leg1_x, leg1_y = move_forward(leg1_x, leg1_y, angle, move_distance)
+    leg2_x, leg2_y = move_forward(leg2_x, leg2_y, angle, move_distance)
+    leg3_x, leg3_y = move_forward(leg3_x, leg3_y, angle, move_distance)
+    leg4_x, leg4_y = move_forward(leg4_x, leg4_y, angle, move_distance)
+    print(leg1_x, leg1_y, leg2_x, leg2_y, leg3_x, leg3_y, leg4_x, leg4_y)
+    return leg1_x, leg1_y, leg2_x, leg2_y, leg3_x, leg3_y, leg4_x, leg4_y
+
 class Leg:
     def __init__(self, O: Point, C: Point, leg_tag: str):
         logging.config.dictConfig(code_config.logger_config)
@@ -281,14 +340,15 @@ class FenixKinematics:
                 round(avg_o_y - avg_d_y - delta_y, 2)]
                            
 
-    def body_to_center(self, delta_y=cfg.start["y_offset_body"], delta_x=0):
+    def body_to_center(self, delta_y=cfg.start["y_offset_body"], delta_x=0, snapshot=True):
         # move body to center
         
         body_delta_xy = self.body_delta_xy(delta_y, delta_x)
         self.logger.info(f'Moving body: {body_delta_xy}')
         self.body_movement(-body_delta_xy[0],
                            -body_delta_xy[1],
-                           0)
+                           0, 
+                           snapshot)
 
     # body compensation for moving up one leg
     def target_body_position(self, leg_in_the_air_number):
@@ -440,6 +500,56 @@ class FenixKinematics:
     Two phased moves end
     """
     # 2-legged movements
+    def turn_in_move(self, angle):
+        #angle = -20
+        distance = 7
+        leg_up = self.leg_up + 1
+        x1, y1, x2, y2, x3, y3, x4, y4 = move_robot_legs(
+            self.legs[1].C.x, self.legs[1].C.y,
+            self.legs[2].C.x, self.legs[2].C.y,
+            self.legs[3].C.x, self.legs[3].C.y,
+            self.legs[4].C.x, self.legs[4].C.y,
+            angle, distance
+        )
+        d12 = math.sqrt((x2-x1)**2 + (y2-y1)**2)
+        d23 = math.sqrt((x2-x3)**2 + (y2-y3)**2)
+        d34 = math.sqrt((x4-x3)**2 + (y4-y3)**2)
+        print(f'Distances: {d12}, {d23}, {d34}')
+        x1_delta = x1 - self.legs[1].C.x
+        y1_delta = y1 - self.legs[1].C.y
+
+        x2_delta = x2 - self.legs[2].C.x
+        y2_delta = y2 - self.legs[2].C.y
+
+        x3_delta = x3 - self.legs[3].C.x
+        y3_delta = y3 - self.legs[3].C.y
+
+        x4_delta = x4 - self.legs[4].C.x
+        y4_delta = y4 - self.legs[4].C.y
+
+        print(f'Move for ({x1_delta, y1_delta}), ({x2_delta, y2_delta}), ({x3_delta, y3_delta}), ({x4_delta, y4_delta})')
+
+        self.legs[2].move_end_point(x2_delta, y2_delta, leg_up)
+        self.legs[4].move_end_point(x4_delta, y4_delta, leg_up)
+        self.add_angles_snapshot('endpoints')
+
+        for leg in [self.legs[2], self.legs[4]]:
+            leg.move_end_point(0, 0, -leg_up)
+        self.add_angles_snapshot('endpoints')
+        
+        self.body_to_center()
+
+        self.legs[1].move_end_point(x1_delta, y1_delta, leg_up)
+        self.legs[3].move_end_point(x3_delta, y3_delta, leg_up)
+        self.add_angles_snapshot('endpoints')
+
+        for leg in [self.legs[1], self.legs[3]]:
+            leg.move_end_point(0, 0, -leg_up)
+        self.add_angles_snapshot('endpoints')
+        
+        self.body_to_center(snapshot=False)
+        self.turn(-angle, True)
+
     def move_2_legs(self, delta_y, steps=0):
         self.leg_up = 5
         leg_delta_1 = [0, delta_y, self.leg_up]
@@ -1175,6 +1285,7 @@ class FenixKinematics:
 if __name__ == '__main__':
     fk = FenixKinematics()
     #fk.body_movement(0, 0, 5)
+    fk.left_turn_in_move()
     angles = fk.current_position #sequence[-1].angles_snapshot
     print([math.degrees(angle) for angle in angles])
     print(fk.sequence)

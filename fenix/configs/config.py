@@ -15,8 +15,8 @@ leg = {
 
 start = {
     "vertical"                 : 8,
-    "horizontal_x"             : 8, # 15
-    "horizontal_y"             : 20, # 15
+    "horizontal_x"             : 15, # 15
+    "horizontal_y"             : 15, # 15
     "y_offset_body"            : 0,
     "initial_z_position_delta" : 5, # 3
 }
