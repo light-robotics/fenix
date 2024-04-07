@@ -3,3 +3,5 @@ pyserial==3.4
 pyPS4Controller==1.2.5
 joblib
 rplidar-roboticia
+mpu6050-raspberrypi==1.2
+smbus
