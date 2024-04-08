@@ -167,6 +167,11 @@ class FenixKinematics:
             ])
 
     @property
+    def height(self):
+        return sum([(leg.O.z - leg.C.z) for leg in self.legs.values()])/4
+        #return self.current_legs_offset_v
+
+    @property
     def sequence(self):
         sequence = []
         for move in self.angles_history:
@@ -1023,17 +1028,19 @@ class FenixKinematics:
         angle = cfg.moves['vertical_look_angle']
         x = cfg.leg["mount_point_offset"] * math.cos(math.radians(angle))
         z = cfg.leg["mount_point_offset"] * math.sin(math.radians(angle))
-        
+        x = 3
+        z = 2
+        print(f'X: {x}, Z: {z}. Height: {self.height}')
         for leg in [self.legs[1], self.legs[2]]:
             if up:
-                leg.move_mount_point(0, -x, z)
+                leg.move_mount_point(x, 0, z)
             else:
-                leg.move_mount_point(0, x, -z)
+                leg.move_mount_point(-x, 0, -z)
         for leg in [self.legs[3], self.legs[4]]:
             if up:
-                leg.move_mount_point(0, x, -z)
+                leg.move_mount_point(-x, 0, -z)
             else:
-                leg.move_mount_point(0, -x, z)
+                leg.move_mount_point(x, 0, z)
 
         self.add_angles_snapshot('body')
 

@@ -66,26 +66,29 @@ def average_angles(sensor, num_samples):
 def main():
     sensor = mpu6050(0x68)
 
-    pitch_bias = 2.72
-    roll_bias = 4.65
+    pitch_bias = 2.0
+    roll_bias = 2.6
 
     while True:
         start_time = time.time()
 
         # Calculate average angles over 5 readings
-        pitch_avg, roll_avg, yaw_avg = average_angles(sensor, 5)
+        pitch_avg, roll_avg, yaw_avg = average_angles(sensor, 20)
 
         pitch_avg -= math.radians(pitch_bias)
         roll_avg -= math.radians(roll_bias)
 
+        pitch = round(math.degrees(pitch_avg), 2)
+        roll = round(math.degrees(roll_avg), 2)
         # Print the results
-        print("Pitch (average of 5 readings):", math.degrees(pitch_avg))
-        print("Roll (average of 5 readings):", math.degrees(roll_avg))
-        print("Yaw (average of 5 readings):", math.degrees(yaw_avg))
-        print("")
+        print("Pitch (average of 5 readings):", pitch)
+        print("Roll (average of 5 readings):", roll, "\n")
+        #print("Yaw (average of 5 readings):", math.degrees(yaw_avg))
+        with open("/fenix/fenix/wrk/gyroaccel_data.txt", "w") as f:
+            f.write(f'{pitch},{roll}')
 
         # Adjust the filter after each measure
-        time.sleep(max(0, 0.1 - (time.time() - start_time)))  # Ensure a 0.1-second interval
+        time.sleep(max(0, 0.2 - (time.time() - start_time)))  # Ensure a 0.1-second interval
 
 if __name__ == "__main__":
     main()

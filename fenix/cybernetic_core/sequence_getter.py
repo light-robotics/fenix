@@ -58,7 +58,7 @@ class VirtualFenix():
 
     def get_height(self, fenix_position: List[float]):
         fk = FenixKinematics(fenix_position=fenix_position)
-        return fk.current_legs_offset_v + 13
+        return fk.height + 13
 
 #@cache
 #@memory.cache

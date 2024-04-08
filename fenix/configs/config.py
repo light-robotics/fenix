@@ -35,8 +35,8 @@ modes = {
         "y": 18,
     },
     "battle_mode" : {
-        "x": 16,
-        "y": 16,
+        "x": 15,
+        "y": 15,
     }
 }
 
@@ -52,7 +52,7 @@ moves = {
     "forward_body_2_leg_cm" : 6,    
     "reposition_cm"         : 1,
     "side_look_angle"       : 12,
-    "vertical_look_angle"   : 30,
+    "vertical_look_angle"   : 6,
 }
 
 fenix = {

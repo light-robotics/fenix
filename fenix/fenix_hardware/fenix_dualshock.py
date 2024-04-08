@@ -201,17 +201,17 @@ class FenixDualShock(DualShock):
         #if self.mode in [FenixModes.WALKING, FenixModes.RUN]:
         #    self.command_writer.write_command('up', self.convert_value_to_speed(value))
         self.right_y = value
-        if self.mode in [FenixModes.SENTRY, FenixModes.RUN]:
-            self.command_writer.write_command('look_up', 1000)
-        elif self.mode == FenixModes.BATTLE:
-            self.command_writer.write_command('hit_1', cfg.speed["hit"])
+        #if self.mode in [FenixModes.SENTRY, FenixModes.RUN]:
+        self.command_writer.write_command('look_up', 1000)
+        #elif self.mode == FenixModes.BATTLE:
+        #    self.command_writer.write_command('hit_1', cfg.speed["hit"])
     
     def on_R3_down(self, value):
         self.right_y = -value
         #if self.mode in [FenixModes.WALKING, FenixModes.RUN]:
         #    self.command_writer.write_command('down', self.convert_value_to_speed(value))
-        if self.mode in [FenixModes.SENTRY, FenixModes.RUN]:
-            self.command_writer.write_command('look_down', 1000)
+        #if self.mode in [FenixModes.SENTRY, FenixModes.RUN]:
+        self.command_writer.write_command('look_down', 1000)
     
     def on_R3_left(self, value):
         self.right_x = -value
