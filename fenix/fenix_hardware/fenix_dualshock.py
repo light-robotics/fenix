@@ -240,20 +240,16 @@ class FenixDualShock(DualShock):
         self.command_writer.write_command('none', 250)
 
     def on_right_arrow_press(self):
-        if self.mode in [FenixModes.BATTLE]:
-            self.command_writer.write_command('save_lidar_data', 1000)
-        elif self.mode in [FenixModes.RUN]:
-            self.command_writer.write_command('right_turn_in_move', cfg.speed["run"])
-        else:
-            self.command_writer.write_command('climb_2_legs', 500)
+        #if self.mode in [FenixModes.BATTLE, FenixModes.RUN]:
+        #    self.command_writer.write_command('save_lidar_data', 1000)
+        #else:
+            self.command_writer.write_command('kneel', 1000)
             time.sleep(0.5)
             self.command_writer.write_command('none', 1000)
 
     def on_left_arrow_press(self):
-        if self.mode in [FenixModes.BATTLE]:
+        if self.mode in [FenixModes.BATTLE, FenixModes.RUN]:
             self.command_writer.write_command('lidar_scan', 1000)
-        elif self.mode in [FenixModes.RUN]:
-            self.command_writer.write_command('left_turn_in_move', cfg.speed["run"])
         else:
             self.command_writer.write_command('climb_2', 500)
             time.sleep(0.5)

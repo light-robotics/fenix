@@ -15,6 +15,8 @@ class FenixLidar(RPLidar):
         self.connect()
         self.reset()
         self.clean_input()
+        with open('/fenix/fenix/wrk/gyroaccel_data.txt', 'r') as f:
+            pitch, roll = f.readline().split(',')
         for i, scan in enumerate(self.iter_scans()):            
             for value in scan:
                 # (quality, angle, distance)
@@ -23,6 +25,8 @@ class FenixLidar(RPLidar):
                         "height": self.current_height,
                         "angle": value[1],
                         "distance": value[2],
+                        "pitch": float(pitch),
+                        "roll": float(roll),
                     })
             
             if i > iterations:

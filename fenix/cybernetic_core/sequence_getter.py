@@ -186,6 +186,8 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.body_movement(0, 0, UP_OR_DOWN_CM)
     elif command == 'down':
         fk.body_movement(0, 0, -UP_OR_DOWN_CM)
+    elif command == 'kneel':
+        fk.kneel()
     elif command == 'climb_2_legs':
         #fk.climb_2_legs(15)
         fk.body_movement(0, 0, 15)

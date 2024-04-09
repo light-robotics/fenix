@@ -1033,14 +1033,19 @@ class FenixKinematics:
         print(f'X: {x}, Z: {z}. Height: {self.height}')
         for leg in [self.legs[1], self.legs[2]]:
             if up:
-                leg.move_mount_point(x, 0, z)
+                leg.move_mount_point(0, 0, z)
             else:
-                leg.move_mount_point(-x, 0, -z)
+                leg.move_mount_point(0, 0, -z)
         for leg in [self.legs[3], self.legs[4]]:
             if up:
-                leg.move_mount_point(-x, 0, -z)
+                leg.move_mount_point(0, 0, -z)
             else:
-                leg.move_mount_point(x, 0, z)
+                leg.move_mount_point(0, 0, z)
+
+        if up:
+            self.body_movement(x, 0, 0)
+        else:
+            self.body_movement(-x, 0, 0)
 
         self.add_angles_snapshot('body')
 
@@ -1068,6 +1073,28 @@ class FenixKinematics:
 
         self.current_angle = angle
 
+    def kneel(self):
+        self.body_movement(-10, 0, 6)
+        self.move_leg_endpoint(1, [0, -8, 5])
+        self.move_leg_endpoint(1, [-10, 0, 0])
+        self.move_leg_endpoint(1, [0, 0, -5])
+        self.move_leg_endpoint(2, [0, 8, 5])
+        self.move_leg_endpoint(2, [-10, 0, 0])
+        self.move_leg_endpoint(2, [0, 0, -5])
+        self.body_movement(5, 0, 0)
+        self.body_movement(0, 0, -5)
+
+        """
+        self.body_movement(0, 0, 5)
+        self.body_movement(-5, 0, 0)
+        self.move_leg_endpoint(2, [0, 0, 5])
+        self.move_leg_endpoint(2, [10, 0, 0])
+        self.move_leg_endpoint(2, [0, -8, -5])
+        self.move_leg_endpoint(1, [0, 0, 5])
+        self.move_leg_endpoint(1, [10, 0, 0])
+        self.move_leg_endpoint(1, [0, 8, -5])
+        self.body_movement(10, 0, -6)
+        """
     # demo part
     def battle_stance(self) -> None:
         self.body_movement(0, -10, -2)
