@@ -1,6 +1,6 @@
 import time
 import datetime
-import copy
+import pickle
 from typing import Callable, Optional, Union
 import os
 import sys
@@ -110,23 +110,27 @@ class MovementProcessor:
             return self.fs.set_servo_values_not_paced_v2
                         
     def run_sequence(self, command: str) -> None:
-        self.logger.info(f'[MOVE] Started run_sequence : {datetime.datetime.now()}')
-        try:            
-            self.logger.info(f'MOVE. Trying command {command}')
-            before_sequence_time = datetime.datetime.now()
-            #sequence, new_position = get_sequence_for_command_cached(command, self.fenix_position)
-            sequence, new_position = self.vf.get_sequence(command, self.fenix_position)
-            
-            if sequence is None:
-                self.logger.info(f'MOVE. Command aborted')
+        if command == 'overcome_obstacle':
+            with open('/fenix/fenix/wrk/obstacles_sequence', 'rb') as f:
+                sequence = pickle.load(f)
+        else:        
+            self.logger.info(f'[MOVE] Started run_sequence : {datetime.datetime.now()}')
+            try:            
+                self.logger.info(f'MOVE. Trying command {command}')
+                before_sequence_time = datetime.datetime.now()
+                #sequence, new_position = get_sequence_for_command_cached(command, self.fenix_position)
+                sequence, new_position = self.vf.get_sequence(command, self.fenix_position)
+                
+                if sequence is None:
+                    self.logger.info(f'MOVE. Command aborted')
+                    return
+                self.logger.info(f'[TIMING] Sequence calculation took : {datetime.datetime.now() - before_sequence_time}')
+                self.fenix_position = new_position[:]
+            except ValueError as e:
+                print(f'MOVE Failed. Could not process command - {str(e)}')
+                self.logger.info(f'MOVE Failed. Could not process command - {str(e)}')
+                time.sleep(0.3)
                 return
-            self.logger.info(f'[TIMING] Sequence calculation took : {datetime.datetime.now() - before_sequence_time}')
-            self.fenix_position = new_position[:]
-        except ValueError as e:
-            print(f'MOVE Failed. Could not process command - {str(e)}')
-            self.logger.info(f'MOVE Failed. Could not process command - {str(e)}')
-            time.sleep(0.3)
-            return
         
         self.logger.info(f'[MOVE] Started: {datetime.datetime.now()}')    
         start_time = datetime.datetime.now()

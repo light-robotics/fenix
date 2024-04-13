@@ -2,7 +2,7 @@
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-
+import pickle
 import copy
 from typing import List, Dict, Callable
 import itertools
@@ -11,7 +11,7 @@ import logging
 from cybernetic_core.kinematics import FenixKinematics as Fenix
 from cybernetic_core.obstacles.obstacle import Obstacle, obstacles_from_csv
 from cybernetic_core.geometry.lines import convert_points_to_3d_lines
-from cybernetic_core.geometry.angles import AnglesException
+from cybernetic_core.geometry.angles import AnglesException, GeometryException
 from cybernetic_core.cybernetic_utils.moves import Move, Attempt
 
 
@@ -21,7 +21,7 @@ class CollisionException(Exception):
 
 logging.basicConfig(filename='pathfinding.log', filemode='w', format='%(message)s')
 
-obstacles = obstacles_from_csv()
+obstacles_in = obstacles_from_csv()
 
 def generate_movement_plan(fnx: Fenix, plan: List[Move], target_xy: List[int]) -> List[Move]:
     
@@ -86,7 +86,7 @@ def obstacle_collision(fenix: Fenix, obstacles: List[Obstacle]) -> bool:
 
     return False
 
-def check_movement_plan(plan: List[Move], target_xy: List[int]) -> int:
+def check_movement_plan(plan: List[Move], target_xy: List[int], obstacles) -> int:
     #fnx = Fenix(legs_offset_v=20, legs_offset_h_x=20, legs_offset_h_y=16)
     #fnx = Fenix(legs_offset_v=15, legs_offset_h_x=13, legs_offset_h_y=20)
     fnx = Fenix()   
@@ -112,12 +112,14 @@ def check_movement_plan(plan: List[Move], target_xy: List[int]) -> int:
         print('Collision')
     except AnglesException as e:
         print(e)
+    except GeometryException as e:
+        print(e)
     #except Exception as e:
     #    print(str(e))
     #    logging.warning(str(e))
     #    return -1
 
-def get_sequence(plan: List[Move], target_xy: List[int]):
+def get_sequence(plan: List[Move], target_xy: List[int], obstacles):
     #fnx = Fenix(legs_offset_v=20, legs_offset_h_x=20, legs_offset_h_y=16)
     fnx = Fenix()
     plan = generate_movement_plan(fnx, plan, target_xy)   
@@ -125,7 +127,7 @@ def get_sequence(plan: List[Move], target_xy: List[int]):
     fnx.move_according_to_plan(adjusted_movement_plan)
     return fnx.sequence
 
-def get_lines(plan: List[Move], target_xy: List[int]):
+def get_lines(plan: List[Move], target_xy: List[int], obstacles):
     #fnx = Fenix(legs_offset_v=20, legs_offset_h_x=20, legs_offset_h_y=16)
     fnx = Fenix()
     plan = generate_movement_plan(fnx, plan, target_xy)   
@@ -135,7 +137,7 @@ def get_lines(plan: List[Move], target_xy: List[int]):
         raise Exception(f'Collision')
     return convert_points_to_3d_lines(fnx.D_points_history)
     
-def check_possibilities(check_function: Callable, target: List[int], possible_moves: List[Move], steps: int) -> List[Attempt]:
+def check_possibilities(obstacles: list[Obstacle], check_function: Callable, target: List[int], possible_moves: List[Move], steps: int) -> List[Attempt]:
     good_tries = []
     bad_tries = []
     for i in range(1, steps + 1):
@@ -153,7 +155,7 @@ def check_possibilities(check_function: Callable, target: List[int], possible_mo
             #print(f'Bad Plan : {bad_plan}. Plan : {plan}')
             if not bad_plan:
                 #print(plan)
-                result = check_function(plan, target)
+                result = check_function(plan, target, obstacles)
                 if result is not None and result >= 0:
                     good_tries.append(Attempt(plan, result))
                     #print(f'Added to good. Result : {result}')
@@ -168,8 +170,12 @@ def check_possibilities(check_function: Callable, target: List[int], possible_mo
 
     return good_tries
 
-def get_best_sequence(target=[30, 0]):
-    possibilities = check_possibilities(check_movement_plan, target, [Move('forward', 12), Move('forward', 8), Move('up', 5)], 5)
+def get_best_sequence(obstacles, target, num_moves):
+    possibilities = check_possibilities(
+        obstacles, 
+        check_movement_plan, 
+        target, [Move('forward', 12), Move('forward', 8), Move('up', 5), Move('up', 10)], 
+        num_moves)
     for possibility in possibilities:
         if possibility.result > 0:
             print(possibility)
@@ -178,10 +184,14 @@ def get_best_sequence(target=[30, 0]):
     best_option = min([x for x in possibilities if x.result > 0], key=attrgetter('result'))
     print('----------')
     print(best_option)
+    sequence = get_sequence(best_option.moves, target, obstacles)
+    with open('/fenix/fenix/wrk/obstacles_sequence', 'wb') as f:
+        pickle.dump(sequence, f)
+
     #return get_sequence(best_option.moves, target)
 
 print('-----')
-get_best_sequence()
+get_best_sequence(obstacles_in, [50, 0], 6)
 # 40 : Result : 2493|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]
 # 50 : Result : 3115|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]
 # 60 : Result : 3811|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]|Move[u.5]|Move[f.10]

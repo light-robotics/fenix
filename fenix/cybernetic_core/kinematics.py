@@ -778,133 +778,6 @@ class FenixKinematics:
     
         self.current_legs_offset_v += delta_z
 
-    """
-    def climb_2_legs_down(self, delta_z, steps_arr=[8, 12, 12, 12, 8, 12, 8]): #steps_arr=[8, 16, 16, 6, 6, 8]
-        negative_delta_z = delta_z # for climbing down
-        #tst_leg_up = round(self.leg_up/2)
-        tst_leg_up = 6 # 6 #5
-        legs_z_up_delta = {1: tst_leg_up, 
-                           2: tst_leg_up,
-                           3: tst_leg_up,
-                           4: tst_leg_up}
-        
-        legs_z_down_delta = {1: -tst_leg_up, 
-                             2: -tst_leg_up,
-                             3: -tst_leg_up,
-                             4: -tst_leg_up}
-        sum_even, sum_odd, sum_body_movement = 0, 0, 0
-        for step, value in enumerate(steps_arr):
-            current_delta_z_up = {key: value for key, value in legs_z_up_delta.items()}
-            current_delta_z_down = {key: value for key, value in legs_z_down_delta.items()}
-                        
-            if step == 0:
-                body_movement_value = value
-            elif step == len(steps_arr) - 1:
-                body_movement_value = 0
-            else:
-                body_movement_value = round(value/2)
-            
-            sum_body_movement += body_movement_value
-            if step == 0:
-                # print('Leg with delta z is 4')
-                current_delta_z_up[4] += positive_delta_z
-                current_delta_z_down[4] -= negative_delta_z
-            if step == 1:
-                # print('Leg with delta z id 1')
-                current_delta_z_up[1] += positive_delta_z
-                current_delta_z_down[1] -= negative_delta_z
-            if step % 2 == 0:
-                sum_even += value
-                if step >= len(steps_arr) - 2:
-                    # print('Leg with delta z is 2')
-                    current_delta_z_up[2] += positive_delta_z
-                    current_delta_z_down[2] -= negative_delta_z
-                # print('Moving legs 2, 4')
-                legs_to_move = [2, 4]                
-            else:
-                sum_odd += value
-                if step >= len(steps_arr) - 2:
-                    # print('Leg with delta z is 3')
-                    current_delta_z_up[3] += positive_delta_z
-                    current_delta_z_down[3] -= negative_delta_z
-                legs_to_move = [1, 3]
-                # print('Moving legs 1, 3')
-            
-            # up
-            for leg_number in legs_to_move:
-                #self.legs[leg_number].move_end_point(0, -2, current_delta_z_up[leg_number])
-                self.legs[leg_number].move_end_point(0, 0, current_delta_z_up[leg_number])
-            self.add_angles_snapshot('endpoint')
-            # forward
-            for leg_number in legs_to_move:
-                #self.legs[leg_number].move_end_point(0, value + 2, 0)
-                self.legs[leg_number].move_end_point(0, value, 0)
-            self.add_angles_snapshot('endpoint')
-            # down
-            for leg_number in legs_to_move:
-                self.legs[leg_number].move_end_point(0, 0, current_delta_z_down[leg_number])
-            self.add_angles_snapshot('endpoint')
-            self.body_movement(0, body_movement_value, 0) # it adds snapshot itself
-        
-        if sum_even != sum_odd or sum_even != sum_body_movement:
-            raise Exception(f'Bad step lengths: odd ({sum_odd}) and even ({sum_even}) and body({sum_body_movement}) not equal')
-    
-        self.current_legs_offset_v += delta_z
-    """
-
-    # 2-legged movements
-    """
-    def move_2_legs_v2(self, delta_y, steps=0):
-        leg_delta_0 =  [0, 0, self.leg_up]
-        leg_delta_11 = [0, delta_y, 0]
-        leg_delta_12 = [0, 2*delta_y, 0]
-        leg_delta_2 =  [0, 0, -self.leg_up]
-        
-        for leg in [self.legs[2], self.legs[4]]:
-            leg.move_end_point(*leg_delta_0)
-        self.add_angles_snapshot()
-        
-        for leg in [self.legs[2], self.legs[4]]:
-            leg.move_end_point(*leg_delta_11)
-        self.add_angles_snapshot()
-        self.body_movement(0, delta_y, 0) # it adds snapshot itself
-        for leg in [self.legs[2], self.legs[4]]:
-            leg.move_end_point(*leg_delta_2)
-        self.add_angles_snapshot() ###
-                
-        ##########
-        if steps > 1:
-            for _ in range(steps-1):
-                for leg in [self.legs[1], self.legs[3]]:
-                    leg.move_end_point(*leg_delta_0)
-                self.add_angles_snapshot()
-                for leg in [self.legs[1], self.legs[3]]:
-                    leg.move_end_point(*leg_delta_12)                
-                self.body_movement(0, delta_y, 0)
-                for leg in [self.legs[1], self.legs[3]]:
-                    leg.move_end_point(*leg_delta_2)
-                self.add_angles_snapshot() ###
-                for leg in [self.legs[2], self.legs[4]]:
-                    leg.move_end_point(*leg_delta_0)
-                self.add_angles_snapshot()
-                for leg in [self.legs[2], self.legs[4]]:
-                    leg.move_end_point(*leg_delta_12)                
-                self.body_movement(0, delta_y, 0)
-                
-                for leg in [self.legs[2], self.legs[4]]:
-                    leg.move_end_point(*leg_delta_2)
-                self.add_angles_snapshot() ###
-        ##########
-        for leg in [self.legs[1], self.legs[3]]:
-            leg.move_end_point(*leg_delta_0)
-        self.add_angles_snapshot()
-        for leg in [self.legs[1], self.legs[3]]:
-            leg.move_end_point(*leg_delta_11)
-        self.add_angles_snapshot()
-        for leg in [self.legs[1], self.legs[3]]:
-            leg.move_end_point(*leg_delta_2)
-        self.add_angles_snapshot()
-    """
     def reposition_legs(self, delta_x, delta_y):
         self.logger.info(f'reposition_legs ({delta_x}, {delta_y})')
         if delta_x == delta_y == 0:
@@ -1294,17 +1167,17 @@ class FenixKinematics:
         #print('------------BEFORE--------------')
         print(f'Plan: {plan}')
         for move in plan:
-            try:
-                if move.command == 'forward':
-                    self.move_1_legged_for_diff(move)
-                elif move.command == 'up':
-                    self.move_body_up(move.value)
-                elif move.command == 'down':
-                    self.move_body_down(move.value)
-                self.successful_moves += 1
-            except Exception as e:
-                print(f'Successful moves : {self.successful_moves}')
-                raise Exception(e)
+            #try:
+            if move.command == 'forward':
+                self.move_1_legged_for_diff(move)
+            elif move.command == 'up':
+                self.move_body_up(move.value)
+            elif move.command == 'down':
+                self.move_body_down(move.value)
+            #self.successful_moves += 1
+            #except Exception as e:
+            #    print(f'Successful moves : {self.successful_moves}')
+            #    raise Exception(e)
         #print('------------AFTER--------------')
         #for item in self.D_points_history:
         #    print(item)

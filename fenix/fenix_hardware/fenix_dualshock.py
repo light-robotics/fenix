@@ -243,7 +243,7 @@ class FenixDualShock(DualShock):
         #if self.mode in [FenixModes.BATTLE, FenixModes.RUN]:
         #    self.command_writer.write_command('save_lidar_data', 1000)
         #else:
-            self.command_writer.write_command('kneel', 1000)
+            self.command_writer.write_command('overcome_obstacle', 1000)
             time.sleep(0.5)
             self.command_writer.write_command('none', 1000)
 

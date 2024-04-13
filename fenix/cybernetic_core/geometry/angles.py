@@ -17,12 +17,15 @@ import logging.config
 class AnglesException(Exception):
     pass
 
+class GeometryException(Exception):
+    pass
+
 @lru_cache(maxsize=None)
 def find_angles(Cx, Cy, logger):
     a, b = cfg.leg["a"], cfg.leg["b"]
     dist = math.sqrt(Cx ** 2 + Cy ** 2)
     if dist > a + b or dist < abs(b - a):
-        raise Exception('No decisions. Full distance : {0}'.format(dist))
+        raise GeometryException('No decisions. Full distance : {0}'.format(dist))
 
     
     alpha1 = math.acos((a ** 2 + dist ** 2 - b ** 2) / (2 * a * dist))
