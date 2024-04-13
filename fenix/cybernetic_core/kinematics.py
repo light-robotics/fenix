@@ -419,7 +419,7 @@ class FenixKinematics:
         #self.compensated_leg_movement(leg_num, [0, 0, -self.leg_up])
 
     def leg_move_obstacled(self, leg_num, delta_x, delta_y, obstacle_z=0, move_type:int = 1):
-        self.obstacled_leg_up = self.leg_up_single / 2
+        self.obstacled_leg_up = self.leg_up_single
         self.logger.info(f'Move. leg_num = {leg_num}, delta_x = {delta_x}, delta_y = {delta_y}, obstacle_z = {obstacle_z}')
         if move_type == 1:
             if obstacle_z >= 0:
@@ -1187,11 +1187,11 @@ class FenixKinematics:
         #for leg_number, deltas in move.target_legs_position.items():
         self.logger.info(f'Move. : {move}')
 
-        self.body_movement(-5, 0, 0)
+        self.body_movement(-6, 0, 0)
 
         for leg_number in [1, 2, 3, 4]:
             if leg_number == 3:
-                self.body_movement(10 + diff[0], 0, 0) # diff[0] here is crutch
+                self.body_movement(12 + diff[0], 0, 0) # diff[0] here is crutch
             self.logger.info(f'Leg {leg_number}')
             deltas = move.target_legs_position[leg_number]
             #self.logger.info(f'Move. Deltas : {deltas}')

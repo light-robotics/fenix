@@ -83,7 +83,12 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
     elif command == 'forward_32':
         # Legs 1 and 3 moved x1
         fk.move_2_legs_phased_13(FORWARD_LEGS_2LEG_CM, 0)
-
+    elif command == 'approach_obstacle':
+        fk.move_2_legs_phased_13(5, 0)
+        for _ in range(4):
+            fk.move_2_legs_phased_24(10, 0)
+            fk.move_2_legs_phased_13(10, 0)
+        fk.move_2_legs_phased_24(5, 0)
     elif command == 'backward_1':
         # Legs 1 and 3 moved x1
         fk.move_2_legs_phased_13(-FORWARD_LEGS_2LEG_CM, 0)

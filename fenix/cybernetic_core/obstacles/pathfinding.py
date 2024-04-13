@@ -174,7 +174,7 @@ def get_best_sequence(obstacles, target, num_moves):
     possibilities = check_possibilities(
         obstacles, 
         check_movement_plan, 
-        target, [Move('forward', 12), Move('forward', 8), Move('up', 5), Move('up', 10)], 
+        target, [Move('forward', 10), Move('forward', 6), Move('up', 5)], 
         num_moves)
     for possibility in possibilities:
         if possibility.result > 0:
@@ -189,7 +189,7 @@ def get_best_sequence(obstacles, target, num_moves):
         pickle.dump(sequence, f)
 
     #return get_sequence(best_option.moves, target)
-
+"""
 print('-----')
 get_best_sequence(obstacles_in, [50, 0], 6)
 # 40 : Result : 2493|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]
@@ -199,11 +199,11 @@ get_best_sequence(obstacles_in, [50, 0], 6)
 # SUCCESS!!!! Result : 4840
 """
 fnx = Fenix()
-plan = [Move('forward', 8), Move('forward', 8), Move('forward', 8), Move('forward', 8)]
-generated_plan = generate_movement_plan(fnx, plan, [30, 0])
-adjusted_plan = adjust_movement_plan_to_obstacles(generated_plan, obstacles)
-check_movement_plan(adjusted_plan, [30, 0])
-"""
+plan = [Move('up', 10), Move('forward', 8), Move('forward', 12), Move('forward', 12), Move('forward', 12), Move('forward', 8)]
+generated_plan = generate_movement_plan(fnx, plan, [50, 0])
+adjusted_plan = adjust_movement_plan_to_obstacles(generated_plan, obstacles_in)
+check_movement_plan(adjusted_plan, [50, 0], obstacles_in)
+
 
 #lines = get_lines(plan, [0, 75])
 #for line in lines:
