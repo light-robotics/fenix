@@ -11,7 +11,12 @@ import logging
 from cybernetic_core.kinematics import FenixKinematics as Fenix
 from cybernetic_core.obstacles.obstacle import Obstacle, obstacles_from_csv
 from cybernetic_core.geometry.lines import convert_points_to_3d_lines
+from cybernetic_core.geometry.angles import AnglesException
 from cybernetic_core.cybernetic_utils.moves import Move, Attempt
+
+
+class CollisionException(Exception):
+    pass
 
 
 logging.basicConfig(filename='pathfinding.log', filemode='w', format='%(message)s')
@@ -39,7 +44,7 @@ def generate_movement_plan(fnx: Fenix, plan: List[Move], target_xy: List[int]) -
         center_x, center_y = 0, 0
         for leg, values in legs.items():
             if leg in move.legs:
-                values[1] += step
+                values[0] += step
                 center_x += values[0]
                 center_y += values[1]
 
@@ -86,7 +91,7 @@ def check_movement_plan(plan: List[Move], target_xy: List[int]) -> int:
     #fnx = Fenix(legs_offset_v=15, legs_offset_h_x=13, legs_offset_h_y=20)
     fnx = Fenix()   
     try:
-    #print(f'Checking plan {plan}')
+        print(f'Checking plan {plan}')
         plan = generate_movement_plan(fnx, plan, target_xy)
         if plan is None:
             logging.warning('None plan')
@@ -98,15 +103,19 @@ def check_movement_plan(plan: List[Move], target_xy: List[int]) -> int:
 
         if obstacle_collision(fnx, obstacles) is True:
             logging.warning('Collision')
-            raise Exception(f'Collision')
+            raise CollisionException(f'Collision')
 
         seq_len = fnx.get_sequence_length()
 
         return seq_len #, fnx
-    except Exception as e:
-        print(str(e))
-        logging.warning(str(e))
-        return -1
+    except CollisionException:
+        print('Collision')
+    except AnglesException as e:
+        print(e)
+    #except Exception as e:
+    #    print(str(e))
+    #    logging.warning(str(e))
+    #    return -1
 
 def get_sequence(plan: List[Move], target_xy: List[int]):
     #fnx = Fenix(legs_offset_v=20, legs_offset_h_x=20, legs_offset_h_y=16)
@@ -145,7 +154,7 @@ def check_possibilities(check_function: Callable, target: List[int], possible_mo
             if not bad_plan:
                 #print(plan)
                 result = check_function(plan, target)
-                if result >= 0:
+                if result is not None and result >= 0:
                     good_tries.append(Attempt(plan, result))
                     #print(f'Added to good. Result : {result}')
                     if result > 0:
@@ -159,7 +168,7 @@ def check_possibilities(check_function: Callable, target: List[int], possible_mo
 
     return good_tries
 
-def get_best_sequence(target=[0, 30]):
+def get_best_sequence(target=[30, 0]):
     possibilities = check_possibilities(check_movement_plan, target, [Move('forward', 12), Move('forward', 8), Move('up', 5)], 5)
     for possibility in possibilities:
         if possibility.result > 0:
@@ -172,24 +181,19 @@ def get_best_sequence(target=[0, 30]):
     #return get_sequence(best_option.moves, target)
 
 print('-----')
-#print(get_best_sequence())
+get_best_sequence()
 # 40 : Result : 2493|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]
 # 50 : Result : 3115|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]
 # 60 : Result : 3811|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]|Move[u.5]|Move[f.10]
 # 70 : Plan : [Move[f.10], Move[f.8], Move[f.10], Move[f.10], Move[f.8], Move[f.8], Move[f.8], Move[u.5], Move[f.8]]. Bad : False
 # SUCCESS!!!! Result : 4840
+"""
 fnx = Fenix()
 plan = [Move('forward', 8), Move('forward', 8), Move('forward', 8), Move('forward', 8)]
-generated_plan = generate_movement_plan(fnx, plan, [0, 30])
+generated_plan = generate_movement_plan(fnx, plan, [30, 0])
 adjusted_plan = adjust_movement_plan_to_obstacles(generated_plan, obstacles)
-check_movement_plan(adjusted_plan, [0, 30])
-
-#plan = [Move('forward', 10), Move('forward', 10), Move('forward', 10), Move('forward', 10), Move('forward', 10), Move('up', 5), Move('forward', 10)]
-#plan = [Move('forward', 10), Move('forward', 8), Move('forward', 13), Move('forward', 10), Move('forward', 10), Move('up', 5), Move('forward', 13), Move('forward', 8), Move('forward', 8)]
-
-#Move[f.10]|Move[f.8]|Move[f.13]|Move[f.10]|Move[f.10]|Move[u.5]|Move[f.13]|Move[f.8]|Move[f.8]
-
-#fnx = Fenix(legs_offset_v=15, legs_offset_h_x=18, legs_offset_h_y=18)
+check_movement_plan(adjusted_plan, [30, 0])
+"""
 
 #lines = get_lines(plan, [0, 75])
 #for line in lines:

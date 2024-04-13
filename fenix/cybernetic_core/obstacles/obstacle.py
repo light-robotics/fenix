@@ -9,11 +9,14 @@ from configs import config as cfg
 
 class Obstacle:
     def __init__(self, min_x, max_x, min_y, max_y, min_z, max_z):
-
-        self.min_x = min_x
-        self.max_x = max_x
-        self.min_y = min_y
-        self.max_y = max_y
+        # crutch, lidar scans and forward for it is Y+
+        # for Fenix forward is X+
+        # so we exchange values of obstacle
+        # #fixlater
+        self.min_x = min_y
+        self.max_x = max_y
+        self.min_y = min_x
+        self.max_y = max_x
         self.min_z = min_z
         self.max_z = max_z
 

@@ -147,7 +147,7 @@ class FenixKinematics:
         sum_diff = 0
         for i in range(len(self.sequence) - 1):
             max_diff = 0
-            for a, b in zip(self.sequence[i], self.sequence[i+1]):
+            for a, b in zip(self.sequence[i].angles_snapshot, self.sequence[i+1].angles_snapshot):
                 max_diff = max(max_diff, abs(a - b))
             sum_diff += max_diff
         
@@ -1315,23 +1315,18 @@ class FenixKinematics:
         self.logger.info(f'Move. : {move}')
 
         self.body_movement(-5, 0, 0)
-        x_diff = move.target_legs_position[1][0]
 
-        for leg_number in [1, 2]:
+        for leg_number in [1, 2, 3, 4]:
+            if leg_number == 3:
+                self.body_movement(10 + diff[0], 0, 0) # diff[0] here is crutch
+            self.logger.info(f'Leg {leg_number}')
             deltas = move.target_legs_position[leg_number]
-            self.logger.info(f'Move. Deltas : {deltas}')
+            #self.logger.info(f'Move. Deltas : {deltas}')
             C = self.legs[leg_number].C
-            diff = [deltas[0] - C.x, deltas[1] - C.y, deltas[2] - C.z]
-            self.logger.info(f'Move. Diff : {diff}')
-            self.leg_move_obstacled(leg_number, *diff, move_type=2)
-
-        self.body_movement(5 + x_diff, 0, 0)
-
-        for leg_number in [3, 4]:
-            deltas = move.target_legs_position[leg_number]
-            self.logger.info(f'Move. Deltas : {deltas}')
-            C = self.legs[leg_number].C
-            diff = [deltas[0] - C.x, deltas[1] - C.y, deltas[2] - C.z]
+            plan_x = deltas[0]
+            plan_y = deltas[1]
+            plan_z = deltas[2]
+            diff = [plan_x - C.x, plan_y - C.y, plan_z - C.z]
             self.logger.info(f'Move. Diff : {diff}')
             self.leg_move_obstacled(leg_number, *diff, move_type=2)
 

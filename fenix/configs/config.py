@@ -1,5 +1,3 @@
-from configs.modes import STAR_LEGS
-
 obstacle = {
     "danger_offset": 1.0,
     "outer_danger_offset": 2.0,

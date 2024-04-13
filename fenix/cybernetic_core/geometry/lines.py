@@ -88,16 +88,88 @@ class Line3D:
                 return True
         return False
 
-    def intersect_with_plane_x(self, x: int) -> Point:
+    def intersect_with_plane_x(self, n):
+        """
+        Find the intersection point of the line with the plane X = n.
+        
+        Parameters:
+        - n: Value of X for the plane
+        
+        Returns:
+        - Point: Intersection point if exists, None otherwise
+        """
+        
+        if self.anchor_point.x == n and self.target_point.x == n:
+            # Line lies on the plane
+            return self.anchor_point if self.anchor_point.y == self.target_point.y else None
+        
+        if self.anchor_point.x == n:
+            # Anchor point lies on the plane
+            return self.anchor_point
+        
+        if self.target_point.x == n:
+            # Target point lies on the plane
+            return self.target_point
+
+        if self.anchor_point.x == self.target_point.x:
+            # Line is parallel to YZ plane
+            return None
+        
+        # Calculate intersection point
+        t = (n - self.anchor_point.x) / (self.target_point.x - self.anchor_point.x)
+        if 0 <= t <= 1:
+            y = self.anchor_point.y + t * (self.target_point.y - self.anchor_point.y)
+            z = self.anchor_point.z + t * (self.target_point.z - self.anchor_point.z)
+            return Point(n, y, z)
+        
+        return None
+
+    def intersect_with_plane_y(self, m):
+        """
+        Find the intersection point of the line with the plane Y = m.
+        
+        Parameters:
+        - m: Value of Y for the plane
+        
+        Returns:
+        - Point: Intersection point if exists, None otherwise
+        """
+        if self.anchor_point.y == m and self.target_point.y == m:
+            # Line lies on the plane
+            return self.anchor_point if self.anchor_point.x == self.target_point.x else None
+        
+        if self.anchor_point.y == m:
+            # Anchor point lies on the plane
+            return self.anchor_point
+        
+        if self.target_point.y == m:
+            # Target point lies on the plane
+            return self.target_point
+
+        if self.anchor_point.y == self.target_point.y:
+            # Line is parallel to XZ plane
+            return None
+
+        # Calculate intersection point
+        t = (m - self.anchor_point.y) / (self.target_point.y - self.anchor_point.y)
+        if 0 <= t <= 1:
+            x = self.anchor_point.x + t * (self.target_point.x - self.anchor_point.x)
+            z = self.anchor_point.z + t * (self.target_point.z - self.anchor_point.z)
+            return Point(x, m, z)
+        
+        return None
+
+    def old_intersect_with_plane_x(self, x: int) -> Point:
         if self.l == 0:
             return None
         y = round((x - self.anchor_point.x) * self.m / self.l + self.anchor_point.y, 1)
         z = round((x - self.anchor_point.x) * self.n / self.l + self.anchor_point.z, 1) 
         if y > self.max_y or y < self.min_y or z > self.max_z or z < self.min_z:            
             return None
+        
         return Point(x, y, z)
 
-    def intersect_with_plane_y(self, y: int) -> Point:
+    def old_intersect_with_plane_y(self, y: int) -> Point:
         if self.m == 0:
             return None
         x = round((y - self.anchor_point.y) * self.l / self.m + self.anchor_point.x, 1)

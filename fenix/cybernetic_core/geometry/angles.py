@@ -14,6 +14,9 @@ import configs.code_config as code_config
 import logging.config
 
 
+class AnglesException(Exception):
+    pass
+
 @lru_cache(maxsize=None)
 def find_angles(Cx, Cy, logger):
     a, b = cfg.leg["a"], cfg.leg["b"]
@@ -98,7 +101,7 @@ def convert_legs_angles(legs_angles: List[float], logger) -> List[float]:
         angles_converted[11]
         ], 
         logger=logger):
-        raise ValueError('Bad tettas')
+        raise AnglesException('Bad tettas')
 
     for i in range(4):
         alpha_converted = angles_converted[3*i+1]
@@ -110,7 +113,7 @@ def convert_legs_angles(legs_angles: List[float], logger) -> List[float]:
                 tetta=tetta_converted,
                 logger=logger
             ):
-            raise ValueError(f'Leg {i+1}. Bad angles:alpha {alpha_converted}, beta {beta_converted}, tetta {tetta_converted}')
+            raise AnglesException(f'Leg {i+1}. Bad angles:alpha {alpha_converted}, beta {beta_converted}, tetta {tetta_converted}')
 
     return angles_converted
 
