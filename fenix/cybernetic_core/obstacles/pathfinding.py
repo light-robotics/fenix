@@ -189,9 +189,9 @@ def get_best_sequence(obstacles, target, num_moves):
         pickle.dump(sequence, f)
 
     #return get_sequence(best_option.moves, target)
-"""
+
 print('-----')
-get_best_sequence(obstacles_in, [50, 0], 6)
+get_best_sequence(obstacles_in, [10, 0], 3)
 # 40 : Result : 2493|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]
 # 50 : Result : 3115|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]
 # 60 : Result : 3811|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]|Move[u.5]|Move[f.10]
@@ -203,7 +203,7 @@ plan = [Move('up', 10), Move('forward', 8), Move('forward', 12), Move('forward',
 generated_plan = generate_movement_plan(fnx, plan, [50, 0])
 adjusted_plan = adjust_movement_plan_to_obstacles(generated_plan, obstacles_in)
 check_movement_plan(adjusted_plan, [50, 0], obstacles_in)
-
+"""
 
 #lines = get_lines(plan, [0, 75])
 #for line in lines:
