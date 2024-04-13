@@ -173,9 +173,11 @@ class MovementProcessor:
                     self.fs.enable_torque()
                 elif command == 'lidar_scan':
                     #for i in range(50):
-                        self.fl = FenixLidar()
-                        self.fl.current_height = self.vf.get_height(self.fenix_position)
-                        self.fl.scan_front()
+                    if "fl" in self.__dict__:
+                        del self.fl
+                    self.fl = FenixLidar()
+                    self.fl.current_height = self.vf.get_height(self.fenix_position)
+                    self.fl.scan_front()
                         #time.sleep(1)
                 else:
                     try:

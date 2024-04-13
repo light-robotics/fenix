@@ -20,7 +20,7 @@ class FenixLidar(RPLidar):
         for i, scan in enumerate(self.iter_scans()):            
             for value in scan:
                 # (quality, angle, distance)
-                if 45 < value[1] < 135:
+                if 15 < value[1] < 165:
                     self.measurements.append({
                         "height": self.current_height,
                         "angle": value[1],
@@ -31,11 +31,13 @@ class FenixLidar(RPLidar):
             
             if i > iterations:
                 break
+        #self.stop()
+        #self.stop_motor()
         self.disconnect()
         #self.motor_speed = 0
+        
         print('Scanning finished')
         self.save_data()
-        del self
     
     def save_data(self):
         print('Saving data')

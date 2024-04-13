@@ -126,14 +126,8 @@ class Line3D:
 
 def convert_points_to_3d_lines(D_points_history: List[List[Point]]) -> List[Line3D]:
     lines = []
-    #print('------------------')
-    #print('D POINTS HISTORY')
-    #for item in D_points_history:
-    #    print(item)
-    #print('------------------')
     for i in range(len(D_points_history) - 1):
         for j in range(4):
-            #print(f'({i}, {j}) : {D_points_history[i][j]}, {D_points_history[i+1][j]}')
             if D_points_history[i][j] == D_points_history[i+1][j]:
                 continue
             lines.append(Line3D(D_points_history[i][j], D_points_history[i+1][j]))

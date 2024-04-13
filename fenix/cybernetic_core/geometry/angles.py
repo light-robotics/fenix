@@ -18,9 +18,10 @@ import logging.config
 def find_angles(Cx, Cy, logger):
     a, b = cfg.leg["a"], cfg.leg["b"]
     dist = math.sqrt(Cx ** 2 + Cy ** 2)
-    if dist > a + b:
+    if dist > a + b or dist < abs(b - a):
         raise Exception('No decisions. Full distance : {0}'.format(dist))
 
+    
     alpha1 = math.acos((a ** 2 + dist ** 2 - b ** 2) / (2 * a * dist))
     beta1 = math.acos((a ** 2 + b ** 2 - dist ** 2) / (2 * a * b))
     beta = math.pi - beta1

@@ -117,12 +117,12 @@ class FenixKinematics:
             self.legs_offset_h_x = round((self.legs[1].C.x - self.legs[4].C.x)/2.0, 2)
             self.legs_offset_h_y = round((self.legs[1].C.y - self.legs[2].C.y)/2.0, 2)
             
-        print(f"""
-            Kinematics created with 
-            v = {self.legs_offset_v}, 
-            h_x = {self.legs_offset_h_x},
-            h_y = {self.legs_offset_h_y}
-            """)
+        #print(f"""
+        #    Kinematics created with 
+        #    v = {self.legs_offset_v}, 
+        #    h_x = {self.legs_offset_h_x},
+        #    h_y = {self.legs_offset_h_y}
+        #    """)
 
         self.current_legs_offset_v = self.legs_offset_v
         self.current_legs_offset_h_x = self.legs_offset_h_x
@@ -140,9 +140,19 @@ class FenixKinematics:
         self.leg_up_single = cfg.fenix["leg_up"][1]
         
         self.angles_history = []
-        self.D_points_history = []
+        self.C_points_history = []
         self.add_angles_snapshot('init')
 
+    def get_sequence_length(self):
+        sum_diff = 0
+        for i in range(len(self.sequence) - 1):
+            max_diff = 0
+            for a, b in zip(self.sequence[i], self.sequence[i+1]):
+                max_diff = max(max_diff, abs(a - b))
+            sum_diff += max_diff
+        
+        return round(sum_diff)
+    
     def reset_history(self):
         self.angles_history = []
 
@@ -158,7 +168,7 @@ class FenixKinematics:
         new_move = MoveSnapshot(move_type, angles_in)
         self.angles_history.append(new_move)
         
-        self.D_points_history.append(
+        self.C_points_history.append(
             [
                 copy.deepcopy(self.legs[1].C),
                 copy.deepcopy(self.legs[2].C),
@@ -408,23 +418,22 @@ class FenixKinematics:
         self.move_leg_endpoint(leg_num, [0, 0, -self.leg_up_single])
         #self.compensated_leg_movement(leg_num, [0, 0, -self.leg_up])
 
-    def leg_move_with_compensation_obstacled(self, leg_num, delta_x, delta_y, obstacle_z=0, move_type:int = 1):
+    def leg_move_obstacled(self, leg_num, delta_x, delta_y, obstacle_z=0, move_type:int = 1):
         self.obstacled_leg_up = self.leg_up_single / 2
         self.logger.info(f'Move. leg_num = {leg_num}, delta_x = {delta_x}, delta_y = {delta_y}, obstacle_z = {obstacle_z}')
         if move_type == 1:
             if obstacle_z >= 0:
-                self.compensated_leg_movement(leg_num, [delta_x, delta_y, self.obstacled_leg_up + obstacle_z])
+                self.move_leg_endpoint(leg_num, [delta_x, delta_y, self.obstacled_leg_up + obstacle_z])
             else:
-                self.compensated_leg_movement(leg_num, [delta_x, delta_y, self.obstacled_leg_up])
+                self.move_leg_endpoint(leg_num, [delta_x, delta_y, self.obstacled_leg_up])
         else:
             if obstacle_z >= 0:
-                self.logger.info(f'Move. Trying move for [{delta_x/2, delta_y/2, self.obstacled_leg_up + obstacle_z}]')
-                self.compensated_leg_movement(leg_num, [delta_x/2, delta_y/2, self.obstacled_leg_up + obstacle_z])
-                self.logger.info('Move. Compensated leg move ok')
-                self.move_leg_endpoint(leg_num, [delta_x/2, delta_y/2, 0])
-                self.logger.info(f'Move. Endpoint for {[delta_x/2, delta_y/2, 0]} ok')
+                self.logger.info(f'Move. Trying move for [{0, 0, self.obstacled_leg_up + obstacle_z}]')
+                self.move_leg_endpoint(leg_num, [0, 0, self.obstacled_leg_up + obstacle_z])
+                self.move_leg_endpoint(leg_num, [delta_x, delta_y, 0])
+                self.logger.info(f'Move. Endpoint for {[delta_x, delta_y, 0]} ok')
             else:
-                self.compensated_leg_movement(leg_num, [delta_x, delta_y, self.obstacled_leg_up])
+                self.move_leg_endpoint(leg_num, [delta_x, delta_y, self.obstacled_leg_up])
 
         if obstacle_z >= 0:
             self.logger.info(f'Move. Trying move for {-self.obstacled_leg_up}')
@@ -432,7 +441,6 @@ class FenixKinematics:
             self.logger.info('Move. Endpoint ok')
         else:
             self.move_leg_endpoint(leg_num, [0, 0, -self.obstacled_leg_up + obstacle_z])
-        #self.compensated_leg_movement(leg_num, [0, 0, -self.leg_up])
 
     def move_leg_endpoint(self, leg_num, leg_delta):        
         self.legs[leg_num].move_end_point(*leg_delta)
@@ -1284,6 +1292,7 @@ class FenixKinematics:
         #for item in self.D_points_history:
         #    print(item)
         #print('------------BEFORE--------------')
+        print(f'Plan: {plan}')
         for move in plan:
             try:
                 if move.command == 'forward':
@@ -1304,14 +1313,28 @@ class FenixKinematics:
     def move_1_legged_for_diff(self, move: Move):
         #for leg_number, deltas in move.target_legs_position.items():
         self.logger.info(f'Move. : {move}')
-        #for leg_number in [1, 3, 4, 2]:
-        for leg_number in [1, 4, 2, 3]:
+
+        self.body_movement(-5, 0, 0)
+        x_diff = move.target_legs_position[1][0]
+
+        for leg_number in [1, 2]:
             deltas = move.target_legs_position[leg_number]
             self.logger.info(f'Move. Deltas : {deltas}')
             C = self.legs[leg_number].C
             diff = [deltas[0] - C.x, deltas[1] - C.y, deltas[2] - C.z]
             self.logger.info(f'Move. Diff : {diff}')
-            self.leg_move_with_compensation_obstacled(leg_number, *diff, move_type=2)
+            self.leg_move_obstacled(leg_number, *diff, move_type=2)
+
+        self.body_movement(5 + x_diff, 0, 0)
+
+        for leg_number in [3, 4]:
+            deltas = move.target_legs_position[leg_number]
+            self.logger.info(f'Move. Deltas : {deltas}')
+            C = self.legs[leg_number].C
+            diff = [deltas[0] - C.x, deltas[1] - C.y, deltas[2] - C.z]
+            self.logger.info(f'Move. Diff : {diff}')
+            self.leg_move_obstacled(leg_number, *diff, move_type=2)
+
         self.body_to_center()
 
 if __name__ == '__main__':

@@ -5,6 +5,7 @@ import struct
 from typing import Union, List
 import sys
 import os
+import subprocess
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import configs.code_config as code_config
 import logging.config
@@ -89,14 +90,22 @@ class LX16A:
         for item in packet:
             sum = sum + item
         full_packet = bytearray(self.Header + packet + struct.pack("<B",(~sum) & 0xff))
-        try:
-            self.serial.write(full_packet)
-        except SerialException as e:
-            print('!!!!!!!!!!!!!!!!!!! Serial ALARM !!!!!!!!!!!!!!!!!!!!!')
-            print(f'Serial exception: {e}')
-            os.system("sudo chmod 666 /dev/ttyAMA0")
-            time.sleep(1)
-            self.serial.write(full_packet)
+ 
+        for i in range(3):
+            try:
+                self.serial.write(full_packet)
+                break
+            except SerialException as e:
+                print(f'!!!!!!!! Send packet Serial ALARM {i+1} !!!!!!!!!!!!!!!!!!!!!')
+                print(f'Serial exception: {e}')
+            time.sleep(2)
+            #os.system("sudo chmod 666 /dev/ttyAMA0")
+            subprocess.check_output("sudo chmod 666 /dev/ttyAMA0", shell=True)
+            time.sleep(2)
+            try:
+                self.reset()
+            except SerialException as e:
+                print('Reset failed')
 
         time.sleep(self.TX_DELAY_TIME)
 
@@ -109,12 +118,28 @@ class LX16A:
             self.serial.flushInput()
             self.serial.timeout = 0.1
             self.send_packet(packet)
-            r_packet = self.serial.read(receive_size + 3)
+            r_packet = self.read(receive_size + 3)
             if len(r_packet) > 0:
                 return r_packet
         raise Exception('Got empty response in {0} attempts'.format(num_attempts))
+    
+    def read(self, size):
+        for i in range(3):
+            try:
+                r_packet = self.serial.read(size)
+                return r_packet
+            except SerialException as e:
+                print(f'!!!!!!!!!!! READ Serial ALARM {i+1} !!!!!!!!!!!!!!!!!!!!!')
+                print(f'Serial exception: {e}')
+            time.sleep(2)
+            #os.system("sudo chmod 666 /dev/ttyAMA0")
+            subprocess.check_output("sudo chmod 666 /dev/ttyAMA0", shell=True)
+            time.sleep(2)
+            try:
+                self.reset()
+            except SerialException as e:
+                print('Reset failed')
         
-
     # Move servo from 0 to 1000 (0.24 degree resolution)
     # rate means speed, 0 is instant, 
     # 1000 means it will take 1 second to make a move, 
@@ -514,14 +539,22 @@ class LX16A:
     def _send_packet(self, packet: list[int]) -> None:
         packet = [0x55, 0x55, *packet]
         packet.append(self._checksum(packet))
-        try:
-            self.serial.write(packet)        
-        except SerialException as e:
-            print('!!!!!!!!!!!!!!!!!!! Serial ALARM !!!!!!!!!!!!!!!!!!!!!')
-            print(f'Serial exception: {e}')
-            os.system("sudo chmod 666 /dev/ttyAMA0")
-            time.sleep(1)
-            self.serial.write(packet)
+        for i in range(3):
+            try:
+                self.serial.write(packet)
+                break
+            except SerialException as e:
+                print(f'!!!!!!!! _Send packet Serial ALARM {i+1} !!!!!!!!!!!!!!!!!!!!!')
+                print(f'Serial exception: {e}')
+            time.sleep(2)
+            #os.system("sudo chmod 666 /dev/ttyAMA0")
+            subprocess.check_output("sudo chmod 666 /dev/ttyAMA0", shell=True)
+            time.sleep(2)
+            try:
+                self.reset()
+            except SerialException as e:
+                print('Reset failed')
+                #self.serial.write(packet)
 
     def enable_torque(self, id) -> None:
         packet = [id, 4, 31, 1]
@@ -529,6 +562,7 @@ class LX16A:
         self._torque_enabled = True
 
     def disable_torque(self, id) -> None:
+        print('Disable torque command received')
         packet = [id, 4, 31, 0]
         self._send_packet(packet)
         self._torque_enabled = False
