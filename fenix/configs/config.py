@@ -1,6 +1,6 @@
 obstacle = {
-    "danger_offset": 1.0,
-    "outer_danger_offset": 2.0,
+    "danger_offset": 2.0,
+    "outer_danger_offset": 3.0,
 }
 
 leg = {

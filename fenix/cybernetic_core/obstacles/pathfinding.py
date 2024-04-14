@@ -21,8 +21,6 @@ class CollisionException(Exception):
 
 logging.basicConfig(filename='pathfinding.log', filemode='w', format='%(message)s')
 
-obstacles_in = obstacles_from_csv()
-
 def generate_movement_plan(fnx: Fenix, plan: List[Move], target_xy: List[int]) -> List[Move]:
     
     legs = {
@@ -174,7 +172,7 @@ def get_best_sequence(obstacles, target, num_moves):
     possibilities = check_possibilities(
         obstacles, 
         check_movement_plan, 
-        target, [Move('forward', 10), Move('forward', 6), Move('up', 5)], 
+        target, [Move('forward', 10), Move('forward', 5), Move('up', 15)], 
         num_moves)
     for possibility in possibilities:
         if possibility.result > 0:
@@ -190,8 +188,10 @@ def get_best_sequence(obstacles, target, num_moves):
 
     #return get_sequence(best_option.moves, target)
 
-print('-----')
-get_best_sequence(obstacles_in, [10, 0], 3)
+if __name__ == '__main__':
+    print('-----')
+    obstacles_in = obstacles_from_csv()
+    get_best_sequence(obstacles_in, [45, 0], 7)
 # 40 : Result : 2493|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]
 # 50 : Result : 3115|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]
 # 60 : Result : 3811|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]|Move[u.5]|Move[f.10]
@@ -220,6 +220,6 @@ generated_plan = generate_movement_plan(fnx, plan, [0, 60])
 print(generated_plan)
 adjusted_plan = adjust_movement_plan_to_obstacles(generated_plan, obstacles)
 print('---------')
-print(adjusted_plan)
+print(adjusted_plan))
 check_movement_plan(adjusted_plan, [0, 60])
 """
