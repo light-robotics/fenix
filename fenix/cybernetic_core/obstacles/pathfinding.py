@@ -9,7 +9,7 @@ import itertools
 import logging
 
 from cybernetic_core.kinematics import FenixKinematics as Fenix
-from cybernetic_core.obstacles.obstacle import Obstacle, obstacles_from_csv
+from cybernetic_core.obstacles.obstacle import Obstacle, obstacles_from_csv, ObstacleException
 from cybernetic_core.geometry.lines import convert_points_to_3d_lines
 from cybernetic_core.geometry.angles import AnglesException, GeometryException
 from cybernetic_core.cybernetic_utils.moves import Move, Attempt
@@ -112,6 +112,8 @@ def check_movement_plan(plan: List[Move], target_xy: List[int], obstacles) -> in
         print(e)
     except GeometryException as e:
         print(e)
+    except ObstacleException as e:
+        print(e)
     #except Exception as e:
     #    print(str(e))
     #    logging.warning(str(e))
@@ -172,7 +174,7 @@ def get_best_sequence(obstacles, target, num_moves):
     possibilities = check_possibilities(
         obstacles, 
         check_movement_plan, 
-        target, [Move('forward', 10), Move('forward', 5), Move('up', 15)], 
+        target, [Move('forward', 12), Move('forward', 6), Move('up', 10)], 
         num_moves)
     for possibility in possibilities:
         if possibility.result > 0:
@@ -191,7 +193,7 @@ def get_best_sequence(obstacles, target, num_moves):
 if __name__ == '__main__':
     print('-----')
     obstacles_in = obstacles_from_csv()
-    get_best_sequence(obstacles_in, [45, 0], 7)
+    get_best_sequence(obstacles_in, [50, 0], 7)
 # 40 : Result : 2493|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]
 # 50 : Result : 3115|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]
 # 60 : Result : 3811|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]|Move[f.10]|Move[u.5]|Move[f.10]

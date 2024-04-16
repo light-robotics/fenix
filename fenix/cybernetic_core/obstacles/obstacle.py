@@ -7,6 +7,9 @@ from cybernetic_core.geometry.lines import Point, Line3D
 from configs import config as cfg
 
 
+class ObstacleException(Exception):
+    pass
+
 class Obstacle:
     def __init__(self, min_x, max_x, min_y, max_y, min_z, max_z):
         # crutch, lidar scans and forward for it is Y+
@@ -34,13 +37,13 @@ class Obstacle:
 
                 # check for danger
                 if x - self.min_x < danger_offset:
-                    raise Exception(f'x = {x} too close to min_x ({self.min_x})')
+                    raise ObstacleException(f'x = {x} too close to min_x ({self.min_x})')
                 if self.max_x - x < danger_offset:
-                    raise Exception(f'x = {x} too close to max_x ({self.max_x})')
+                    raise ObstacleException(f'x = {x} too close to max_x ({self.max_x})')
                 if y - self.min_y < danger_offset:
-                    raise Exception(f'y = {y} too close to min_y ({self.min_y})')
+                    raise ObstacleException(f'y = {y} too close to min_y ({self.min_y})')
                 if self.max_y - y < danger_offset:
-                    raise Exception(f'y = {y} too close to max_y ({self.max_y})')
+                    raise ObstacleException(f'y = {y} too close to max_y ({self.max_y})')
                 
                 return self.max_z
 

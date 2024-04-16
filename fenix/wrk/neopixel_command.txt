@@ -1,1 +1,1 @@
-steady,blue,255
+steady,white,0

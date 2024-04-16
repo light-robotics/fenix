@@ -60,7 +60,7 @@ fenix = {
     },
     "leg_up": {
         1: 7,
-        2: 2
+        2: 3
     },
     # parameters for moving further, when moving with feedback
     "servos": {
@@ -69,7 +69,7 @@ fenix = {
     },
     # issue next command a little faster, than previous is finished executing
     # when moving without feedback
-    "movement_command_advance_ms" : 0.0,
+    "movement_command_advance_ms" : -0.05,
     "movement_overshoot_coefficient" : 0.0,
 }
 
