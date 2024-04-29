@@ -7,3 +7,4 @@ mpu6050-raspberrypi==1.2
 smbus
 vl53l1x
 scikit-learn
+ArducamDepthCamera
