@@ -10,6 +10,13 @@ import configs.config as cfg
 from configs.modes import NIGHT_MODE
 
 
+def remove_noise(f):
+    def wrapper(*args):
+        if abs(args[1]) > 2000:
+            f(*args)
+    return wrapper
+
+
 class FenixModes(Enum):
     WALKING = 1
     RUN     = 2
@@ -135,8 +142,9 @@ class FenixDualShock(DualShock):
             elif self.left_x > 15000 and self.left_y < -15000:
                 self.command_writer.write_command('diagonal_back_right', cfg.speed["run"])
             else:
-                self.command_writer.write_command('none', 250)
+                self.command_writer.write_command('none', 200)
 
+    @remove_noise
     def on_L3_up(self, value):
         self.left_y = -value
         if self.mode in [FenixModes.RUN, FenixModes.SENTRY]:
@@ -159,6 +167,7 @@ class FenixDualShock(DualShock):
         elif self.mode == FenixModes.SENTRY:
             self.command_writer.write_command('body_backward', 1000)
 
+    @remove_noise
     def on_L3_left(self, value):
         self.left_x = value
         if self.mode == FenixModes.RUN:
@@ -169,6 +178,7 @@ class FenixDualShock(DualShock):
         elif self.mode == FenixModes.SENTRY:
             self.command_writer.write_command('body_left', 1000)
 
+    @remove_noise
     def on_L3_right(self, value):
         self.left_x = value
         if self.mode == FenixModes.RUN:
@@ -188,15 +198,16 @@ class FenixDualShock(DualShock):
         if self.mode == FenixModes.RUN:
             self.write_multi_command()
         else:
-            self.command_writer.write_command('none', 250)
+            self.command_writer.write_command('none', 260)
 
     def on_L3_x_at_rest(self):
         self.left_x = 0
         if self.mode == FenixModes.RUN:
             self.write_multi_command()
         else:
-            self.command_writer.write_command('none', 250)
+            self.command_writer.write_command('none', 270)
     
+    @remove_noise
     def on_R3_up(self, value):
         #if self.mode in [FenixModes.WALKING, FenixModes.RUN]:
         #    self.command_writer.write_command('up', self.convert_value_to_speed(value))
@@ -213,6 +224,7 @@ class FenixDualShock(DualShock):
         #if self.mode in [FenixModes.SENTRY, FenixModes.RUN]:
         self.command_writer.write_command('look_down', 1000)
     
+    @remove_noise
     def on_R3_left(self, value):
         self.right_x = -value
         if self.mode in [FenixModes.RUN, FenixModes.WALKING]:
@@ -232,12 +244,13 @@ class FenixDualShock(DualShock):
             self.command_writer.write_command('sight_to_normal', 1000)
     
     def on_R3_y_at_rest(self):
+        if self.right_y != 0:
+            self.command_writer.write_command('none', 280)
         self.right_y = 0
-        self.command_writer.write_command('none', 250)
     
     def on_R3_x_at_rest(self):
         self.right_x = 0
-        self.command_writer.write_command('none', 250)
+        self.command_writer.write_command('none', 290)
 
     def on_right_arrow_press(self):
         #if self.mode in [FenixModes.BATTLE, FenixModes.RUN]:
