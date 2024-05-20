@@ -152,6 +152,8 @@ class FenixDualShock(DualShock):
             self.command_writer.write_command('turn_right_two_legged', 500)
         elif self.mode in [FenixModes.RUN]:
             self.command_writer.write_command('strafe_right_two_legged', cfg.speed["run"])
+        elif self.mode in [FenixModes.SENTRY]:
+            self.command_writer.write_command('tof_scan', 1000)
 
     def on_left_arrow_press(self):
         if self.mode in [FenixModes.WALKING]:

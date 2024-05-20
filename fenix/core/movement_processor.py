@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from cybernetic_core.kinematics import FenixKinematics
 from cybernetic_core.sequence_getter import VirtualFenix
 from core.utils.multiphase_moves import CommandsForwarder
-from fenix_hardware.fenix_lidar import FenixLidar
+from fenix_hardware.fenix_tof_cam import FenixTofCamera
 import configs.code_config as code_config
 import configs.config as config
 import logging.config
@@ -28,6 +28,7 @@ class MovementProcessor:
         fk = FenixKinematics()
         self.vf = VirtualFenix(self.logger)
         self.cf = CommandsForwarder()
+        self.ftc = FenixTofCamera()
         
         self.fenix_position = fk.current_position
 
@@ -175,13 +176,9 @@ class MovementProcessor:
                     self.fs.disable_torque()
                 elif command == 'enable_torque':
                     self.fs.enable_torque()
-                elif command == 'lidar_scan':
-                    #for i in range(50):
-                    if "fl" in self.__dict__:
-                        del self.fl
-                    self.fl = FenixLidar()
-                    self.fl.current_height = self.vf.get_height(self.fenix_position)
-                    self.fl.scan_front()
+                elif command == 'tof_scan':
+                    current_height = self.vf.get_height(self.fenix_position)
+                    self.ftc.read_depth(current_height)
                         #time.sleep(1)
                 else:
                     try:
