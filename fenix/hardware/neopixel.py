@@ -11,7 +11,7 @@ from rpi_ws281x import PixelStrip, Color
 
 class Neopixel:
     # LED strip configuration:
-    LED_COUNT = 8        # Number of LED pixels.
+    LED_COUNT = 18        # Number of LED pixels.
     LED_PIN = 18          # GPIO pin connected to the pixels (18 uses PWM!).
     # LED_PIN = 10        # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
     LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
@@ -76,6 +76,8 @@ class Neopixel:
             self.theater_chase_rainbow(brightness)
         if mode == 'activation':
             self.activation(color, brightness)
+        if mode == 'running_diodes':
+            self.running_diodes(color, brightness)
 
     def mode_cycle(self, mode: str, color_str: str, brightness: int) -> None:
         while True:
@@ -126,23 +128,57 @@ class Neopixel:
         self.steady_color(self.colors['none'], 0)
         self.strip.setBrightness(0)
         #print(f'Setting brightness to 0')
-        time.sleep(1.0)
+        time.sleep(0.3)
 
         self.strip.setBrightness(brightness)
         #print(f'Setting brightness to {brightness}')
-        for pixels in [[0, 4], [1, 5], [2, 6], [3, 7]]:
+        for pixels in [[3, 4], [2, 5], [1, 6], [0, 7]]:
             self.strip.setPixelColor(pixels[0], color)
             self.strip.setPixelColor(pixels[1], color)
             self.strip.show()
-            time.sleep(1.0)        
+            time.sleep(0.7)        
 
         time.sleep(1.0)
 
-        for pixels in [8, 9, 10, 11, 12, 13, 14, 15, 16]:
-            self.strip.setPixelColor(pixels, color)
-            #time.sleep(0.3)
+        for pixels in [[8, 17], [9, 16], [10, 15], [11, 14], [12, 13]]:
+            self.strip.setPixelColor(pixels[0], color)
+            self.strip.setPixelColor(pixels[1], color)
             self.strip.show()
+            time.sleep(0.2)
+        
+        for pixels in [[3, 4], [2, 5], [1, 6], [0, 7], [8, 17], [9, 16], [10, 15], [11, 14], [12, 13]]:
+            self.strip.setPixelColor(pixels[0], self.colors['none'])
+            self.strip.setPixelColor(pixels[1], self.colors['none'])
+            self.strip.show()
+            time.sleep(0.1)
+    
+    def running_diodes(self, 
+            color: Color = colors['white'], 
+            brightness: int = 255,
+            num_cycles: int = 3,
+            wait_time: float = 0.05,
+        ) -> None:
+        self.steady_color(self.colors['none'], 0)
+        self.strip.setBrightness(0)
+        #print(f'Setting brightness to 0')
+        time.sleep(0.3)
 
+        diodes_pairs = [
+            [3, 4], [2, 5], [1, 6], [0, 7], [8, 17], [9, 16], [10, 15], [11, 14], [12, 13]
+        ]
+
+        self.strip.setBrightness(brightness)
+        #print(f'Setting brightness to {brightness}')
+        for i in range(num_cycles):
+            for index in range(len(diodes_pairs) + 1):
+                if index < len(diodes_pairs):
+                    self.strip.setPixelColor(diodes_pairs[index][0], color)
+                    self.strip.setPixelColor(diodes_pairs[index][1], color)
+                if index > 0:
+                    self.strip.setPixelColor(diodes_pairs[index-1][0], self.colors['none'])
+                    self.strip.setPixelColor(diodes_pairs[index-1][1], self.colors['none'])
+                self.strip.show()
+                time.sleep(wait_time)        
 
     def rainbow(self, brightness: int = 255, wait_ms: int = 20, iterations: int = 2) -> None:
         """Draw rainbow that fades across all pixels at once."""
