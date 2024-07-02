@@ -22,7 +22,8 @@ class NeopixelCommandsSetter:
             'shutdown'          : 'shutdown,white,0',
             'activation'        : 'activation,blue,120',
             'rampage'           : 'steady,red,255',
-            'steady'            : f'steady,{color},255'
+            'steady'            : f'steady,{color},255',
+            'running_diodes'    : f'running_diodes,{color},255'
         }
         command_out = commands_mapper[command_in]
         

@@ -155,7 +155,7 @@ class Neopixel:
     def running_diodes(self, 
             color: Color = colors['white'], 
             brightness: int = 255,
-            num_cycles: int = 3,
+            num_cycles: int = 10,
             wait_time: float = 0.05,
         ) -> None:
         self.steady_color(self.colors['none'], 0)

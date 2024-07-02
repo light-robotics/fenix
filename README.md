@@ -6,6 +6,7 @@ Email: light.robotics.2020@gmail.com
 To run fenix:
 - run sudo /fenix/venv/bin/python fenix/run/neopixel_commands_reader.py
 - run python fenix/fenix_hardware/fenix_dualshock.py
+- run python fenix/fenix_hardware/fenix_dualshock_cut.py
 - run python fenix/core/movement_processor.py
 - python /fenix/fenix/hardware/mpu6050_avg.py
 - to stream video:

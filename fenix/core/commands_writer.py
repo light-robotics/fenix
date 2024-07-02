@@ -1,4 +1,9 @@
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from configs import code_config
+from configs import config as cfg
 
 
 class CommandsWriter:
@@ -6,7 +11,7 @@ class CommandsWriter:
         'w' : 'forward',
         's' : 'backward',
         'r' : 'up',
-        't' : 'down',
+        'f' : 'down',
         'a' : 'turn_left',
         'd' : 'turn_right',
         'q' : 'strafe_left',
@@ -16,7 +21,11 @@ class CommandsWriter:
         'wq': 'forward_left',
         'we': 'forward_right',
         'x' : 'start',
-        'z' : 'exit'
+        'z' : 'exit',
+        '`' : 'none',
+        '1' : 'disable_torque',
+        't' : 'look_up',
+        'g' : 'look_down'
     }
 
     def __init__(self):
@@ -37,7 +46,15 @@ class CommandsWriter:
             while True:
                 symbol = input('Enter command:\n')
                 command = self.symbols.get(symbol, 'none')
-                self.write_command(command, 500)
+                speed = 500
+                if command in [
+                    'forward_two_legged',
+                    'backward_two_legged',
+                    'strafe_right_two_legged',
+                    'strafe_left_two_legged',
+                    ]:
+                    speed = cfg.speed["run"]
+                self.write_command(command, speed)
                 if command == 'exit':
                     break
 

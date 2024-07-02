@@ -1,4 +1,5 @@
 import time
+import datetime
 from enum import Enum
 import sys
 import os
@@ -10,10 +11,28 @@ import configs.config as cfg
 from configs.modes import NIGHT_MODE
 
 
+last_write = datetime.datetime.now()
+commands_read_delta = 0.2
+
+def pause_writes(f):
+    def wrapper(*args):
+        global last_write
+        current_time = datetime.datetime.now()
+        if (current_time - last_write).total_seconds() > commands_read_delta:
+            print('Not Skipping', last_write, current_time, f)
+            last_write = current_time
+            f(*args)
+        else:
+            print('Skipping', last_write, current_time)
+    return wrapper
+
 def remove_noise(f):
     def wrapper(*args):
-        if abs(args[1]) > 2000:
+        if abs(args[1]) > 3000:
+            print('Value', args[1])
             f(*args)
+        else:
+            print('Noise', args[1])
     return wrapper
 
 
@@ -116,11 +135,12 @@ class FenixDualShock(DualShock):
             return 250
         return 1000
     
+    #@pause_writes
     def write_multi_command(self):
+        print(self.left_x, self.left_y, self.right_x, self.right_y)
         if self.left_x == 0 and self.left_y == 0:
             self.command_writer.write_command('none', 250)
         elif self.right_x == 0 and self.right_y == 0:
-            print(self.left_x, self.left_y)
             
             if self.left_y > 20000 and abs(self.left_x) < 10000:
                 self.command_writer.write_command('forward_two_legged', cfg.speed["run"])
@@ -144,70 +164,97 @@ class FenixDualShock(DualShock):
             else:
                 self.command_writer.write_command('none', 200)
 
+    """
     @remove_noise
+    @pause_writes
     def on_L3_up(self, value):
         self.left_y = -value
         if self.mode in [FenixModes.RUN, FenixModes.SENTRY]:
-            #self.command_writer.write_command('forward_two_legged', cfg.speed["run"])
-            self.write_multi_command()
+            self.command_writer.write_command('forward_two_legged', cfg.speed["run"])
+            #self.write_multi_command()
         elif self.mode == FenixModes.WALKING:
             self.command_writer.write_command('forward_one_legged', self.convert_value_to_speed(value))
         #elif self.mode == FenixModes.SENTRY:
         #    self.command_writer.write_command('body_forward', 1000)
         elif self.mode == FenixModes.BATTLE:
             self.command_writer.write_command('hit_4', cfg.speed["hit"])
+        
+        time.sleep(commands_read_delta)
+        self.command_writer.write_command('none', 300)
     
+    @remove_noise
+    @pause_writes
     def on_L3_down(self, value):
         self.left_y = -value
         if self.mode == FenixModes.RUN:
-            #self.command_writer.write_command('backward_two_legged', cfg.speed["run"])
-            self.write_multi_command()
+            self.command_writer.write_command('backward_two_legged', cfg.speed["run"])
+            #self.write_multi_command()
         elif self.mode == FenixModes.WALKING:
             self.command_writer.write_command('backward_one_legged', self.convert_value_to_speed(value))
         elif self.mode == FenixModes.SENTRY:
             self.command_writer.write_command('body_backward', 1000)
 
+        time.sleep(commands_read_delta)
+        self.command_writer.write_command('none', 310)
+
     @remove_noise
+    @pause_writes
     def on_L3_left(self, value):
         self.left_x = value
         if self.mode == FenixModes.RUN:
-            #self.command_writer.write_command('strafe_left_two_legged', cfg.speed["run"])
-            self.write_multi_command()
+            self.command_writer.write_command('strafe_left_two_legged', cfg.speed["run"])
+            #self.write_multi_command()
         elif self.mode == FenixModes.WALKING:
             self.command_writer.write_command('strafe_left_one_legged', self.convert_value_to_speed(value))
         elif self.mode == FenixModes.SENTRY:
             self.command_writer.write_command('body_left', 1000)
+        
+        time.sleep(commands_read_delta)
+        self.command_writer.write_command('none', 320)
 
     @remove_noise
+    @pause_writes
     def on_L3_right(self, value):
         self.left_x = value
         if self.mode == FenixModes.RUN:
-            #self.command_writer.write_command('strafe_right_two_legged', cfg.speed["run"])
-            self.write_multi_command()
+            self.command_writer.write_command('strafe_right_two_legged', cfg.speed["run"])
+            #self.write_multi_command()
         elif self.mode == FenixModes.WALKING:
             self.command_writer.write_command('strafe_right_one_legged', self.convert_value_to_speed(value))
         elif self.mode == FenixModes.SENTRY:
             self.command_writer.write_command('body_right', 1000)
     
+        time.sleep(commands_read_delta)
+        self.command_writer.write_command('none', 330)
+    
     def on_L3_press(self):
         #if self.mode == FenixModes.SENTRY:
             self.command_writer.write_command('body_to_center', 1000)
     
+    @pause_writes
     def on_L3_y_at_rest(self):
-        self.left_y = 0
+        self.command_writer.write_command('none', 260)
+        return
         if self.mode == FenixModes.RUN:
+            self.left_y = 0
             self.write_multi_command()
-        else:
+        elif self.left_y != 0:
             self.command_writer.write_command('none', 260)
+            self.left_y = 0
 
+    @pause_writes
     def on_L3_x_at_rest(self):
-        self.left_x = 0
+        self.command_writer.write_command('none', 270)
+        return
         if self.mode == FenixModes.RUN:
+            self.left_x = 0
             self.write_multi_command()
-        else:
+        elif self.left_x != 0:
             self.command_writer.write_command('none', 270)
-    
+            self.left_x = 0
+    """
     @remove_noise
+    @pause_writes
     def on_R3_up(self, value):
         #if self.mode in [FenixModes.WALKING, FenixModes.RUN]:
         #    self.command_writer.write_command('up', self.convert_value_to_speed(value))
@@ -216,28 +263,45 @@ class FenixDualShock(DualShock):
         self.command_writer.write_command('look_up', 1000)
         #elif self.mode == FenixModes.BATTLE:
         #    self.command_writer.write_command('hit_1', cfg.speed["hit"])
+
+        time.sleep(commands_read_delta)
+        self.command_writer.write_command('none', 340)
     
+    @remove_noise
+    @pause_writes
     def on_R3_down(self, value):
         self.right_y = -value
         #if self.mode in [FenixModes.WALKING, FenixModes.RUN]:
         #    self.command_writer.write_command('down', self.convert_value_to_speed(value))
         #if self.mode in [FenixModes.SENTRY, FenixModes.RUN]:
         self.command_writer.write_command('look_down', 1000)
+
+        time.sleep(commands_read_delta)
+        self.command_writer.write_command('none', 350)
     
     @remove_noise
+    @pause_writes
     def on_R3_left(self, value):
         self.right_x = -value
         if self.mode in [FenixModes.RUN, FenixModes.WALKING]:
             self.command_writer.write_command('turn_left_two_legged', self.convert_value_to_speed(value))
         elif self.mode in [FenixModes.SENTRY, FenixModes.BATTLE]:
             self.command_writer.write_command('look_left', 1000)
+        
+        time.sleep(commands_read_delta)
+        self.command_writer.write_command('none', 360)
     
+    @remove_noise
+    @pause_writes
     def on_R3_right(self, value):
         self.right_x = value
         if self.mode in [FenixModes.RUN, FenixModes.WALKING]:
             self.command_writer.write_command('turn_right_two_legged', self.convert_value_to_speed(value))
         elif self.mode in [FenixModes.SENTRY, FenixModes.BATTLE]:
             self.command_writer.write_command('look_right', 1000)
+        
+        time.sleep(commands_read_delta)
+        self.command_writer.write_command('none', 370)
 
     def on_R3_press(self):
         if self.mode == FenixModes.SENTRY:
@@ -249,8 +313,9 @@ class FenixDualShock(DualShock):
         self.right_y = 0
     
     def on_R3_x_at_rest(self):
+        if self.right_x != 0:
+            self.command_writer.write_command('none', 290)
         self.right_x = 0
-        self.command_writer.write_command('none', 290)
 
     def on_right_arrow_press(self):
         #if self.mode in [FenixModes.BATTLE, FenixModes.RUN]:

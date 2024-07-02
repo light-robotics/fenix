@@ -165,6 +165,10 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.turn_in_move(20)
     elif command == "right_turn_in_move":
         fk.turn_in_move(-20)
+    elif command == 'body_forward_8':
+        fk.body_movement(8, 0, 0)
+    elif command == 'body_backward_8':
+        fk.body_movement(-8, 0, 0)
     elif command == 'body_forward':
         if fk.body_delta_xy()[1] > cfg.limits["body_forward"]:
             print('Forward body limit reached')
@@ -191,6 +195,12 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.body_movement(0, 0, UP_OR_DOWN_CM)
     elif command == 'down':
         fk.body_movement(0, 0, -UP_OR_DOWN_CM)
+    elif command == 'up_4':
+        fk.body_movement(0, 0, 4)
+    elif command == 'up_16':
+        fk.body_movement(0, 0, 16)
+    elif command == 'down_16':
+        fk.body_movement(0, 0, -16)
     elif command == 'kneel':
         fk.kneel()
     elif command == 'climb_2_legs':
