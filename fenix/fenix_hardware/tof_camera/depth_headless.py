@@ -37,13 +37,15 @@ if __name__ == "__main__":
         depth_buf = frame.getDepthData()
         amplitude_buf = frame.getAmplitudeData()
         cam.releaseFrame(frame)
-        amplitude_buf*=(255/1024)
-        amplitude_buf = np.clip(amplitude_buf, 0, 255)
+        #amplitude_buf*=(255/1024)
+        #amplitude_buf = np.clip(amplitude_buf, 0, 255)
 
     #result = amplitude_buf.astype(np.uint8)
     #result = process_depth(depth_buf)
+    result_image = process_frame(depth_buf, amplitude_buf)
     result = depth_buf
     print(type(result), result, len(result), len(result[0]), min(result[0]), max(result[0]))
     cam.stop()
     cam.close()
-    np.savetxt('/arducam_tof_camera/example/python/data', result)
+    #np.savetxt('/fenix/fenix/wrk/depth_buf', result)
+    np.savetxt('/fenix/fenix/wrk/result_image', result_image)

@@ -90,5 +90,28 @@ def main():
         # Adjust the filter after each measure
         time.sleep(max(0, 0.2 - (time.time() - start_time)))  # Ensure a 0.1-second interval
 
+def single_scan():
+    sensor = mpu6050(0x68)
+
+    pitch_bias = 2.0
+    roll_bias = 2.6
+
+    start_time = time.time()
+
+    # Calculate average angles over 5 readings
+    pitch_avg, roll_avg, yaw_avg = average_angles(sensor, 20)
+
+    pitch_avg -= math.radians(pitch_bias)
+    roll_avg -= math.radians(roll_bias)
+
+    pitch = round(math.degrees(pitch_avg), 2)
+    roll = round(math.degrees(roll_avg), 2)
+    # Print the results
+    print("Pitch (average of 5 readings):", pitch)
+    print("Roll (average of 5 readings):", roll, "\n")
+
+    return round(roll)
+
 if __name__ == "__main__":
     main()
+    #print(single_scan())

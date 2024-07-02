@@ -154,6 +154,7 @@ class FenixDualShock(DualShock):
             self.command_writer.write_command('strafe_right_two_legged', cfg.speed["run"])
         elif self.mode in [FenixModes.SENTRY]:
             self.command_writer.write_command('tof_scan', 1000)
+            self.neopixel.issue_command('running_diodes', color='white')
 
     def on_left_arrow_press(self):
         if self.mode in [FenixModes.WALKING]:

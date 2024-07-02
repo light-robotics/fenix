@@ -11,8 +11,22 @@ class DualShock(Controller):
     I was using this tutorial: https://salamwaddah.com/blog/connecting-ps4-controller-to-raspberry-pi-via-bluetooth
     And some information from here: https://pypi.org/project/pyPS4Controller/
     override all the commands you need, like on_x_press or on_R2_release
+
+    to connect:
+    sudo bluetoothctl
+    agent on
+    discoverable on
+    pairable on
+    default-agent
+    scan on
+    hold ps+share on joystick
+    pair CONTROLLER_MAC_ADDRESS
+    connect CONTROLLER_MAC_ADDRESS
+    trust CONTROLLER_MAC_ADDRESS
+    ---
+    replace mac_address below
     """
-    mac_address = 'A4:53:85:81:D5:6A'
+    mac_address = '10:18:49:42:51:17'
     device_address = '/dev/input/js0'
 
     def __init__(self):

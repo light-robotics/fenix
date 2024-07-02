@@ -13,9 +13,7 @@ logging.config.dictConfig(code_config.logger_config)
 class FenixServos:
     def __init__(self):
         self.m1 = LX16A(port='/dev/ttyAMA3') # 5-8   # 1-4
-        #self.m2 = LX16A(Port='/dev/ttyAMA2') # 9-12  # 5-8
-        #self.m3 = LX16A(Port='/dev/ttyAMA3') # 13-16 # 9-12
-        self.m4 = LX16A(port='/dev/ttyAMA0') # 1-4   # 13-16
+        self.m4 = LX16A(port='/dev/ttyAMA4') # 1-4   # 13-16
         self.speed = 500
         self.min_speed = 700
         self.max_speed = 0 # 130 # 0 is instant, 10000 is very slow
