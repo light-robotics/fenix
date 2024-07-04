@@ -39,3 +39,6 @@ if not uart5_found:
 if not uart0_found:
     print("dtoverlay=uart0 not found in config. Adding")
     os.system('sudo bash -c "echo dtoverlay=uart0 >> /boot/firmware/config.txt"')
+
+# sudo raspi-config
+# enable serial port

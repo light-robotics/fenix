@@ -8,3 +8,4 @@ smbus
 vl53l1x
 scikit-learn
 ArducamDepthCamera
+numpy==1.26.4
