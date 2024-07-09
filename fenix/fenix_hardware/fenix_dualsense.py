@@ -130,8 +130,7 @@ class FenixDualSense(DualSense):
         print(self.left_x, self.left_y, self.right_x, self.right_y)
         if self.left_x == 0 and self.left_y == 0:
             self.command_writer.write_command('none', 250)
-        elif self.right_x == 0 and self.right_y == 0:
-            
+        elif self.right_x == 0 and self.right_y == 0:            
             if self.left_y > 0.6 and abs(self.left_x) < 0.35:
                 self.command_writer.write_command('forward_two_legged', cfg.speed["run"])
             elif self.left_y < -0.6 and abs(self.left_x) < 0.35:
@@ -156,7 +155,6 @@ class FenixDualSense(DualSense):
 
     def on_left_trigger_change(self, joystick):
         x, y = joystick.x, joystick.y
-        print(x, y)
         if abs(x) < 0.1 and abs(y) < 0.1:
             self.command_writer.write_command('none', 300)
         elif y > 0 and abs(x) < 0.5:
@@ -169,10 +167,10 @@ class FenixDualSense(DualSense):
             self.on_L3_left(x)
 
     def on_L3_up(self, value):
-        self.left_y = -value
+        self.left_y = value
         if self.mode in [FenixModes.RUN, FenixModes.SENTRY]:
-            self.command_writer.write_command('forward_two_legged', cfg.speed["run"])
-            #self.write_multi_command()
+            #self.command_writer.write_command('forward_two_legged', cfg.speed["run"])
+            self.write_multi_command()
         elif self.mode == FenixModes.WALKING:
             self.command_writer.write_command('forward_one_legged', self.convert_value_to_speed(value))
         #elif self.mode == FenixModes.SENTRY:
@@ -181,10 +179,10 @@ class FenixDualSense(DualSense):
             self.command_writer.write_command('hit_4', cfg.speed["hit"])
     
     def on_L3_down(self, value):
-        self.left_y = -value
+        self.left_y = value
         if self.mode == FenixModes.RUN:
-            self.command_writer.write_command('backward_two_legged', cfg.speed["run"])
-            #self.write_multi_command()
+            #self.command_writer.write_command('backward_two_legged', cfg.speed["run"])
+            self.write_multi_command()
         elif self.mode == FenixModes.WALKING:
             self.command_writer.write_command('backward_one_legged', self.convert_value_to_speed(value))
         elif self.mode == FenixModes.SENTRY:
@@ -193,8 +191,8 @@ class FenixDualSense(DualSense):
     def on_L3_left(self, value):
         self.left_x = value
         if self.mode == FenixModes.RUN:
-            self.command_writer.write_command('strafe_left_two_legged', cfg.speed["run"])
-            #self.write_multi_command()
+            #self.command_writer.write_command('strafe_left_two_legged', cfg.speed["run"])
+            self.write_multi_command()
         elif self.mode == FenixModes.WALKING:
             self.command_writer.write_command('strafe_left_one_legged', self.convert_value_to_speed(value))
         elif self.mode == FenixModes.SENTRY:
@@ -203,8 +201,8 @@ class FenixDualSense(DualSense):
     def on_L3_right(self, value):
         self.left_x = value
         if self.mode == FenixModes.RUN:
-            self.command_writer.write_command('strafe_right_two_legged', cfg.speed["run"])
-            #self.write_multi_command()
+            #self.command_writer.write_command('strafe_right_two_legged', cfg.speed["run"])
+            self.write_multi_command()
         elif self.mode == FenixModes.WALKING:
             self.command_writer.write_command('strafe_right_one_legged', self.convert_value_to_speed(value))
         elif self.mode == FenixModes.SENTRY:
@@ -212,7 +210,6 @@ class FenixDualSense(DualSense):
 
     def on_right_trigger_change(self, joystick):
         x, y = joystick.x, joystick.y
-        print(x, y)
         if abs(x) < 0.1 and abs(y) < 0.1:
             self.command_writer.write_command('none', 300)
         elif y > 0 and abs(x) < 0.5:
