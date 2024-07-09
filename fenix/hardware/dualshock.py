@@ -26,7 +26,7 @@ class DualShock(Controller):
     ---
     replace mac_address below
     """
-    mac_address = '10:18:49:42:51:17'
+    mac_address = '10:18:49:4B:97:4F' # '10:18:49:42:51:17'
     device_address = '/dev/input/js0'
 
     def __init__(self):
