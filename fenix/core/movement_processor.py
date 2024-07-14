@@ -210,7 +210,8 @@ class MovementProcessor:
                         self.execute_command(command, speed)
                     except Exception as e:
                         self.fs.disable_torque()
-                        raise Exception
+                        print(e)
+                        #raise Exception
 
         except KeyboardInterrupt:
             print('Movement stopped')

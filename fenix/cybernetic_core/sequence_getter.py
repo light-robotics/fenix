@@ -203,42 +203,9 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.body_movement(0, 0, -16)
     elif command == 'kneel':
         fk.kneel()
-    elif command == 'climb_2_legs':
-        #fk.climb_2_legs(15)
-        fk.body_movement(0, 0, 15)
-        fk.body_movement(-5, 0, 0)
-
-        fk.leg_movement(1, [-5, 10, 23])
-        fk.leg_movement(1, [30, -10, 0])
-        fk.leg_movement(1, [0, 0, -8])
-
-        
-        fk.leg_movement(2, [-5, -10, 23])
-        fk.leg_movement(2, [30, 10, 0])
-        fk.leg_movement(2, [0, 0, -8])
-
-        fk.body_movement(25, 0, 0)
-        fk.body_movement(0, 0, -5)
-
-        #fk.leg_movement(3, [0, 0, 10], snapshot=False)
-        #fk.leg_movement(4, [0, 0, 10])
-
-        
-        fk.leg_movement(3, [15, -5, 20], snapshot=False)
-        fk.leg_movement(4, [15, 5, 20])
-        
-        fk.leg_movement(3, [10, 0, 0], snapshot=False)
-        fk.leg_movement(4, [10, 0, 0])
-
-        fk.leg_movement(3, [0, 5, -5], snapshot=False)
-        fk.leg_movement(4, [0, -5, -5])
-        
-        fk.body_movement(3, 0, 0)
-        fk.body_movement(0, 0, 5)
-
-        fk.body_to_center()
-
     elif command == 'climb_2':
+        fk.climb_20()
+        """
         fk.body_movement(0, 0, 14)
         fk.body_movement(-5, 0, 0)
         
@@ -262,8 +229,6 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.leg_movement(4, [10, 0, 5])
         fk.leg_movement(4, [0, 0, -5])
 
-        #fk.body_movement(10, 5, 0)
-
         fk.body_movement(-3, 10, 3)
 
         fk.leg_movement(1, [15, 0, 5])
@@ -272,7 +237,6 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.leg_movement(2, [15, 0, 5])
         fk.leg_movement(2, [0, 0, -5])
 
-        #fk.body_movement(17, 0, 0)
         fk.body_movement(23, 0, -2)
         fk.body_movement(0, 0, -3)
 
@@ -288,29 +252,8 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.body_movement(3, 0, 0)
         fk.body_movement(0, 0, 6)
 
-        """
-        fk.leg_movement(3, [15, -5, 5])
-        fk.leg_movement(3, [0, 0, -5])
-
-        fk.leg_movement(4, [15, 5, 5])
-        fk.leg_movement(4, [0, 0, -5])
-
-        
-        fk.body_movement(12, 0, 5)
-        fk.body_movement(0, 0, -2)
-
-        fk.leg_movement(3, [0, 0, 25])
-        fk.leg_movement(3, [10, 5, 0])
-        fk.leg_movement(3, [0, 0, -5])
-
-        fk.leg_movement(4, [0, 0, 25])
-        fk.leg_movement(4, [10, -5, 0])
-        fk.leg_movement(4, [0, 0, -5])
-
-        fk.body_movement(1, 0, 3)
-        """
         fk.body_to_center()
-    
+        """
     elif command == 'backward_one_legged':
         pass
     

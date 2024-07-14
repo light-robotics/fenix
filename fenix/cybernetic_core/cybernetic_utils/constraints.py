@@ -18,7 +18,7 @@ def tettas_correct(tettas: list[float], logger = None) -> bool:
             plus_index = idx + 1
             plus_value = tettas[idx + 1]
         
-        if value - plus_value > 90:
+        if value - plus_value > 97:
             logger.info(f'Bad value: {value - plus_value} for {(idx + 1, plus_index + 1)}')
             return False
 

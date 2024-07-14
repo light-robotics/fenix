@@ -118,7 +118,7 @@ class Neopixel:
         #print(f'Setting brightness to {brightness}')
 
         for i in range(0, self.LED_COUNT):
-            if i < 11: # first 6 are front flashlight
+            if i < 8: # first 6 are front flashlight
                 self.strip.setPixelColor(i, color)
             else:
                 self.strip.setPixelColor(i, self.colors['none'])

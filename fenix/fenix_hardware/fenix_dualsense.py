@@ -45,7 +45,9 @@ class FenixDualSense(DualSense):
         self.controller.btn_ps.on_down(self.on_playstation_button_press)
         self.controller.btn_options.on_down(self.on_options_press)
         self.controller.btn_r1.on_down(self.on_R1_press)
+        self.controller.btn_l1.on_down(self.on_L1_press)
         self.controller.right_trigger.on_change(self.on_R2_press)
+        self.controller.left_trigger.on_change(self.on_L2_press)
 
         self.controller.left_stick.on_change(self.on_left_trigger_change)
         self.controller.right_stick.on_change(self.on_right_trigger_change)
@@ -99,14 +101,12 @@ class FenixDualSense(DualSense):
             print(f'Flashlight for {value} power')
     
     def on_L1_press(self):
-        if self.light_on:
-            self.light_on = False
-            self.neopixel.issue_command('light_off')
-            print('Turn the lights off')
-        else:
-            self.light_on = True
-            self.neopixel.issue_command('dipped_headlights')
-            print('Turn the dim lights on')   
+        self.neopixel.issue_command('running_diodes', 'white', 255)
+        print('Running diodes white')
+    
+    def on_L2_press(self):
+        self.neopixel.issue_command('running_diodes', 'blue', 255)
+        print('Running diodes blue')
     
     @staticmethod
     def convert_value_to_speed(value):
@@ -147,25 +147,37 @@ class FenixDualSense(DualSense):
                 #self.command_writer.write_command('diagonal_forward_left', cfg.speed["run"])
                 self.command_writer.write_command('left_turn_in_move', cfg.speed["run"])   
             elif self.left_x < -0.45 and self.left_y < -0.45:
-                self.command_writer.write_command('diagonal_back_left', cfg.speed["run"])
+                #self.command_writer.write_command('diagonal_back_left', cfg.speed["run"])
+                self.command_writer.write_command('turn_left_two_legged', cfg.speed["run"])
             elif self.left_x > 0.45 and self.left_y < -0.45:
-                self.command_writer.write_command('diagonal_back_right', cfg.speed["run"])
+                #self.command_writer.write_command('diagonal_back_right', cfg.speed["run"])
+                self.command_writer.write_command('turn_right_two_legged', cfg.speed["run"])
             else:
                 self.command_writer.write_command('none', 200)
 
     def on_left_trigger_change(self, joystick):
+        
+        print(f'on_left_trigger_change ({joystick.x, joystick.y})')
         x, y = joystick.x, joystick.y
         if abs(x) < 0.1 and abs(y) < 0.1:
             self.command_writer.write_command('none', 300)
+        else:
+            self.left_x, self.left_y = x, y
+            self.write_multi_command()
+        """
         elif y > 0 and abs(x) < 0.5:
+            print('on_L3_up')
             self.on_L3_up(y)
         elif y < 0 and abs(x) < 0.5:
+            print('on_L3_down')
             self.on_L3_down(y)
         elif x > 0 and abs(y) < 0.5:
+            print('on_L3_right')
             self.on_L3_right(x)
         elif x < 0 and abs(y) < 0.5:
+            print('on_L3_left')
             self.on_L3_left(x)
-
+        """
     def on_L3_up(self, value):
         self.left_y = value
         if self.mode in [FenixModes.RUN, FenixModes.SENTRY]:
@@ -209,16 +221,17 @@ class FenixDualSense(DualSense):
             self.command_writer.write_command('body_right', 1000)
 
     def on_right_trigger_change(self, joystick):
+        print(f'on_right_trigger_change ({joystick.x, joystick.y})')
         x, y = joystick.x, joystick.y
         if abs(x) < 0.1 and abs(y) < 0.1:
             self.command_writer.write_command('none', 300)
-        elif y > 0 and abs(x) < 0.5:
+        elif y > 0.5 and abs(x) < 0.5:
             self.on_R3_up(y)
-        elif y < 0 and abs(x) < 0.5:
+        elif y < -0.5 and abs(x) < 0.5:
             self.on_R3_down(y)
-        elif x > 0 and abs(y) < 0.5:
+        elif x > 0.5 and abs(y) < 0.5:
             self.on_R3_right(x)
-        elif x < 0 and abs(y) < 0.5:
+        elif x < -0.5 and abs(y) < 0.5:
             self.on_R3_left(x)
 
     def on_R3_up(self, value):
@@ -229,7 +242,7 @@ class FenixDualSense(DualSense):
         self.command_writer.write_command('look_up', 1000)
         #elif self.mode == FenixModes.BATTLE:
         #    self.command_writer.write_command('hit_1', cfg.speed["hit"])
-
+        time.sleep(0.3)
         self.command_writer.write_command('none', 340)
     
     def on_R3_down(self, value):
@@ -238,7 +251,7 @@ class FenixDualSense(DualSense):
         #    self.command_writer.write_command('down', self.convert_value_to_speed(value))
         #if self.mode in [FenixModes.SENTRY, FenixModes.RUN]:
         self.command_writer.write_command('look_down', 1000)
-
+        time.sleep(0.3)
         self.command_writer.write_command('none', 350)
     
     def on_R3_left(self, value):
@@ -247,7 +260,7 @@ class FenixDualSense(DualSense):
             self.command_writer.write_command('turn_left_two_legged', self.convert_value_to_speed(value))
         elif self.mode in [FenixModes.SENTRY, FenixModes.BATTLE]:
             self.command_writer.write_command('look_left', 1000)
-        
+        time.sleep(0.3)
         self.command_writer.write_command('none', 360)
     
     def on_R3_right(self, value):
@@ -256,7 +269,7 @@ class FenixDualSense(DualSense):
             self.command_writer.write_command('turn_right_two_legged', self.convert_value_to_speed(value))
         elif self.mode in [FenixModes.SENTRY, FenixModes.BATTLE]:
             self.command_writer.write_command('look_right', 1000)
-        
+        time.sleep(0.3)
         self.command_writer.write_command('none', 370)
     
     def on_R3_y_at_rest(self):
@@ -279,14 +292,14 @@ class FenixDualSense(DualSense):
             self.command_writer.write_command('none', 1000)
 
     def on_left_arrow_press(self):
-        if self.mode in [FenixModes.BATTLE, FenixModes.RUN]:
-            self.command_writer.write_command('lidar_scan', 1000)
-        elif self.mode in [FenixModes.WALKING]:
-            self.command_writer.write_command('approach_obstacle', 300)
-        else:
-            self.command_writer.write_command('climb_2', 500)
-            time.sleep(0.5)
-            self.command_writer.write_command('none', 1000)
+        #if self.mode in [FenixModes.BATTLE, FenixModes.RUN]:
+        #    self.command_writer.write_command('lidar_scan', 1000)
+        #elif self.mode in [FenixModes.WALKING]:
+        #    self.command_writer.write_command('approach_obstacle', 300)
+        #else:
+        self.command_writer.write_command('climb_2', 500)
+        time.sleep(0.5)
+        self.command_writer.write_command('none', 1000)
       
     def on_up_arrow_press(self):
         #if self.mode in [FenixModes.RUN, FenixModes.WALKING, FenixModes.SENTRY]:

@@ -678,6 +678,53 @@ class FenixKinematics:
             leg.move_end_point(*leg_delta_2)
         self.add_angles_snapshot('endpoints')
 
+    def climb_20(self):
+        self.body_movement(0, 0, 14)
+        self.body_movement(-5, 0, 0)
+        
+        self.leg_movement(1, [-5, 10, 27])
+        self.leg_movement(1, [25, -10, 0])
+        self.leg_movement(1, [0, 0, -7])
+        
+        self.leg_movement(2, [-5, -10, 27])
+        self.leg_movement(2, [25, 10, 0])
+        self.leg_movement(2, [0, 0, -7])
+        
+        self.body_movement(14, 5, 4)
+
+        self.leg_movement(3, [10, 0, 5])
+        self.leg_movement(3, [0, 0, -5])
+
+        self.body_movement(-1, -15, -2)
+
+        self.leg_movement(4, [10, 0, 5])
+        self.leg_movement(4, [0, 0, -5])
+
+        self.body_movement(-3, 10, 3)
+
+        self.leg_movement(1, [15, 0, 5])
+        self.leg_movement(1, [0, 0, -5])
+
+        self.leg_movement(2, [15, 0, 5])
+        self.leg_movement(2, [0, 0, -5])
+
+        self.body_movement(23, 0, -2)
+        self.body_movement(0, 0, -3)
+
+        self.leg_movement(3, [15, -5, 25], snapshot=False)
+        self.leg_movement(4, [15, 5, 25])
+
+        self.leg_movement(3, [10, 0, 0], snapshot=False)
+        self.leg_movement(4, [10, 0, 0])
+
+        self.leg_movement(3, [0, 5, -5], snapshot=False)
+        self.leg_movement(4, [0, -5, -5])
+
+        self.body_movement(3, 0, 0)
+        self.body_movement(0, 0, 6)
+
+        self.body_to_center()
+
     def climb_2_legs(self, delta_z, steps_arr=[8, 12, 12, 12, 8, 12, 8]): #steps_arr=[8, 16, 16, 6, 6, 8]
         
         steps_arr=[12, 12, 6, 12, 6, 6, 6, 12, 12]
