@@ -1061,22 +1061,21 @@ class FenixKinematics:
     # fun moves
     def hit(self, leg_num):
         x_move = 10
-        if leg_num == 4:
+        if leg_num == 2:
             x_move = -10
-        y_move = 11
         self.logger.info(f'Processing leg {leg_num} body_compensation_for_a_leg')
         self.body_compensation_for_a_leg(leg_num)
         self.logger.info(f'Processing leg {leg_num} move_end_point 1')
-        self.legs[leg_num].move_end_point(-x_move, 5, 5)
+        self.legs[leg_num].move_end_point(10, -x_move, 5)
         self.add_angles_snapshot('endpoint')
         self.logger.info(f'Processing leg {leg_num} move_end_point 2')
-        self.legs[leg_num].move_end_point(0, y_move, 5)
+        self.legs[leg_num].move_end_point(13, 0, 10)
         self.add_angles_snapshot('endpoint')
         self.logger.info(f'Processing leg {leg_num} move_end_point 3')
-        self.legs[leg_num].move_end_point(0, -y_move, -5)
+        self.legs[leg_num].move_end_point(-13, 0, -10)
         self.add_angles_snapshot('endpoint')
         self.logger.info(f'Processing leg {leg_num} move_end_point 4')
-        self.legs[leg_num].move_end_point(x_move, -5, 0)
+        self.legs[leg_num].move_end_point(-10, x_move, 0)
         self.add_angles_snapshot('endpoint')
         self.logger.info(f'Processing leg {leg_num} move_end_point 5')
         self.legs[leg_num].move_end_point(0, 0, -5)

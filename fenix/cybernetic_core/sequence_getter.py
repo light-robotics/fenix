@@ -304,8 +304,8 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.reset()
     elif command == 'hit_1':
         fk.hit(1)
-    elif command == 'hit_4':
-        fk.hit(4)
+    elif command == 'hit_2':
+        fk.hit(2)
     elif command == 'battle_stance':
         fk.battle_stance()
     elif command == 'normal_stance':

@@ -100,7 +100,7 @@ class MovementProcessor:
                 self.run_sequence(command)
 
     def move_function_dispatch(self, command: str) -> Callable:
-        if command in ['hit_1', 'hit_4', 'forward_one_legged']:
+        if command in ['hit_1', 'hit_2', 'forward_one_legged']:
             self.logger.info('Using function set_servo_values_paced')
             return self.fs.set_servo_values_paced
         elif command in ['forward_1', 'forward_2', 'forward_3', 'forward_22', 'forward_32']:

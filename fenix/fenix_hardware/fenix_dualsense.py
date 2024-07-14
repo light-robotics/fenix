@@ -188,7 +188,7 @@ class FenixDualSense(DualSense):
         #elif self.mode == FenixModes.SENTRY:
         #    self.command_writer.write_command('body_forward', 1000)
         elif self.mode == FenixModes.BATTLE:
-            self.command_writer.write_command('hit_4', cfg.speed["hit"])
+            self.command_writer.write_command('hit_2', cfg.speed["hit"])
     
     def on_L3_down(self, value):
         self.left_y = value
@@ -286,10 +286,13 @@ class FenixDualSense(DualSense):
         #if self.mode in [FenixModes.BATTLE, FenixModes.RUN]:
         #    self.command_writer.write_command('save_lidar_data', 1000)
         #else:
-        if self.mode in [FenixModes.WALKING]:
-            self.command_writer.write_command('overcome_obstacle', 1000)
-            time.sleep(0.5)
-            self.command_writer.write_command('none', 1000)
+        if self.mode == FenixModes.BATTLE:
+           self.command_writer.write_command('hit_2', cfg.speed["hit"])
+
+        #if self.mode in [FenixModes.WALKING]:
+        #    self.command_writer.write_command('overcome_obstacle', 1000)
+        time.sleep(0.5)
+        self.command_writer.write_command('none', 1000)
 
     def on_left_arrow_press(self):
         #if self.mode in [FenixModes.BATTLE, FenixModes.RUN]:
@@ -297,7 +300,10 @@ class FenixDualSense(DualSense):
         #elif self.mode in [FenixModes.WALKING]:
         #    self.command_writer.write_command('approach_obstacle', 300)
         #else:
-        self.command_writer.write_command('climb_2', 500)
+        if self.mode == FenixModes.BATTLE:
+           self.command_writer.write_command('hit_1', cfg.speed["hit"])
+        else:
+            self.command_writer.write_command('climb_2', 500)
         time.sleep(0.5)
         self.command_writer.write_command('none', 1000)
       
