@@ -50,7 +50,7 @@ class FenixDualSense(DualSense):
         self.controller.left_trigger.on_change(self.on_L2_press)
 
         self.controller.left_stick.on_change(self.on_left_trigger_change)
-        self.controller.right_stick.on_change(self.on_right_trigger_change)
+        #self.controller.right_stick.on_change(self.on_right_trigger_change)
 
         self.controller.btn_left.on_down(self.on_left_arrow_press)
         self.controller.btn_left.on_up(self.on_arrow_release)
@@ -156,30 +156,22 @@ class FenixDualSense(DualSense):
                 self.command_writer.write_command('none', 200)
 
     def on_left_trigger_change(self, joystick):
-        
-        print(f'on_left_trigger_change ({joystick.x, joystick.y})')
         x, y = joystick.x, joystick.y
         if abs(x) < 0.1 and abs(y) < 0.1:
             self.command_writer.write_command('none', 300)
-        else:
+            return
+        
+        #print(f'on_left_trigger_change ({joystick.x, joystick.y})')
+        if self.mode in [FenixModes.RUN, FenixModes.SENTRY]:
+            #self.command_writer.write_command('forward_two_legged', cfg.speed["run"])
             self.left_x, self.left_y = x, y
             self.write_multi_command()
-        """
-        elif y > 0 and abs(x) < 0.5:
-            print('on_L3_up')
-            self.on_L3_up(y)
-        elif y < 0 and abs(x) < 0.5:
-            print('on_L3_down')
-            self.on_L3_down(y)
-        elif x > 0 and abs(y) < 0.5:
-            print('on_L3_right')
-            self.on_L3_right(x)
-        elif x < 0 and abs(y) < 0.5:
-            print('on_L3_left')
-            self.on_L3_left(x)
-        """
+        elif self.mode == FenixModes.WALKING:
+            self.command_writer.write_command('forward_one_legged', 1000)
+        
     def on_L3_up(self, value):
         self.left_y = value
+        print(self.mode)
         if self.mode in [FenixModes.RUN, FenixModes.SENTRY]:
             #self.command_writer.write_command('forward_two_legged', cfg.speed["run"])
             self.write_multi_command()
@@ -288,7 +280,8 @@ class FenixDualSense(DualSense):
         #else:
         if self.mode == FenixModes.BATTLE:
            self.command_writer.write_command('hit_2', cfg.speed["hit"])
-
+        elif self.mode == FenixModes.RUN:
+            self.command_writer.write_command('climb_2_legs', 500)
         #if self.mode in [FenixModes.WALKING]:
         #    self.command_writer.write_command('overcome_obstacle', 1000)
         time.sleep(0.5)
@@ -302,8 +295,8 @@ class FenixDualSense(DualSense):
         #else:
         if self.mode == FenixModes.BATTLE:
            self.command_writer.write_command('hit_1', cfg.speed["hit"])
-        else:
-            self.command_writer.write_command('climb_2', 500)
+        elif self.mode == FenixModes.RUN:
+            self.command_writer.write_command('descend_2_legs', 500)
         time.sleep(0.5)
         self.command_writer.write_command('none', 1000)
       

@@ -205,55 +205,6 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.kneel()
     elif command == 'climb_2':
         fk.climb_20()
-        """
-        fk.body_movement(0, 0, 14)
-        fk.body_movement(-5, 0, 0)
-        
-        
-        fk.leg_movement(1, [-5, 10, 27])
-        fk.leg_movement(1, [25, -10, 0])
-        fk.leg_movement(1, [0, 0, -7])
-
-        
-        fk.leg_movement(2, [-5, -10, 27])
-        fk.leg_movement(2, [25, 10, 0])
-        fk.leg_movement(2, [0, 0, -7])
-        
-        fk.body_movement(14, 5, 4)
-
-        fk.leg_movement(3, [10, 0, 5])
-        fk.leg_movement(3, [0, 0, -5])
-
-        fk.body_movement(-1, -15, -2)
-
-        fk.leg_movement(4, [10, 0, 5])
-        fk.leg_movement(4, [0, 0, -5])
-
-        fk.body_movement(-3, 10, 3)
-
-        fk.leg_movement(1, [15, 0, 5])
-        fk.leg_movement(1, [0, 0, -5])
-
-        fk.leg_movement(2, [15, 0, 5])
-        fk.leg_movement(2, [0, 0, -5])
-
-        fk.body_movement(23, 0, -2)
-        fk.body_movement(0, 0, -3)
-
-        fk.leg_movement(3, [15, -5, 25], snapshot=False)
-        fk.leg_movement(4, [15, 5, 25])
-
-        fk.leg_movement(3, [10, 0, 0], snapshot=False)
-        fk.leg_movement(4, [10, 0, 0])
-
-        fk.leg_movement(3, [0, 5, -5], snapshot=False)
-        fk.leg_movement(4, [0, -5, -5])
-
-        fk.body_movement(3, 0, 0)
-        fk.body_movement(0, 0, 6)
-
-        fk.body_to_center()
-        """
     elif command == 'backward_one_legged':
         pass
     
@@ -266,7 +217,6 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         pass
     elif command == 'strafe_right_one_legged':
         pass    
-    
     elif command == 'look_up':
         #fk.look_on_angle(-VERTICAL_LOOK_ANGLE) # this should be iterative P.S.: or not    
         fk.look_on_angle_new(up=True)
@@ -306,30 +256,12 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.hit(1)
     elif command == 'hit_2':
         fk.hit(2)
-    elif command == 'battle_stance':
-        fk.battle_stance()
-    elif command == 'normal_stance':
-        fk.normal_stance()
-    elif command == 'jump':
-        fk.jump()
-    elif command == 'demo1':
-        fk.demo1()
-    elif command == 'demo2':
-        fk.demo2()
-    elif command == 'demo11':
-        fk.demo11()
-    elif command == 'demo12':
-        fk.demo12()
-    elif command == 'demo13':
-        fk.demo13()
+    elif command == 'climb_2_legs':
+        fk.climb_2_legs(10)
+    elif command == 'descend_2_legs':
+        fk.descend_2_legs(10)
     elif command == 'double_back':
         fk.body_movement(0, -3*FORWARD_BODY_CM, 0)
-    elif command == 'demo_sequence':
-        fk.demo_sequence()
-    elif command == 'nano_demo_1':
-        fk.nano_demo_1()
-    elif command == 'nano_demo_2':
-        fk.nano_demo_2()
     else:
         print(f'Unknown command')
     
