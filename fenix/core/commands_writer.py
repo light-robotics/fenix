@@ -31,11 +31,17 @@ class CommandsWriter:
     def __init__(self):
         self.command_file = code_config.movement_command_file
         self.command_id = 1
+        self.prev_command = 'none'
+        self.prev_speed = 1000
 
     def write_command(self, command: str, speed: int) -> None:
+        if self.prev_command == command and self.prev_speed == speed:
+            return
         if speed > 2000:
             print(f'Ignoring command {command}, {speed}')
         else:
+            self.prev_command = command
+            self.prev_speed = speed
             print(f'writing {command}, {speed} to command file')
             with open(self.command_file, 'w') as f:
                 f.write(f'{self.command_id},{command},{speed}')

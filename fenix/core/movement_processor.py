@@ -10,8 +10,6 @@ from cybernetic_core.sequence_getter import VirtualFenix
 from core.utils.multiphase_moves import CommandsForwarder
 from fenix_hardware.fenix_tof_cam import FenixTofCamera
 from hardware.mpu6050_avg import single_scan
-from hardware.fnx_vl531x import FnxVL51L1X
-from fenix_hardware.neopixel_commands_setter import NeopixelCommandsSetter
 import configs.code_config as code_config
 import configs.config as config
 import logging.config
@@ -119,8 +117,6 @@ class MovementProcessor:
             with open('/fenix/fenix/wrk/obstacles_sequence', 'rb') as f:
                 sequence = pickle.load(f)
         else:
-            tof = FnxVL51L1X()
-            neopixel = NeopixelCommandsSetter()
             self.logger.info(f'[MOVE] Started run_sequence : {datetime.datetime.now()}')
             try:            
                 self.logger.info(f'MOVE. Trying command {command}')
@@ -157,13 +153,6 @@ class MovementProcessor:
             self.logger.info(f'Speed: {self.fs.speed}')
             if not code_config.DEBUG:
                 move_function(angles)
-                tof_data = tof.get_data()
-                print(f'TOF: {tof_data}')
-                if tof_data < 115:
-                    neopixel.issue_command('light_on')
-                else:
-                    neopixel.issue_command('light_off')
-                # HERE
             else:
                 time.sleep(1.0)
         self.logger.info(f'[MOVE] finished: {datetime.datetime.now()}')
