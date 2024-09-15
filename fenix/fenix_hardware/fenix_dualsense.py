@@ -105,8 +105,8 @@ class FenixDualSense(DualSense):
         print('Running diodes white')
     
     def on_L2_press(self):
-        self.neopixel.issue_command('running_diodes', 'blue', 255)
-        print('Running diodes blue')
+        self.neopixel.issue_command('running_diodes', 'red', 255)
+        print('Running diodes red')
     
     @staticmethod
     def convert_value_to_speed(value):
@@ -282,8 +282,8 @@ class FenixDualSense(DualSense):
            self.command_writer.write_command('hit_2', cfg.speed["hit"])
         elif self.mode == FenixModes.RUN:
             self.command_writer.write_command('climb_2_legs', 500)
-        #if self.mode in [FenixModes.WALKING]:
-        #    self.command_writer.write_command('overcome_obstacle', 1000)
+        elif self.mode in [FenixModes.SENTRY]:
+           self.command_writer.write_command('tof_scan', 1000)
         time.sleep(0.5)
         self.command_writer.write_command('none', 1000)
 

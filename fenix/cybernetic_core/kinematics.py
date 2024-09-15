@@ -1183,6 +1183,29 @@ class FenixKinematics:
         self.add_angles_snapshot('endpoint')
         self.body_to_center()
 
+    def play(self, leg_num=2):
+        x_move = 10
+        if leg_num == 2:
+            x_move = -10
+        self.logger.info(f'Processing leg {leg_num} body_compensation_for_a_leg')
+        self.body_compensation_for_a_leg(leg_num)
+        self.logger.info(f'Processing leg {leg_num} move_end_point 1')
+        self.legs[leg_num].move_end_point(10, -x_move, 5)
+        self.add_angles_snapshot('endpoint')
+        self.logger.info(f'Processing leg {leg_num} move_end_point 2')
+        self.legs[leg_num].move_end_point(-15, 2*x_move, 3)
+        self.add_angles_snapshot('endpoint')
+        self.logger.info(f'Processing leg {leg_num} move_end_point 3')
+        self.legs[leg_num].move_end_point(15, -2*x_move, -3)
+        self.add_angles_snapshot('endpoint')
+        self.logger.info(f'Processing leg {leg_num} move_end_point 4')
+        self.legs[leg_num].move_end_point(-10, x_move, 0)
+        self.add_angles_snapshot('endpoint')
+        self.logger.info(f'Processing leg {leg_num} move_end_point 5')
+        self.legs[leg_num].move_end_point(0, 0, -5)
+        self.add_angles_snapshot('endpoint')
+        self.body_to_center()
+
     # dance moves
     def opposite_legs_up(self, leg_up, leg_forward):
         for leg in [self.legs[1], self.legs[3]]:

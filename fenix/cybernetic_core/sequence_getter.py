@@ -1,6 +1,7 @@
 from typing import List, Tuple
 import sys
 import os
+import math
 from joblib import Memory
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from cybernetic_core.kinematics import FenixKinematics
@@ -59,6 +60,11 @@ class VirtualFenix():
     def get_height(self, fenix_position: List[float]):
         fk = FenixKinematics(fenix_position=fenix_position)
         return fk.height + 13
+
+    def get_leg_angle_to_surface(self, fenix_position: List[float], leg_num: int):
+        fk = FenixKinematics(fenix_position=fenix_position)
+        print(math.degrees(fk.legs[leg_num].alpha), math.degrees(fk.legs[leg_num].beta))
+        return math.degrees(fk.legs[leg_num].alpha - fk.legs[leg_num].beta)
 
 #@cache
 #@memory.cache
@@ -255,7 +261,7 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
     elif command == 'hit_1':
         fk.hit(1)
     elif command == 'hit_2':
-        fk.hit(2)
+        fk.play(2)
     elif command == 'climb_2_legs':
         fk.climb_2_legs(10)
     elif command == 'descend_2_legs':
