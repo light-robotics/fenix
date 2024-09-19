@@ -9,6 +9,7 @@ from cybernetic_core.kinematics import FenixKinematics
 from cybernetic_core.sequence_getter import VirtualFenix
 from core.utils.multiphase_moves import CommandsForwarder
 from fenix_hardware.fenix_tof_cam import FenixTofCamera
+from fenix_hardware.fenix_tof_sensor import FenixTofs
 from hardware.mpu6050_avg import single_scan
 import configs.code_config as code_config
 import configs.config as config
@@ -29,7 +30,8 @@ class MovementProcessor:
         fk = FenixKinematics()
         self.vf = VirtualFenix(self.logger)
         self.cf = CommandsForwarder()
-        self.ftc = FenixTofCamera()
+        self.ftfs = FenixTofs()
+        #self.ftc = FenixTofCamera()
         
         self.fenix_position = fk.current_position
 
@@ -175,6 +177,15 @@ class MovementProcessor:
                     self.fs.disable_torque()
                 elif command == 'enable_torque':
                     self.fs.enable_torque()
+                elif command == 'tof_scan':                    
+                    self.execute_command("leg2_up", 1000)
+                    time.sleep(2.0)
+                    angle = self.vf.get_leg_angle_to_surface(self.fenix_position, 1)
+                    data_1 = self.ftfs.calculate_touch(0, angle) + 4
+                    print(f'Moving down for {data_1} cm')
+                    self.execute_command(f"leg2_down_{data_1}", 1000)
+                    #self.execute_command("leg2_down", 1000)
+                    """
                 elif command == 'tof_scan':
                     self.execute_command('up_16', 500)
                     self.execute_command('look_down', 500)
@@ -183,7 +194,7 @@ class MovementProcessor:
                     time.sleep(1)
                     current_height = round(self.vf.get_height(self.fenix_position))
                     roll = single_scan()
-                    self.ftc.read_depth(current_height, roll)
+                    #self.ftc.read_depth(current_height, roll)
                     time.sleep(1)
                     self.execute_command('look_up', 500)
                     self.execute_command('look_up', 500)
@@ -194,15 +205,15 @@ class MovementProcessor:
                     time.sleep(1)
                     for _ in range(3):
                         current_height = self.vf.get_height(self.fenix_position)
-                        self.ftc.read_depth(current_height)
+                        #self.ftc.read_depth(current_height)
                         self.execute_command('up_4', 500)
                         time.sleep(1)
                     current_height = self.vf.get_height(self.fenix_position)
-                    self.ftc.read_depth(current_height)
+                    #self.ftc.read_depth(current_height)
                     time.sleep(1)
                     self.execute_command('down_12', 1000)
                     self.execute_command('body_backward_8', 1000)
-                        #
+                    """
                 else:
                     try:
                         self.execute_command(command, speed)

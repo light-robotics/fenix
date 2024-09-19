@@ -15,7 +15,7 @@ class FnxVL51L1X(VL53L1X):
     
     def get_data(self):
         for _ in range(3):
-            data = round(self.get_distance()*0.92, 1)
+            data = round(self.get_distance()*0.88, 1)
             if data > 0:
                 return data
         return None

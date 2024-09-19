@@ -461,18 +461,33 @@ class FenixKinematics:
         self.logger.info(f'Processing body to center')
         self.body_to_center()
     """
-    def move_body_straight(self, delta_x, delta_y, leg_seq=[1, 3, 4, 2]):
-        self.body_movement(5, 0, 0)
+    def move_body_straight_(self, delta_x, delta_y, leg_seq=[1, 3, 4, 2]):
+        self.body_movement(4, 0, 0)
         self.move_leg_endpoint(3, [delta_x, delta_y, cfg.fenix["leg_up"][1]])
         self.move_leg_endpoint(3, [0, 0, -cfg.fenix["leg_up"][1]])
         self.move_leg_endpoint(4, [delta_x, delta_y, cfg.fenix["leg_up"][1]])
         self.move_leg_endpoint(4, [0, 0, -cfg.fenix["leg_up"][1]])
 
-        self.body_movement(-10, 0, 0)
+        self.body_movement(-8, 0, 0)
         self.move_leg_endpoint(1, [delta_x, delta_y, cfg.fenix["leg_up"][1]])
         self.move_leg_endpoint(1, [0, 0, -cfg.fenix["leg_up"][1]])
         self.move_leg_endpoint(2, [delta_x, delta_y, cfg.fenix["leg_up"][1]])
         self.move_leg_endpoint(2, [0, 0, -cfg.fenix["leg_up"][1]])
+        
+        self.body_to_center()
+
+    def move_body_straight(self, delta_x, delta_y, leg_seq=[1, 3, 4, 2]):
+        self.body_movement(-4, 0, 0)
+        self.move_leg_endpoint(1, [delta_x, delta_y, cfg.fenix["leg_up"][1]])
+        self.move_leg_endpoint(1, [0, 0, -cfg.fenix["leg_up"][1]])
+        self.move_leg_endpoint(2, [delta_x, delta_y, cfg.fenix["leg_up"][1]])
+        self.move_leg_endpoint(2, [0, 0, -cfg.fenix["leg_up"][1]])
+
+        self.body_movement(16, 0, 0)
+        self.move_leg_endpoint(3, [delta_x, delta_y, cfg.fenix["leg_up"][1]])
+        self.move_leg_endpoint(3, [0, 0, -cfg.fenix["leg_up"][1]])
+        self.move_leg_endpoint(4, [delta_x, delta_y, cfg.fenix["leg_up"][1]])
+        self.move_leg_endpoint(4, [0, 0, -cfg.fenix["leg_up"][1]])
         
         self.body_to_center()
 

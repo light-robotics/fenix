@@ -266,8 +266,54 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int]) -> 
         fk.climb_2_legs(10)
     elif command == 'descend_2_legs':
         fk.descend_2_legs(10)
-    elif command == 'double_back':
-        fk.body_movement(0, -3*FORWARD_BODY_CM, 0)
+    elif command == 'leg2_up':
+        fk.body_compensation_for_a_leg(2)
+        fk.move_leg_endpoint(2, [0, 0, 14])
+    elif command == 'leg2_down':
+        fk.move_leg_endpoint(2, [0, 0, -6])
+        fk.body_to_center()
+    elif command == 'leg2_down_1':
+        fk.move_leg_endpoint(2, [0, 0, -1])
+        fk.body_to_center()
+    elif command == 'leg2_down_2':
+        fk.move_leg_endpoint(2, [0, 0, -2])
+        fk.body_to_center()
+    elif command == 'leg2_down_3':
+        fk.move_leg_endpoint(2, [0, 0, -3])
+        fk.body_to_center()
+    elif command == 'leg2_down_4':
+        fk.move_leg_endpoint(2, [0, 0, -4])
+        fk.body_to_center()
+    elif command == 'leg2_down_5':
+        fk.move_leg_endpoint(2, [0, 0, -5])
+        fk.body_to_center()
+    elif command == 'leg2_down_6':
+        fk.move_leg_endpoint(2, [0, 0, -6])
+        fk.body_to_center()
+    elif command == 'leg2_down_7':
+        fk.move_leg_endpoint(2, [0, 0, -7])
+        fk.body_to_center()
+    elif command == 'leg2_down_8':
+        fk.move_leg_endpoint(2, [0, 0, -8])
+        fk.body_to_center()
+    elif command == 'leg2_down_9':
+        fk.move_leg_endpoint(2, [0, 0, -9])
+        fk.body_to_center()
+    elif command == 'leg2_down_10':
+        fk.move_leg_endpoint(2, [0, 0, -10])
+        fk.body_to_center()
+    elif command == 'leg2_down_11':
+        fk.move_leg_endpoint(2, [0, 0, -11])
+        fk.body_to_center()
+    elif command == 'leg2_down_12':
+        fk.move_leg_endpoint(2, [0, 0, -12])
+        fk.body_to_center()
+    elif command == 'leg2_down_13':
+        fk.move_leg_endpoint(2, [0, 0, -13])
+        fk.body_to_center()
+    elif command == 'leg2_down_14':
+        fk.move_leg_endpoint(2, [0, 0, -14])
+        fk.body_to_center()
     else:
         print(f'Unknown command')
     

@@ -33,6 +33,7 @@ if __name__ == "__main__":
     cam.setControl(ac.TOFControl.RANG,MAX_DISTANCE)
 
     frame = cam.requestFrame(200)
+    print(frame)
     if frame != None:
         depth_buf = frame.getDepthData()
         amplitude_buf = frame.getAmplitudeData()

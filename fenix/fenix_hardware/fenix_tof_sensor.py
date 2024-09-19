@@ -31,6 +31,7 @@ class FenixTofs:
         target = calculate_target(angle)
         data = self.get_data(sensor_num)
         print(f'Angle: {angle}. Target: {target}. Data: {data}')
+        return round((data - 115)/10)
 
 
 if __name__ == '__main__':
