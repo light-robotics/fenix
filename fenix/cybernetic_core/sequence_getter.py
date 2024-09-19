@@ -269,11 +269,19 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int], kwa
     elif command == 'leg_up_adjusted':
         leg_num = kwargs["leg_num"]
         fk.body_compensation_for_a_leg(leg_num)
-        fk.move_leg_endpoint(leg_num, [-3, 5, 15])
+        if leg_num == 1:
+            x_value = 3
+        else:
+            x_value = -3
+        fk.move_leg_endpoint(leg_num, [3, x_value, 15])
     elif command == 'leg_down_adjusted':
         leg_num = kwargs["leg_num"]
         leg_down = kwargs["leg_down"]
-        fk.move_leg_endpoint(leg_num, [3, 3, leg_down])
+        if leg_num == 1:
+            x_value = -3
+        else:
+            x_value = 3
+        fk.move_leg_endpoint(leg_num, [5, x_value, -leg_down])
         fk.body_to_center()
     elif command == 'leg2_up':
         fk.body_compensation_for_a_leg(2)

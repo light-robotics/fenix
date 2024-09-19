@@ -185,7 +185,13 @@ class MovementProcessor:
                     data_1 = self.ftfs.calculate_touch(0, angle) + 4
                     print(f'Moving down for {data_1} cm')
                     self.execute_command(f"leg_down_adjusted", 1000, {"leg_num": 2, "leg_down": data_1})
-                    #self.execute_command("leg2_down", 1000)
+
+                    self.execute_command("leg_up_adjusted", 1000, {"leg_num": 1})
+                    time.sleep(2.0)
+                    angle = self.vf.get_leg_angle_to_surface(self.fenix_position, 2)
+                    data_2 = self.ftfs.calculate_touch(1, angle) + 4
+                    print(f'Moving down for {data_2} cm')
+                    self.execute_command(f"leg_down_adjusted", 1000, {"leg_num": 1, "leg_down": data_2})
                     """
                 elif command == 'tof_scan':
                     self.execute_command('up_16', 500)
