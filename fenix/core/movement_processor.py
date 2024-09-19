@@ -7,6 +7,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from cybernetic_core.kinematics import FenixKinematics
 from cybernetic_core.sequence_getter import VirtualFenix
+from cybernetic_core.geometry.angles import AnglesException
 from core.utils.multiphase_moves import CommandsForwarder
 from fenix_hardware.fenix_tof_cam import FenixTofCamera
 from fenix_hardware.fenix_tof_sensor import FenixTofs
@@ -78,7 +79,7 @@ class MovementProcessor:
         self.max_processed_command_id = command_id
         return command, int(contents[2])
 
-    def execute_command(self, command: str, speed: int) -> None:
+    def execute_command(self, command: str, speed: int, kwargs=None) -> None:
         if self.speed != speed:
             if not code_config.DEBUG:
                 self.fs.set_speed(speed)
@@ -99,7 +100,7 @@ class MovementProcessor:
             if command == 'none':
                 time.sleep(0.1)
             else:    
-                self.run_sequence(command)
+                self.run_sequence(command, kwargs)
 
     def move_function_dispatch(self, command: str) -> Callable:
         if command in ['hit_1', 'hit_2', 'forward_one_legged']:
@@ -114,7 +115,7 @@ class MovementProcessor:
             #return self.fs.set_servo_values_not_paced_v2
             return self.fs.set_servo_values_paced
                         
-    def run_sequence(self, command: str) -> None:
+    def run_sequence(self, command: str, kwargs) -> None:
         if command == 'overcome_obstacle':
             with open('/fenix/fenix/wrk/obstacles_sequence', 'rb') as f:
                 sequence = pickle.load(f)
@@ -124,14 +125,14 @@ class MovementProcessor:
                 self.logger.info(f'MOVE. Trying command {command}')
                 before_sequence_time = datetime.datetime.now()
                 #sequence, new_position = get_sequence_for_command_cached(command, self.fenix_position)
-                sequence, new_position = self.vf.get_sequence(command, self.fenix_position)
+                sequence, new_position = self.vf.get_sequence(command, self.fenix_position, kwargs)
                 
                 if sequence is None:
                     self.logger.info(f'MOVE. Command aborted')
                     return
                 self.logger.info(f'[TIMING] Sequence calculation took : {datetime.datetime.now() - before_sequence_time}')
                 self.fenix_position = new_position[:]
-            except ValueError as e:
+            except (ValueError, AnglesException) as e:
                 print(f'MOVE Failed. Could not process command - {str(e)}')
                 self.logger.info(f'MOVE Failed. Could not process command - {str(e)}')
                 time.sleep(0.3)
@@ -178,12 +179,12 @@ class MovementProcessor:
                 elif command == 'enable_torque':
                     self.fs.enable_torque()
                 elif command == 'tof_scan':                    
-                    self.execute_command("leg2_up", 1000)
+                    self.execute_command("leg_up_adjusted", 1000, {"leg_num": 2})
                     time.sleep(2.0)
                     angle = self.vf.get_leg_angle_to_surface(self.fenix_position, 1)
                     data_1 = self.ftfs.calculate_touch(0, angle) + 4
                     print(f'Moving down for {data_1} cm')
-                    self.execute_command(f"leg2_down_{data_1}", 1000)
+                    self.execute_command(f"leg_down_adjusted", 1000, {"leg_num": 2, "leg_down": data_1})
                     #self.execute_command("leg2_down", 1000)
                     """
                 elif command == 'tof_scan':

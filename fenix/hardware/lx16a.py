@@ -81,8 +81,11 @@ class LX16A:
         self.port = port
 
     def reset(self) -> None:
+        print('............. Resetting .............')
+        time.sleep(0.1)
         self.serial = Serial(self.port, baudrate=115200, timeout=0.001)
-        self.serial.setDTR(1)     
+        self.serial.setDTR(1)
+        time.sleep(0.1)
 
     # send the packet with header and checksum
     def send_packet(self, packet: bytes) -> None:
