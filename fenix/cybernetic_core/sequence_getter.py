@@ -66,6 +66,10 @@ class VirtualFenix():
         print(math.degrees(fk.legs[leg_num].alpha), math.degrees(fk.legs[leg_num].beta))
         return math.degrees(fk.legs[leg_num].alpha - fk.legs[leg_num].beta)
 
+    def get_legs_zs(self, fenix_position: list[float]):
+        fk = FenixKinematics(fenix_position=fenix_position)
+        return [leg.O.z - leg.C.z for leg in fk.legs.values()]
+
 #@cache
 #@memory.cache
 def get_sequence_for_command_cached(command: str, fenix_position: List[int], kwargs) -> Sequence:
@@ -266,14 +270,18 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int], kwa
         fk.climb_2_legs(10)
     elif command == 'descend_2_legs':
         fk.descend_2_legs(10)
+    elif command == 'back_8':
+        fk.body_movement(-8, 0, 0)
     elif command == 'leg_up_adjusted':
         leg_num = kwargs["leg_num"]
-        fk.body_compensation_for_a_leg(leg_num)
+        leg_up = kwargs["leg_up"]
+        #fk.body_compensation_for_a_leg(leg_num)
         if leg_num == 1:
             x_value = 3
         else:
             x_value = -3
-        fk.move_leg_endpoint(leg_num, [3, x_value, 15])
+        fk.move_leg_endpoint(leg_num, [3, x_value, leg_up])
+        print(f'{leg_num, [3, x_value, leg_up]}')
     elif command == 'leg_down_adjusted':
         leg_num = kwargs["leg_num"]
         leg_down = kwargs["leg_down"]
@@ -282,6 +290,15 @@ def get_sequence_for_command_cached(command: str, fenix_position: List[int], kwa
         else:
             x_value = 3
         fk.move_leg_endpoint(leg_num, [5, x_value, -leg_down])
+        #fk.body_to_center()
+    elif command == "back_legs":
+        fk.body_movement(8, 0, 0)
+        for leg_num in [3, 4]:
+            fk.body_compensation_for_a_leg(leg_num)
+            fk.move_leg_endpoint(leg_num, [8, 0, 5])
+            fk.move_leg_endpoint(leg_num, [0, 0, -5])
+        fk.body_to_center()
+    elif command == 'body_to_center':
         fk.body_to_center()
     elif command == 'leg2_up':
         fk.body_compensation_for_a_leg(2)
