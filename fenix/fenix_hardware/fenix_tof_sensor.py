@@ -19,13 +19,13 @@ def calculate_target(angle):
 
 class FenixTofs:
     def __init__(self):
-        self.tofs = [
+        self.tofs: list[FnxVL51L1X] = [
             FnxVL51L1X(i2c_bus=1, i2c_address=0x29),
             FnxVL51L1X(i2c_bus=1, i2c_address=0x2a)
         ]
 
     def get_data(self, sensor_num):
-        return self.tofs[sensor_num].get_data()
+        return self.tofs[sensor_num].get_averaged_data() #get_data()
     
     def calculate_touch(self, sensor_num, angle):
         target = calculate_target(angle)

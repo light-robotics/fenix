@@ -153,6 +153,9 @@ class FenixServos:
         
         for s in range(50):
             self.logger.info(f'Step {s}')
+            #with open("/fenix/fenix/wrk/gyroaccel_data.txt", "r") as f:
+            #    ga_data = f.readline()
+            #self.logger.info(f"GA_DATA: {ga_data}")
             #time.sleep(0.02)
             
             current_angles = self.get_current_angles()

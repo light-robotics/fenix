@@ -31,7 +31,7 @@ class MovementProcessor:
         fk = FenixKinematics()
         self.vf = VirtualFenix(self.logger)
         self.cf = CommandsForwarder()
-        self.ftfs = FenixTofs()
+        #self.ftfs = FenixTofs()
         #self.ftc = FenixTofCamera()
         
         self.fenix_position = fk.current_position
@@ -115,7 +115,7 @@ class MovementProcessor:
             #return self.fs.set_servo_values_not_paced_v2
             return self.fs.set_servo_values_paced
                         
-    def run_sequence(self, command: str, kwargs) -> None:
+    def run_sequence(self, command: str, kwargs=None) -> None:
         if command == 'overcome_obstacle':
             with open('/fenix/fenix/wrk/obstacles_sequence', 'rb') as f:
                 sequence = pickle.load(f)
@@ -178,68 +178,9 @@ class MovementProcessor:
                     self.fs.disable_torque()
                 elif command == 'enable_torque':
                     self.fs.enable_torque()
-                elif command == 'tof_scan':
-                    self.execute_command("back_8", 1000)
-                    legs_zs = self.vf.get_legs_zs(self.fenix_position)
-                    print(f'legs_zs: {legs_zs}')
-                    self.execute_command(
-                        "leg_up_adjusted", 
-                        1000, 
-                        {
-                            "leg_num": 2, 
-                            "leg_up": 35 - legs_zs[1]
-                        }
-                    )
-                    time.sleep(2.0)
+                #elif command == 'tof_scan':
+                #    self.move_with_scan()
                     
-                    angle = self.vf.get_leg_angle_to_surface(self.fenix_position, 1)
-                    data_1 = self.ftfs.calculate_touch(0, angle) + 4
-                    print(f'Moving down for {data_1} cm')
-                    self.execute_command(f"leg_down_adjusted", 1000, {"leg_num": 2, "leg_down": data_1})
-
-                    self.execute_command(
-                        "leg_up_adjusted", 
-                        1000, 
-                        {
-                            "leg_num": 1, 
-                            "leg_up": 35 - legs_zs[0]
-                        }
-                    )
-                    time.sleep(2.0)
-                    angle = self.vf.get_leg_angle_to_surface(self.fenix_position, 2)
-                    data_2 = self.ftfs.calculate_touch(1, angle) + 5
-                    print(f'Moving down for {data_2} cm')
-                    self.execute_command(f"leg_down_adjusted", 1000, {"leg_num": 1, "leg_down": data_2})
-                    self.execute_command("back_legs", 1000)
-                    """
-                elif command == 'tof_scan':
-                    self.execute_command('up_16', 500)
-                    self.execute_command('look_down', 500)
-                    self.execute_command('look_down', 500)
-                    self.execute_command('look_down', 500)
-                    time.sleep(1)
-                    current_height = round(self.vf.get_height(self.fenix_position))
-                    roll = single_scan()
-                    #self.ftc.read_depth(current_height, roll)
-                    time.sleep(1)
-                    self.execute_command('look_up', 500)
-                    self.execute_command('look_up', 500)
-                    self.execute_command('look_up', 500)
-                    self.execute_command('down_16', 1000)
-                elif command == 'tof_scan2':
-                    self.execute_command('body_forward_8', 500)
-                    time.sleep(1)
-                    for _ in range(3):
-                        current_height = self.vf.get_height(self.fenix_position)
-                        #self.ftc.read_depth(current_height)
-                        self.execute_command('up_4', 500)
-                        time.sleep(1)
-                    current_height = self.vf.get_height(self.fenix_position)
-                    #self.ftc.read_depth(current_height)
-                    time.sleep(1)
-                    self.execute_command('down_12', 1000)
-                    self.execute_command('body_backward_8', 1000)
-                    """
                 else:
                     try:
                         self.execute_command(command, speed)
@@ -250,6 +191,71 @@ class MovementProcessor:
 
         except KeyboardInterrupt:
             print('Movement stopped')
+
+    def tof_scan(self, command):
+        if command == 'tof_scan':
+            self.execute_command('up_16', 500)
+            self.execute_command('look_down', 500)
+            self.execute_command('look_down', 500)
+            self.execute_command('look_down', 500)
+            time.sleep(1)
+            current_height = round(self.vf.get_height(self.fenix_position))
+            roll = single_scan()
+            #self.ftc.read_depth(current_height, roll)
+            time.sleep(1)
+            self.execute_command('look_up', 500)
+            self.execute_command('look_up', 500)
+            self.execute_command('look_up', 500)
+            self.execute_command('down_16', 1000)
+        elif command == 'tof_scan2':
+            self.execute_command('body_forward_8', 500)
+            time.sleep(1)
+            for _ in range(3):
+                current_height = self.vf.get_height(self.fenix_position)
+                #self.ftc.read_depth(current_height)
+                self.execute_command('up_4', 500)
+                time.sleep(1)
+            current_height = self.vf.get_height(self.fenix_position)
+            #self.ftc.read_depth(current_height)
+            time.sleep(1)
+            self.execute_command('down_12', 1000)
+            self.execute_command('body_backward_8', 1000)
+
+    def move_with_scan(self):
+        self.execute_command("back_legs", 1000)
+        self.execute_command("back_8", 1000)
+        legs_zs = self.vf.get_legs_zs(self.fenix_position)
+        print(f'legs_zs: {legs_zs}')
+        self.execute_command(
+            "leg_up_adjusted", 
+            1000, 
+            {
+                "leg_num": 2, 
+                "leg_up": 34 - legs_zs[1]
+            }
+        )
+        time.sleep(2.0)
+        
+        angle = self.vf.get_leg_angle_to_surface(self.fenix_position, 1)
+        data_1 = min(16, self.ftfs.calculate_touch(0, angle) + 7)
+        print(f'Moving down for {data_1} cm')
+        self.execute_command(f"leg_down_adjusted", 1000, {"leg_num": 2, "leg_down": data_1})
+
+        self.execute_command(
+            "leg_up_adjusted", 
+            1000, 
+            {
+                "leg_num": 1, 
+                "leg_up": 34 - legs_zs[0]
+            }
+        )
+        time.sleep(2.0)
+        angle = self.vf.get_leg_angle_to_surface(self.fenix_position, 2)
+        data_2 = min(16, self.ftfs.calculate_touch(1, angle) + 7)
+        print(f'Moving down for {data_2} cm')
+        self.execute_command(f"leg_down_adjusted", 1000, {"leg_num": 1, "leg_down": data_2})
+        self.execute_command("body_to_center", 1000)       
+
 
 if __name__ == '__main__':
     MP = MovementProcessor()
