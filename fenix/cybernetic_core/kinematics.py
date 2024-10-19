@@ -240,7 +240,7 @@ class FenixKinematics:
         O1 = Point(cfg.leg["mount_point_offset"],
                    cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
-        D1 = Point(self.legs_offset_h_x,
+        D1 = Point(self.legs_offset_h_x - cfg.start["x_offset_body"],
                    self.legs_offset_h_y - cfg.start["y_offset_body"],
                    0)
         self.logger.info('[Init] Initiating leg 1')
@@ -249,7 +249,7 @@ class FenixKinematics:
         O2 = Point(cfg.leg["mount_point_offset"],
                    -cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
-        D2 = Point(self.legs_offset_h_x,
+        D2 = Point(self.legs_offset_h_x - cfg.start["x_offset_body"],
                    -self.legs_offset_h_y - cfg.start["y_offset_body"],
                    0)
         self.logger.info('[Init] Initiating leg 2')
@@ -258,7 +258,7 @@ class FenixKinematics:
         O3 = Point(-cfg.leg["mount_point_offset"],
                    -cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
-        D3 = Point(-self.legs_offset_h_x,
+        D3 = Point(-self.legs_offset_h_x - cfg.start["x_offset_body"],
                    -self.legs_offset_h_y - cfg.start["y_offset_body"],
                    0)
         self.logger.info('[Init] Initiating leg 3')
@@ -267,7 +267,7 @@ class FenixKinematics:
         O4 = Point(-cfg.leg["mount_point_offset"],
                    cfg.leg["mount_point_offset"],
                    self.legs_offset_v)
-        D4 = Point(-self.legs_offset_h_x,
+        D4 = Point(-self.legs_offset_h_x - cfg.start["x_offset_body"],
                    self.legs_offset_h_y - cfg.start["y_offset_body"],
                    0)
         self.logger.info('[Init] Initiating leg 4')
@@ -337,7 +337,7 @@ class FenixKinematics:
         if abs(delta_x) + abs(delta_y) != 0:
             self.reposition_legs(delta_x, delta_y)
     
-    def body_delta_xy(self, delta_y=cfg.start["y_offset_body"], delta_x=0):
+    def body_delta_xy(self, delta_y=cfg.start["y_offset_body"], delta_x=cfg.start["x_offset_body"]):
         # move body to center
         avg_o_x, avg_o_y, avg_d_x, avg_d_y = 0, 0, 0, 0
         for leg in self.legs.values():
@@ -355,7 +355,7 @@ class FenixKinematics:
                 round(avg_o_y - avg_d_y - delta_y, 2)]
                            
 
-    def body_to_center(self, delta_y=cfg.start["y_offset_body"], delta_x=0, snapshot=True):
+    def body_to_center(self, delta_y=cfg.start["y_offset_body"], delta_x=cfg.start["x_offset_body"], snapshot=True):
         # move body to center
         
         body_delta_xy = self.body_delta_xy(delta_y, delta_x)
@@ -477,13 +477,13 @@ class FenixKinematics:
         self.body_to_center()
 
     def move_body_straight(self, delta_x, delta_y, leg_seq=[1, 3, 4, 2]):
-        self.body_movement(-4, 0, 0)
+        self.body_movement(-10, 0, 0)
         self.move_leg_endpoint(1, [delta_x, delta_y, cfg.fenix["leg_up"][1]])
         self.move_leg_endpoint(1, [0, 0, -cfg.fenix["leg_up"][1]])
         self.move_leg_endpoint(2, [delta_x, delta_y, cfg.fenix["leg_up"][1]])
         self.move_leg_endpoint(2, [0, 0, -cfg.fenix["leg_up"][1]])
 
-        self.body_movement(16, 0, 0)
+        self.body_movement(18, 0, 0)
         self.move_leg_endpoint(3, [delta_x, delta_y, cfg.fenix["leg_up"][1]])
         self.move_leg_endpoint(3, [0, 0, -cfg.fenix["leg_up"][1]])
         self.move_leg_endpoint(4, [delta_x, delta_y, cfg.fenix["leg_up"][1]])
@@ -744,10 +744,15 @@ class FenixKinematics:
         # legs 1 and 2 up
         self.body_movement(0, 0, delta_z)
         tst_leg_up = 7
-        self.body_movement(-3, 0, 0)
+        #self.body_movement(-3, 0, 0)
+        self.body_movement(-9, 0, 0) # 
         step_length = 8
+        #self.legs[1].move_end_point(0, 0, 30) # 
+        #self.add_angles_snapshot('endpoint') # 
+        #self.legs[1].move_end_point(0, 0, -30) # 
+        #self.add_angles_snapshot('endpoint') #
 
-        for leg_number in [1, 2]:            
+        for leg_number in [1, 2]:
             self.legs[leg_number].move_end_point(0, 0, delta_z + tst_leg_up)
             self.add_angles_snapshot('endpoint')
             self.legs[leg_number].move_end_point(step_length, 0, 0)
@@ -755,7 +760,8 @@ class FenixKinematics:
             self.legs[leg_number].move_end_point(0, 0, -tst_leg_up)
             self.add_angles_snapshot('endpoint')
         
-        self.body_movement(step_length + 6, 0, 0)
+        #self.body_movement(step_length + 6, 0, 0)
+        self.body_movement(step_length + 12, 0, 0) #
 
         for leg_number in [3, 4]:            
             self.legs[leg_number].move_end_point(step_length, 0, tst_leg_up)
