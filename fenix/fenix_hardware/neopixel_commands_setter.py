@@ -25,6 +25,9 @@ class NeopixelCommandsSetter:
             'steady'            : f'steady,{color},255',
             'running_diodes'    : f'running_diodes,{color},255'
         }
-        command_out = commands_mapper[command_in]
+        if command_in.isnumeric():
+            command_out = f'{command_in},white,255'
+        else:
+            command_out = commands_mapper[command_in]
         
         self.write_command(command_out)

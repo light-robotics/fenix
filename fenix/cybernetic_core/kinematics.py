@@ -416,6 +416,7 @@ class FenixKinematics:
         self.compensated_leg_movement(leg_num, [delta_x, delta_y, self.leg_up_single])
         self.logger.info(f'Processing leg {leg_num} move_end_point {[0, 0, -self.leg_up_single]}')
         self.move_leg_endpoint(leg_num, [0, 0, -self.leg_up_single])
+        self.add_angles_snapshot('endpoint')
         #self.compensated_leg_movement(leg_num, [0, 0, -self.leg_up])
 
     def leg_move_obstacled(self, leg_num, delta_x, delta_y, obstacle_z=0, move_type:int = 1):
@@ -453,7 +454,7 @@ class FenixKinematics:
         #    print(f'Delta {leg_num} : [{round(leg.D.x - leg.O.x, 2)}, {round(leg.D.y - leg.O.y, 2)}, {round(leg.D.z - leg.O.z, 2)}]')
         
     # 1-legged movements
-    """
+    
     def move_body_straight(self, delta_x, delta_y, leg_seq=[1, 3, 4, 2]):
         for leg_number in leg_seq:
             self.logger.info(f'Processing leg {leg_number} with compensation')
@@ -490,7 +491,7 @@ class FenixKinematics:
         self.move_leg_endpoint(4, [0, 0, -cfg.fenix["leg_up"][1]])
         
         self.body_to_center()
-
+    """
     """
     Two phased moves
     """

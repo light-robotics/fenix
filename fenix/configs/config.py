@@ -5,7 +5,7 @@ obstacle = {
 
 leg = {
     "a": 15,    # PointA to PointB - femur
-    "b": 18,    # PointB to PointC - femur-tibia
+    "b": 15.5, # 18,    # PointB to PointC - femur-tibia
     "d": 6.5,    # PointO to PointA - trochanter-coxa
     "mount_point_offset": 3.8, # ???
     #"phi_angle" : -22.5 # angle fix due to leg not being straight
@@ -13,25 +13,25 @@ leg = {
 
 start = {
     "vertical"                 : 8,
-    "horizontal_x"             : 15, # 15
-    "horizontal_y"             : 15, # 15
-    "x_offset_body"            : -1,
+    "horizontal_x"             : 16, # 15
+    "horizontal_y"             : 16, # 15
+    "x_offset_body"            : 0,
     "y_offset_body"            : 0,
     "initial_z_position_delta" : 5, # 3
 }
 
 modes = {
     "run_mode" : {
-        "x": 15,
-        "y": 15,
+        "x": 16,
+        "y": 16,
     },
     "sentry_mode" : {
         "x": 15,
         "y": 15,
     },
     "walking_mode" : {
-        "x": 15,
-        "y": 15,
+        "x": 18,
+        "y": 18,
     },
     "battle_mode" : {
         "x": 15,
@@ -40,15 +40,15 @@ modes = {
 }
 
 speed = {
-    "run" : 200,
+    "run" : 350,
     "hit" : 500,
 }
 
 moves = {
     "up_or_down_cm"         : 6,
     "move_body_cm"          : 7,
-    "forward_body_1_leg_cm" : 12,
-    "forward_body_2_leg_cm" : 9,    
+    "forward_body_1_leg_cm" : 10,
+    "forward_body_2_leg_cm" : 7,    
     "reposition_cm"         : 1,
     "side_look_angle"       : 12,
     "vertical_look_angle"   : 6,
@@ -56,12 +56,12 @@ moves = {
 
 fenix = {
     "margin": {
-        1: 5,
+        1: 2,
         2: 6
     },
     "leg_up": {
-        1: 7,
-        2: 3
+        1: 10,
+        2: 4
     },
     # parameters for moving further, when moving with feedback
     "servos": {

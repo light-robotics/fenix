@@ -32,7 +32,12 @@ class NeopixelCommandsReader():
                     continue
                 
                 mode, color, brightness = contents
-                self.neopixel.activate_mode(mode, color, int(brightness))
+                kwargs = None
+                if mode.isnumeric():
+                    kwargs = {'parts': mode}
+                    mode = 'steady_partial'
+                    
+                self.neopixel.activate_mode(mode, color, int(brightness), kwargs)
                 prev_command = command
                 time.sleep(0.1)
             except KeyboardInterrupt:

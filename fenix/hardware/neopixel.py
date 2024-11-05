@@ -52,8 +52,8 @@ class Neopixel:
         # Intialize the library (must be called once before other functions).
         self.strip.begin()        
 
-    def activate_mode(self, mode: str, color_str: str, brightness: int) -> None:
-        print(f'Activating mode {mode} - {color_str} - {brightness}')
+    def activate_mode(self, mode: str, color_str: str, brightness: int, kwargs) -> None:
+        print(f'Activating mode {mode} - {color_str} - {brightness} - {kwargs}')
         color = self.colors[color_str]
         #self.strip.setBrightness(brigthness)
 
@@ -78,6 +78,8 @@ class Neopixel:
             self.activation(color, brightness)
         if mode == 'running_diodes':
             self.running_diodes(color, brightness)
+        if mode == 'steady_partial':
+            self.steady_color_partial(color, brightness, kwargs['parts'])
 
     def mode_cycle(self, mode: str, color_str: str, brightness: int) -> None:
         while True:
@@ -99,6 +101,34 @@ class Neopixel:
             self.strip.show()
             time.sleep(wait_ms / 1000.0)
     
+    def steady_color_partial(self, color: Color, brightness: int = 255, parts: str = '1111', wait_ms: int = 0) -> None:
+
+        # wait_ms introduces delay between pixels turning on
+        self.strip.setBrightness(brightness)
+        #print(f'Setting brightness to {brightness}')
+        turn_on_pixels = set()
+        if f'{parts}'[0] == '1':
+            turn_on_pixels.add(16)
+            turn_on_pixels.add(17)
+        if f'{parts}'[1] == '1':
+            turn_on_pixels.add(8)
+            turn_on_pixels.add(9)
+        if f'{parts}'[2] == '1':
+            turn_on_pixels.add(11)
+            turn_on_pixels.add(12)
+        if f'{parts}'[3] == '1':
+            turn_on_pixels.add(13)
+            turn_on_pixels.add(14)
+
+        for i in range(self.strip.numPixels()):
+            if i in turn_on_pixels:
+                self.strip.setPixelColor(i, color)
+            else:
+                self.strip.setPixelColor(i, self.colors['none'])
+            self.strip.show()
+
+            time.sleep(wait_ms / 1000.0)
+
     def blink(self, color: Color, brightness: int = 255, wait_ms: int = 10) -> None:
         self.steady_color(color)
         self.strip.setBrightness(brightness)
