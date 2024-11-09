@@ -112,8 +112,8 @@ class MovementProcessor:
             #return self.fs.set_servo_values_paced
         else:
             self.logger.info('Using function set_servo_values_not_paced_v2')
-            #return self.fs.set_servo_values_not_paced_v2
-            return self.fs.set_servo_values_paced
+            return self.fs.set_servo_values_not_paced_v2
+            #return self.fs.set_servo_values_paced
                         
     def run_sequence(self, command: str, kwargs=None) -> None:
         if command == 'overcome_obstacle':
@@ -131,7 +131,7 @@ class MovementProcessor:
                     self.logger.info(f'MOVE. Command aborted')
                     return
                 self.logger.info(f'[TIMING] Sequence calculation took : {datetime.datetime.now() - before_sequence_time}')
-                self.fenix_position = new_position[:]
+                self.fenix_position = new_position[:] # WTF?
             except (ValueError, AnglesException) as e:
                 print(f'MOVE Failed. Could not process command - {str(e)}')
                 self.logger.info(f'MOVE Failed. Could not process command - {str(e)}')
@@ -144,6 +144,7 @@ class MovementProcessor:
         if not code_config.DEBUG:
             move_function = self.move_function_dispatch(command)
 
+        original_move_function = move_function
         for move_snapshot in sequence:
             angles = move_snapshot.angles_snapshot[:]
             #if move_snapshot.move_type == 'body' and self.speed != self.body_speed:
@@ -152,10 +153,18 @@ class MovementProcessor:
                 self.fs.set_speed(self.body_speed)
             else:
                 self.fs.set_speed(self.speed)
-            self.logger.info(f'Moving to {angles}. Move type: {move_snapshot.move_type}')
+                        
+            if move_snapshot.move_type == 'touch':
+                self.logger.info('[MP] Using function set_servo_values_touching')
+                move_function = self.fs.set_servo_values_touching
+            else:
+                move_function = original_move_function
+
+            self.logger.info(f'[MP] Moving to {angles}. Move type: {move_snapshot.move_type}')
             self.logger.info(f'Speed: {self.fs.speed}')
             if not code_config.DEBUG:
                 move_function(angles)
+                #self.fenix_position = angles[:]
             else:
                 time.sleep(1.0)
         self.logger.info(f'[MOVE] finished: {datetime.datetime.now()}')
@@ -191,71 +200,6 @@ class MovementProcessor:
 
         except KeyboardInterrupt:
             print('Movement stopped')
-
-    def tof_scan(self, command):
-        if command == 'tof_scan':
-            self.execute_command('up_16', 500)
-            self.execute_command('look_down', 500)
-            self.execute_command('look_down', 500)
-            self.execute_command('look_down', 500)
-            time.sleep(1)
-            current_height = round(self.vf.get_height(self.fenix_position))
-            roll = single_scan()
-            #self.ftc.read_depth(current_height, roll)
-            time.sleep(1)
-            self.execute_command('look_up', 500)
-            self.execute_command('look_up', 500)
-            self.execute_command('look_up', 500)
-            self.execute_command('down_16', 1000)
-        elif command == 'tof_scan2':
-            self.execute_command('body_forward_8', 500)
-            time.sleep(1)
-            for _ in range(3):
-                current_height = self.vf.get_height(self.fenix_position)
-                #self.ftc.read_depth(current_height)
-                self.execute_command('up_4', 500)
-                time.sleep(1)
-            current_height = self.vf.get_height(self.fenix_position)
-            #self.ftc.read_depth(current_height)
-            time.sleep(1)
-            self.execute_command('down_12', 1000)
-            self.execute_command('body_backward_8', 1000)
-
-    def move_with_scan(self):
-        self.execute_command("back_legs", 1000)
-        self.execute_command("back_8", 1000)
-        legs_zs = self.vf.get_legs_zs(self.fenix_position)
-        print(f'legs_zs: {legs_zs}')
-        self.execute_command(
-            "leg_up_adjusted", 
-            1000, 
-            {
-                "leg_num": 2, 
-                "leg_up": 34 - legs_zs[1]
-            }
-        )
-        time.sleep(2.0)
-        
-        angle = self.vf.get_leg_angle_to_surface(self.fenix_position, 1)
-        data_1 = min(16, self.ftfs.calculate_touch(0, angle) + 7)
-        print(f'Moving down for {data_1} cm')
-        self.execute_command(f"leg_down_adjusted", 1000, {"leg_num": 2, "leg_down": data_1})
-
-        self.execute_command(
-            "leg_up_adjusted", 
-            1000, 
-            {
-                "leg_num": 1, 
-                "leg_up": 34 - legs_zs[0]
-            }
-        )
-        time.sleep(2.0)
-        angle = self.vf.get_leg_angle_to_surface(self.fenix_position, 2)
-        data_2 = min(16, self.ftfs.calculate_touch(1, angle) + 7)
-        print(f'Moving down for {data_2} cm')
-        self.execute_command(f"leg_down_adjusted", 1000, {"leg_num": 1, "leg_down": data_2})
-        self.execute_command("body_to_center", 1000)       
-
 
 if __name__ == '__main__':
     MP = MovementProcessor()

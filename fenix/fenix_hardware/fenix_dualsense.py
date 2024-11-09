@@ -280,6 +280,8 @@ class FenixDualSense(DualSense):
         #else:
         if self.mode == FenixModes.BATTLE:
            self.command_writer.write_command('hit_2', cfg.speed["hit"])
+        elif self.mode == FenixModes.WALKING:
+            self.command_writer.write_command('touching', 2000)           
         elif self.mode == FenixModes.RUN:
             self.command_writer.write_command('climb_2_legs', 500)
         elif self.mode in [FenixModes.SENTRY]:

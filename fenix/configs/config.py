@@ -56,7 +56,7 @@ moves = {
 
 fenix = {
     "margin": {
-        1: 2,
+        1: 4,
         2: 6
     },
     "leg_up": {
