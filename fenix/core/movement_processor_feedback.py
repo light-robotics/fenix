@@ -107,7 +107,7 @@ class MovementProcessor:
         for move in sequence:
             next_angles = get_angles_for_sequence(move, self.fenix_position)
             angles_snapshot = next_angles.angles_snapshot[:]
-            print(f'angles_snapshot: {angles_snapshot}')
+            #print(f'angles_snapshot: {angles_snapshot}')
 
             if next_angles.move_type == 'body':
                 self.fs.set_speed(self.body_speed)
@@ -144,8 +144,8 @@ class MovementProcessor:
                 if command == 'exit':
                     break
 
-                if command == 'enable_torque':
-                    self.fs.enable_torque()
+                if command == 'disable_torque':
+                    self.fs.disable_torque()
                     
                 else:
                     try:
@@ -154,7 +154,6 @@ class MovementProcessor:
                         self.fs.disable_torque()
                         time.sleep(1.0)
                         print(e)
-                        raise e
 
         except KeyboardInterrupt:
             print('Movement stopped')

@@ -159,6 +159,7 @@ class FenixServos:
                 return current_angles
             
             time.sleep(0.03)
+        return current_angles
             
 
     #@timing

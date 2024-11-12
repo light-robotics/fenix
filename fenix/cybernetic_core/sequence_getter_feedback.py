@@ -40,26 +40,45 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
     elif command == 'down':
         sequence.append(Move('body_movement', {'deltas': [0, 0, -UP_OR_DOWN_CM]}))
     elif command == 'forward_one_legged':
-        sequence.append(Move('compensated_leg_movement', {'leg': 1, 'deltas': [0, 0, 15]}))
-        sequence.append(Move('touch', {'leg': 1, 'deltas': [0, 0, -15]}))
+        for leg in [1, 3, 2, 4]:
+            if leg in [1, 4]:
+                y_diff = -2
+            else:
+                y_diff = 2
+            if leg in [1, 2]:
+                x_diff = -1
+            else:
+                x_diff = 1
+            sequence.append(Move('body_compensation_for_a_leg', {'leg': leg}))
+            sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM + x_diff, y_diff, 20]}))
+            sequence.append(Move('touch', {'leg': leg}))
+            sequence.append(Move('endpoint', {'leg': leg, 'deltas': [0, 0, -5]}))
         sequence.append(Move('body_to_center', {}))
+    elif command in ['battle_mode', 'sentry_mode', 'walking_mode', 'run_mode']:
+        sequence.append(Move('switch_mode', {"mode": command}))
     else:
         print(f'Unknown command')
     
-    print(f'[SG]. Sequence commands: {sequence}')
+    #print(f'[SG]. Sequence commands: {sequence}')
     return sequence
 
 def get_angles_for_sequence(move: Move, fenix_position: List[int]):
     fk = FenixKinematics(fenix_position=fenix_position)
-    print(f'fenix_position: {fenix_position}')
+    # print(f'fenix_position: {fenix_position}')
     if move.move_type == 'body_movement':
         fk.body_movement(*move.values['deltas'])
     elif move.move_type == 'body_to_center':
         fk.body_to_center()
     elif move.move_type == 'compensated_leg_movement':
         fk.compensated_leg_movement(move.values['leg'], move.values['deltas'])
+    elif move.move_type == 'body_compensation_for_a_leg':
+        fk.body_compensation_for_a_leg(move.values['leg'])        
+    elif move.move_type == 'endpoint':
+        fk.move_leg_endpoint(move.values['leg'], move.values['deltas'])
     elif move.move_type == 'touch':
         fk.leg_move_with_touching(move.values['leg'])
+    elif move.move_type == 'switch_mode':
+        fk.switch_mode(move.values['mode'])
 
-    print(f'[SG]. Sequence: {fk.sequence[-1]}')
+    #print(f'[SG]. Sequence: {fk.sequence[-1]}')
     return fk.sequence[-1]

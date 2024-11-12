@@ -30,7 +30,7 @@ modes = {
         "y": 15,
     },
     "walking_mode" : {
-        "x": 18,
+        "x": 15,
         "y": 18,
     },
     "battle_mode" : {
@@ -47,7 +47,7 @@ speed = {
 moves = {
     "up_or_down_cm"         : 6,
     "move_body_cm"          : 7,
-    "forward_body_1_leg_cm" : 10,
+    "forward_body_1_leg_cm" : 1,
     "forward_body_2_leg_cm" : 7,    
     "reposition_cm"         : 1,
     "side_look_angle"       : 12,
@@ -56,7 +56,7 @@ moves = {
 
 fenix = {
     "margin": {
-        1: 4,
+        1: 6,
         2: 6
     },
     "leg_up": {
