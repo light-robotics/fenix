@@ -49,9 +49,9 @@ def calculate_leg_angles(O: Point, C: Point, logger):
 
     l = round(math.sqrt((C.x - A.x) ** 2 + (C.y - A.y) ** 2), 2)
     delta_z = round(C.z - O.z, 2)
-    logger.info(f'Trying l {l} and delta_z {delta_z}')
+    #logger.info(f'Trying l {l} and delta_z {delta_z}')
     alpha, beta = find_angles(l, delta_z, logger)
-    logger.info(f'Success : {math.degrees(alpha)}, {math.degrees(beta)}')
+    #logger.info(f'Success : {math.degrees(alpha)}, {math.degrees(beta)}')
 
     return tetta, alpha, beta
 
@@ -59,9 +59,15 @@ def convert_alpha(alpha: float) -> float:
     alpha_converted = round(math.degrees(alpha), 2)
     return alpha_converted
 
+def convert_alpha_to_kinematic(alpha_deg: float) -> float:
+    return round(math.radians(alpha_deg), 4)
+
 def convert_beta(beta: float) -> float:
     beta_converted = round(math.degrees(beta) - 90, 2)
     return beta_converted
+
+def convert_beta_to_kinematic(beta_deg: float) -> float:
+    return round(math.radians(beta_deg + 90), 4)
 
 def convert_tetta(tetta: float, leg_number: int) -> float:
     # virtual model to real servos
@@ -78,10 +84,26 @@ def convert_tetta(tetta: float, leg_number: int) -> float:
     
     return round(tetta_degrees, 2)
 
-def convert_legs_angles(legs_angles: List[float], logger) -> List[float]:
+def convert_tetta_to_kinematic(tetta_deg: float, leg_number: int) -> float:
+    # real servos to virtual model
+    if leg_number == 1:
+        tetta_deg += 45        
+    elif leg_number == 2:
+        tetta_deg -= 45
+    elif leg_number == 3:
+        tetta_deg -= 135
+    elif leg_number == 4:
+        tetta_deg += 135
+    
+    tetta_radians = math.radians(tetta_deg)
+    
+    return round(tetta_radians, 4)
+
+def convert_legs_angles(legs_angles: List[float], logger=None) -> List[float]:
     # input: 16 angles in RADIANS
     # output: 16 converted angles in DEGREES
     # now tetta, alpha, beta one leg after another
+    #print(f'Before conversion: {legs_angles}')
     angles_converted = [
         convert_beta(legs_angles[2]),
         convert_alpha(legs_angles[1]),
@@ -96,6 +118,8 @@ def convert_legs_angles(legs_angles: List[float], logger) -> List[float]:
         convert_alpha(legs_angles[10]),
         convert_tetta(legs_angles[9], 4),
     ]
+
+    #print(f'Converted: {angles_converted}')
 
     if not tettas_correct([
         angles_converted[2], 
@@ -117,6 +141,30 @@ def convert_legs_angles(legs_angles: List[float], logger) -> List[float]:
                 logger=logger
             ):
             raise AnglesException(f'Leg {i+1}. Bad angles:alpha {alpha_converted}, beta {beta_converted}, tetta {tetta_converted}')
+
+    return angles_converted
+
+def convert_legs_angles_to_kinematic(legs_angles: List[float]) -> List[float]:
+    # input: 16 angles in DEGREES
+    # output: 16 converted angles in RADIANS
+    # now tetta, alpha, beta one leg after another
+    angles_converted = [
+        convert_tetta_to_kinematic(legs_angles[2], 1),        
+        convert_alpha_to_kinematic(legs_angles[1]),
+        convert_beta_to_kinematic(legs_angles[0]),
+
+        convert_tetta_to_kinematic(legs_angles[5], 2),        
+        convert_alpha_to_kinematic(legs_angles[4]),
+        convert_beta_to_kinematic(legs_angles[3]),
+
+        convert_tetta_to_kinematic(legs_angles[8], 3),
+        convert_alpha_to_kinematic(legs_angles[7]),
+        convert_beta_to_kinematic(legs_angles[6]),
+
+        convert_tetta_to_kinematic(legs_angles[11], 4),
+        convert_alpha_to_kinematic(legs_angles[10]),
+        convert_beta_to_kinematic(legs_angles[9]),
+    ]
 
     return angles_converted
 
@@ -165,12 +213,8 @@ if __name__ == '__main__':
     logging.config.dictConfig(code_config.logger_config)
     logger = logging.getLogger('main_logger')
 
-    #print(calculate_leg_angles(Point(x=3.8, y=-3.8, z=0), Point(x=18.0, y=-21.0, z=-11.0), 'rear_leg', logger))
-    # [2022-03-09 23:22:21,571][INFO] Trying l 3.46 and delta_z -14.22
-    O = Point(x=3.8, y=-3.8, z=0)
-    C = Point(x=7.24, y=-3.69, z=-14.22)
-    leg_tag = 'rear_leg'
-    calculate_leg_angles(O, C, logger)
-
-    # D initial : Point(x=7.24, y=-3.69, z=-14.22)
-    # D calcula : Point(x=14.15, y=-3.47, z=-14.22)
+    angles = [0.7853981633974483, 0.06096254159288539, 1.9076410156604413, -0.7853981633974483, 0.06096254159288539, 1.9076410156604413, -2.356194490192345, 0.06096254159288539, 1.9076410156604413, 2.356194490192345, 0.06096254159288539, 1.9076410156604413]
+    angles_converted = convert_legs_angles(angles)
+    print(angles_converted)
+    angles_converted_back = convert_legs_angles_to_kinematic(angles_converted)
+    print(angles_converted_back)

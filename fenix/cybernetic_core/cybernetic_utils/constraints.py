@@ -19,7 +19,10 @@ def tettas_correct(tettas: list[float], logger = None) -> bool:
             plus_value = tettas[idx + 1]
         
         if value - plus_value > 115: # > 97:
-            logger.info(f'Bad value: {value}, {plus_value} for {(idx + 1, plus_index + 1)}')
+            if logger is not None:
+                logger.info(f'Bad value: {value}, {plus_value} for {(idx + 1, plus_index + 1)}')
+            else:
+                print(f'Bad value: {value}, {plus_value} for {(idx + 1, plus_index + 1)}')
             return False
 
     return True
@@ -34,7 +37,10 @@ def leg_angles_correct(
     #logger.info(f'Trying angles {[alpha, beta, tetta]}')
 
     if alpha is None and beta is None and tetta is None:
-        logger.info('All angles provided are None')
+        if logger is not None:
+            logger.info('All angles provided are None')
+        else:
+            print('All angles provided are None')
         raise Exception('All angles provided are None')
     
     #leg_constraints = cfg.angles
@@ -43,15 +49,27 @@ def leg_angles_correct(
         #if not rule_followed(leg_constraints["tetta"], tetta):
         if alpha > 90:
             if abs(tetta) > 50:
-                logger.info(f'Bad alpha + tetta up : {alpha}, {tetta}')
+                
+                if logger is not None:
+                    logger.info(f'Bad alpha + tetta up : {alpha}, {tetta}')
+                else:
+                    print('All angles provided are None')
                 return False
         elif alpha > 30:
             if abs(tetta) > 70:
-                logger.info(f'Bad alpha + tetta normal : {alpha}, {tetta}')
+                
+                if logger is not None:
+                    logger.info(f'Bad alpha + tetta normal : {alpha}, {tetta}')
+                else:
+                    print('All angles provided are None')
                 return False
         else:
             if abs(tetta) > 90:
-                logger.info(f'Bad alpha + tetta down : {alpha}, {tetta}')
+                
+                if logger is not None:
+                    logger.info(f'Bad alpha + tetta down : {alpha}, {tetta}')
+                else:
+                    print('All angles provided are None')
                 return False
         
         """

@@ -8,6 +8,7 @@ To run fenix:
 - python fenix/fenix_hardware/fenix_dualshock.py (DualShock 4v2)
 - sudo /fenix/venv/bin/python /fenix/fenix/fenix_hardware/fenix_dualsense.py (DualSense)
 - python fenix/core/movement_processor.py
+- python /fenix/fenix/core/movement_processor_feedback.py
 - python /fenix/fenix/hardware/mpu6050_avg.py
 - python /fenix/fenix/fenix_hardware/fenix_enders.py
 - to stream video:
