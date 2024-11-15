@@ -50,9 +50,9 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
             else:
                 x_diff = 1
             sequence.append(Move('body_compensation_for_a_leg', {'leg': leg}))
-            sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM + x_diff, y_diff, 20]}))
+            sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM + x_diff, y_diff, 16]}))
             sequence.append(Move('touch', {'leg': leg}))
-            sequence.append(Move('endpoint', {'leg': leg, 'deltas': [0, 0, -5]}))
+            sequence.append(Move('endpoint', {'leg': leg, 'deltas': [0, 0, -3]}))
         sequence.append(Move('body_to_center', {}))
     elif command in ['battle_mode', 'sentry_mode', 'walking_mode', 'run_mode']:
         sequence.append(Move('switch_mode', {"mode": command}))
@@ -65,18 +65,48 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
 def get_angles_for_sequence(move: Move, fenix_position: List[int]):
     fk = FenixKinematics(fenix_position=fenix_position)
     # print(f'fenix_position: {fenix_position}')
+
     if move.move_type == 'body_movement':
         fk.body_movement(*move.values['deltas'])
     elif move.move_type == 'body_to_center':
         fk.body_to_center()
-    elif move.move_type == 'compensated_leg_movement':
-        fk.compensated_leg_movement(move.values['leg'], move.values['deltas'])
+    #elif move.move_type == 'compensated_leg_movement':
+    #    fk.compensated_leg_movement(move.values['leg'], move.values['deltas'])
     elif move.move_type == 'body_compensation_for_a_leg':
-        fk.body_compensation_for_a_leg(move.values['leg'])        
+        fk.body_compensation_for_a_leg(move.values['leg'])
     elif move.move_type == 'endpoint':
         fk.move_leg_endpoint(move.values['leg'], move.values['deltas'])
     elif move.move_type == 'touch':
-        fk.leg_move_with_touching(move.values['leg'])
+        leg_num = move.values['leg']
+        leg = fk.legs[leg_num]
+        global leg1x, leg1y, leg2x, leg2y, leg3x, leg3y, leg4x, leg4y
+        delta_x, delta_y = 0, 0
+        if int(leg_num) == 1:
+            if 'leg1x' not in globals():
+                leg1x, leg1y = leg.C.x, leg.C.y
+            delta_x, delta_y = round(leg1x - leg.C.x, 1), round(leg1y - leg.C.y, 1)
+        elif leg_num == 2:
+            if 'leg2x' not in globals():
+                leg2x, leg2y = leg.C.x, leg.C.y
+            delta_x, delta_y = round(leg2x - leg.C.x, 1), round(leg2y - leg.C.y, 1)
+        elif leg_num == 3:
+            if 'leg3x' not in globals():
+                leg3x, leg3y = leg.C.x, leg.C.y
+            delta_x, delta_y = round(leg3x - leg.C.x, 1), round(leg3y - leg.C.y, 1)
+        elif leg_num == 4:
+            if 'leg4x' not in globals():
+                leg4x, leg4y = leg.C.x, leg.C.y
+            delta_x, delta_y = round(leg4x - leg.C.x, 1), round(leg4y - leg.C.y, 1)
+        
+        print("Touch before. leg_num: ", 
+              move.values['leg'],
+              f'Cx = {leg.C.x}. Cy = {leg.C.y}',
+              cfg.modes['walking_mode']['x']
+              ,'\n'
+              , 'delta:'
+              , delta_x
+              , delta_y)
+        fk.leg_move_with_touching(move.values['leg'], [-delta_x, -delta_y, 0])
     elif move.move_type == 'switch_mode':
         fk.switch_mode(move.values['mode'])
 
