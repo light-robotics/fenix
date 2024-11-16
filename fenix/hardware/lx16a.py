@@ -607,15 +607,17 @@ def read_values(m0, servo):
 
 
 if __name__ == '__main__':      
-    m1 = LX16A(Port='/dev/ttyAMA0') # 5-8   # 1-4
-    m2 = LX16A(Port='/dev/ttyAMA2') # 9-12  # 5-8
-    m3 = LX16A(Port='/dev/ttyAMA3') # 13-16 # 9-12
-    m4 = LX16A(Port='/dev/ttyAMA1') # 1-4   # 13-16
-   
-    for m in range(1):
-        j = 1
-        for m in [m1, m2, m3, m4]:
-            for _ in range(4):
-                print(read_values(m, j))
-                j += 1
-   
+    #m1 = LX16A(port='/dev/ttyAMA0') # 5-8   # 1-4
+    #m2 = LX16A(port='/dev/ttyAMA2') # 9-12  # 5-8
+    m3 = LX16A(port='/dev/ttyAMA3') # 13-16 # 9-12
+    m4 = LX16A(port='/dev/ttyAMA4') # 1-4   # 13-16
+
+    for i in [3, 4, 5, 9, 10, 11]:
+        m3.read_values(i)
+        time.sleep(0.0002)
+    for i in [15, 16, 17, 21, 22, 23]:
+        m4.read_values(i)
+        time.sleep(0.0002)
+    
+    #m3.move_servo_to_angle(9, 0, 1000)
+    

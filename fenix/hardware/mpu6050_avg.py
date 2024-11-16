@@ -66,8 +66,8 @@ def average_angles(sensor, num_samples):
 def main():
     sensor = mpu6050(0x68)
 
-    pitch_bias = 2.0
-    roll_bias = 2.6
+    pitch_bias = -3.5
+    roll_bias = 5.8
 
     while True:
         start_time = time.time()
@@ -88,13 +88,13 @@ def main():
             f.write(f'{pitch},{roll}')
 
         # Adjust the filter after each measure
-        time.sleep(max(0, 0.2 - (time.time() - start_time)))  # Ensure a 0.1-second interval
+        time.sleep(max(0, 0.1 - (time.time() - start_time)))  # Ensure a 0.1-second interval
 
 def single_scan():
     sensor = mpu6050(0x68)
 
-    pitch_bias = 2.0
-    roll_bias = 2.6
+    pitch_bias = 7.5
+    roll_bias = 5.8
 
     start_time = time.time()
 

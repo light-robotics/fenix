@@ -117,6 +117,10 @@ class MovementProcessor:
             if next_angles.move_type == 'touch':
                 self.logger.info('[MP] Using function set_servo_values_touching')
                 move_function = self.fs.set_servo_values_touching
+            elif next_angles.move_type == 'balance':
+                self.logger.info('[MP] Using function set_servo_values_balancing')
+                move_function = self.fs.set_servo_values_balancing
+                self.fs.set_speed(2000)
             else:
                 self.logger.info('[MP] Using function set_servo_values_paced_wo_feedback')
                 move_function = self.fs.set_servo_values_paced_wo_feedback

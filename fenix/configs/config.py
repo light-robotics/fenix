@@ -47,7 +47,7 @@ speed = {
 moves = {
     "up_or_down_cm"         : 4,
     "move_body_cm"          : 7,
-    "forward_body_1_leg_cm" : 3,
+    "forward_body_1_leg_cm" : 5,
     "forward_body_2_leg_cm" : 7,    
     "reposition_cm"         : 1,
     "side_look_angle"       : 12,
@@ -72,6 +72,7 @@ fenix = {
     # when moving without feedback
     "movement_command_advance_ms" : -0.05,
     "movement_overshoot_coefficient" : 0.0,
+    "balance_offset": 2.5,
 }
 
 limits = {

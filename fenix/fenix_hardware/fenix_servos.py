@@ -137,6 +137,40 @@ class FenixServos:
         for j in range(start_numbers[board], start_numbers[board] + 4):
             board.move_servo_to_angle(j, angles[j-1], rate)
 
+    def set_servo_values_balancing(self, angles):
+        _, max_angle_diff = self.get_angles_diff(angles)
+        rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
+        self.logger.info(f'max_angle_diff: {max_angle_diff}, self.speed : {self.speed}, self.speed * max_angle_diff / 45 : {self.speed * max_angle_diff / 45}')
+
+        self.send_command_to_servos(angles, rate)
+        self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
+        prev_pitch, prev_roll = None, None
+        for s in range(20):
+            self.logger.info(f'Step {s}')
+            
+            with open('/fenix/fenix/wrk/gyroaccel_data.txt', "r") as f:
+                pitch, roll = f.readline().split(',')
+            pitch, roll = float(pitch), float(roll)
+            self.logger.info(f"ga_data: {pitch, roll}")
+            
+            if prev_pitch and abs(prev_pitch) < abs(pitch):
+                self.logger.info(f'Body balance moving wrong pitch {prev_pitch, pitch}. Exiting')
+                return self.get_current_angles()
+            if prev_roll and abs(prev_roll) < abs(roll):
+                self.logger.info(f'Body balance moving wrong roll {prev_roll, roll}. Exiting')
+                return self.get_current_angles()
+            
+            if abs(pitch) < config.fenix["balance_offset"] and abs(roll) < config.fenix["balance_offset"]:
+                current_angles = self.get_current_angles()
+                self.logger.info(f'current angles: {current_angles}')
+                self.logger.info(f'Body balanced. Exiting')
+                self.send_command_to_servos(current_angles, 0)
+                return current_angles
+            
+            prev_pitch, prev_roll = pitch, roll
+            time.sleep(0.1)
+        return self.get_current_angles()
+
     def set_servo_values_touching(self, angles):
         _, max_angle_diff = self.get_angles_diff(angles)
         rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
@@ -147,19 +181,19 @@ class FenixServos:
         
         for s in range(50):
             self.logger.info(f'Step {s}')
-            current_angles = self.get_current_angles()
-            self.logger.info(f'current angles: {current_angles}')
             
             with open("/fenix/fenix/wrk/neopixel_command.txt", "r") as f:
                 legs_down = f.readline().split(',')[0]
             self.logger.info(f"legs_down: {legs_down}")
             if legs_down == '1111':
-                self.logger.info(f'All down. Exiting')
+                current_angles = self.get_current_angles()
+                self.logger.info(f'current angles: {current_angles}')
+                print(f'All down. Exiting')
                 self.send_command_to_servos(current_angles, 0)
                 return current_angles
             
             time.sleep(0.03)
-        return current_angles
+        return self.get_current_angles()
             
 
     #@timing
