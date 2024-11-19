@@ -5,16 +5,17 @@ obstacle = {
 
 leg = {
     "a": 15,    # PointA to PointB - femur
-    "b": 15.8, # 18,    # PointB to PointC - femur-tibia
+    "b": 6.5,
+    "c": 15.8, # 18,    # PointB to PointC - femur-tibia
     "d": 6.5,    # PointO to PointA - trochanter-coxa
     "mount_point_offset": 3.8, # ???
     #"phi_angle" : -22.5 # angle fix due to leg not being straight
 }
 
 start = {
-    "vertical"                 : 8,
-    "horizontal_x"             : 16, # 15
-    "horizontal_y"             : 16, # 15
+    "vertical"                 : 10,
+    "horizontal_x"             : 18, # 15
+    "horizontal_y"             : 18, # 15
     "x_offset_body"            : 0,
     "y_offset_body"            : 0,
     "initial_z_position_delta" : 5, # 3
@@ -22,8 +23,8 @@ start = {
 
 modes = {
     "run_mode" : {
-        "x": 16,
-        "y": 16,
+        "x": 18,
+        "y": 18,
     },
     "sentry_mode" : {
         "x": 15,
@@ -56,12 +57,12 @@ moves = {
 
 fenix = {
     "margin": {
-        1: 6,
+        1: 4,
         2: 6
     },
     "leg_up": {
         1: 5,
-        2: 4
+        2: 6
     },
     # parameters for moving further, when moving with feedback
     "servos": {
@@ -103,5 +104,9 @@ angles_limits = {
     "beta": {
         "min": -100,
         "max": 75,
+    },
+    "gamma": {
+        "min": -110,
+        "max": 110,
     }
 }

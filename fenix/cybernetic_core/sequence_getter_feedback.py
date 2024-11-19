@@ -39,6 +39,28 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
         sequence.append(Move('body_movement', {'deltas': [0, 0, UP_OR_DOWN_CM]}))
     elif command == 'down':
         sequence.append(Move('body_movement', {'deltas': [0, 0, -UP_OR_DOWN_CM]}))
+    elif command == 'forward_one_legged_v2':
+        for leg in [1, 2, 3, 4]:
+            if leg == 1:
+                sequence.append(Move('body_movement', {'deltas': [-7, 0, 0]}))
+            elif leg == 3:
+                sequence.append(Move('body_movement', {'deltas': [16, 0, 0]}))
+
+            if leg in [1, 4]:
+                y_diff = -1
+            else:
+                y_diff = 1
+            if leg in [1, 2]:
+                x_diff = -0
+            else:
+                x_diff = 0
+            sequence.append(Move('balance', {}))
+            sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM + x_diff, y_diff, 20]}))
+            sequence.append(Move('touch', {'leg': leg}))
+            #sequence.append(Move('body_to_center', {}))
+            sequence.append(Move('balance', {}))
+            sequence.append(Move('balance', {}))
+        sequence.append(Move('body_to_center', {}))
     elif command == 'forward_one_legged':
         for leg in [1, 3, 2, 4]:
             

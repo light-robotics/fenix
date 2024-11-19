@@ -26,13 +26,13 @@ class FenixServos:
         # 0.18 sec / 60 degrees for 6V+
         # my max speed is for 45 degrees
         # that means that max speed should be 120 for 7.4V+ and 135 for 6V+
-        self.servos = [3, 4, 5, 9, 10, 11, 15, 16, 17, 21, 22, 23]
+        self.servos = [2, 3, 4, 5, 8, 9, 10, 11, 14, 15, 16, 17, 20, 21, 22, 23]
 
     def print_status(self):
-        for i in [3, 4, 5, 9, 10, 11]:
+        for i in [2, 3, 4, 5, 8, 9, 10, 11]:
             self.m1.read_values(i)
             time.sleep(0.0002)
-        for i in [15, 16, 17, 21, 22, 23]:
+        for i in [14, 15, 16, 17, 20, 21, 22, 23]:
             self.m4.read_values(i)
             time.sleep(0.0002)
     
@@ -46,10 +46,10 @@ class FenixServos:
     def get_current_angles(self):
         current_angles = []
         
-        for i in [3, 4, 5, 9, 10, 11]:
+        for i in [2, 3, 4, 5, 8, 9, 10, 11]:
             current_angles.append(self.m1.read_angle(i))
             time.sleep(0.0002)
-        for i in [15, 16, 17, 21, 22, 23]:
+        for i in [14, 15, 16, 17, 20, 21, 22, 23]:
             current_angles.append(self.m4.read_angle(i))
             time.sleep(0.0002)
 
@@ -88,9 +88,9 @@ class FenixServos:
         return True
 
     def get_board_by_id(self, id):
-        if id in [3, 4, 5, 9, 10, 11]:
+        if id in [2, 3, 4, 5, 8, 9, 10, 11]:
             return self.m1
-        elif id in [15, 16, 17, 21, 22, 23]:
+        elif id in [14, 15, 16, 17, 20, 21, 22, 23]:
             return self.m4
         else:
             raise ValueError(f'Bad id: {id}')
@@ -114,11 +114,11 @@ class FenixServos:
     #@timing
     def send_command_to_servos(self, angles, rate):
         j = 0
-        for i in [3, 4, 5, 9, 10, 11]:
+        for i in [2, 3, 4, 5, 8, 9, 10, 11]:
             self.m1.move_servo_to_angle(i, angles[j], rate)
             time.sleep(0.0002)
             j += 1
-        for i in [15, 16, 17, 21, 22, 23]:
+        for i in [14, 15, 16, 17, 20, 21, 22, 23]:
             self.m4.move_servo_to_angle(i, angles[j], rate)
             time.sleep(0.0002)
             j += 1
@@ -382,11 +382,11 @@ class FenixServos:
 if __name__ == '__main__':
     fnx = FenixServos()
 
-    """
-    fnx.set_speed(500)
-    sequence = [[0.0, 60.0, 100.0, -10.0, 0.0, 60.0, 100.0, -10.0, 0.0, 60.0, 100.0, -10.0, 0.0, 60.0, 100.0, -10.0]]
-       
+    
+    fnx.set_speed(2000)
+    sequence = [[65, 16, 19, 0.0, 65, 16, 19, 0.0, 65, 16, 19, 0.0, 65, 16, 19, 0.0]]
+    # 19.42853486276713, -74.1493912084663, -65.2791436543008   
     for angles in sequence:     
         fnx.set_servo_values_paced(angles)
-    """
+    
     fnx.print_status()

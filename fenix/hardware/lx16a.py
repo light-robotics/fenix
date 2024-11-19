@@ -12,15 +12,19 @@ import logging.config
 
 
 neutral = {
+    2 : 500,
     3 : 300,
     4 : 610,
     5 : 500,
+    8 : 280,
     9 : 300,
     10 : 550,
     11 : 500,
+    14 : 200,
     15 : 320,
     16 : 560,
     17 : 500,
+    20 : 250,
     21 : 340,
     22 : 560,
     23 : 500
@@ -612,12 +616,15 @@ if __name__ == '__main__':
     m3 = LX16A(port='/dev/ttyAMA3') # 13-16 # 9-12
     m4 = LX16A(port='/dev/ttyAMA4') # 1-4   # 13-16
 
-    for i in [3, 4, 5, 9, 10, 11]:
+    #m4.set_id(4, 14)
+    for i in [2, 3, 4, 5, 8, 9, 10, 11]:
         m3.read_values(i)
         time.sleep(0.0002)
-    for i in [15, 16, 17, 21, 22, 23]:
+    for i in [14, 15, 16, 17, 20, 21, 22, 23]:
         m4.read_values(i)
         time.sleep(0.0002)
     
-    #m3.move_servo_to_angle(9, 0, 1000)
+    m4.move_servo_to_angle(14, 0, 3000)
+    time.sleep(3)
+    m4.disable_torque(14)
     

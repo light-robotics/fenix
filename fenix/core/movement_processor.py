@@ -179,8 +179,8 @@ class MovementProcessor:
                 if command == 'exit':
                     break
 
-                if command == 'enable_torque':
-                    self.fs.enable_torque()
+                if command == 'disable_torque':
+                    self.fs.disable_torque()
                     
                 else:
                     try:
