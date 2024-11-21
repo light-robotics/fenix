@@ -39,7 +39,7 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
         sequence.append(Move('body_movement', {'deltas': [0, 0, UP_OR_DOWN_CM]}))
     elif command == 'down':
         sequence.append(Move('body_movement', {'deltas': [0, 0, -UP_OR_DOWN_CM]}))
-    elif command == 'forward_one_legged':
+    elif command == 'forward_one_legged_v2':
         for leg in [1, 2, 3, 4]:
             if leg == 1:
                 sequence.append(Move('body_movement', {'deltas': [-7, 0, 0]}))
@@ -134,19 +134,19 @@ def get_angles_for_sequence(move: Move, fenix_position: List[int]):
               , delta_y)
         
         delta_x = delta_y = 0
-        fk.leg_move_custom(move.values['leg'], 'touch', [-delta_x, -delta_y, -10])
+        fk.leg_move_custom(move.values['leg'], 'touch', [-delta_x, -delta_y, -15])
     elif move.move_type == 'balance':
         with open('/fenix/fenix/wrk/gyroaccel_data.txt', "r") as f:
             pitch, roll = f.readline().split(',')
         pitch, roll = float(pitch), float(roll)
         if pitch < -cfg.fenix["balance_offset"] and roll > cfg.fenix["balance_offset"]:
-            fk.leg_move_custom(1, 'balance', [0, 0, -10])
+            fk.leg_move_custom(1, 'balance', [0, 0, -15])
         elif pitch > cfg.fenix["balance_offset"] and roll > cfg.fenix["balance_offset"]:
-            fk.leg_move_custom(2, 'balance', [0, 0, -10])
+            fk.leg_move_custom(2, 'balance', [0, 0, -15])
         elif pitch > cfg.fenix["balance_offset"] and roll < -cfg.fenix["balance_offset"]:
-            fk.leg_move_custom(3, 'balance', [0, 0, -10])
+            fk.leg_move_custom(3, 'balance', [0, 0, -15])
         elif pitch < -cfg.fenix["balance_offset"] and roll < -cfg.fenix["balance_offset"]:
-            fk.leg_move_custom(4, 'balance', [0, 0, -10])
+            fk.leg_move_custom(4, 'balance', [0, 0, -15])
     elif move.move_type == 'switch_mode':
         fk.switch_mode(move.values['mode'])
 

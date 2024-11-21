@@ -33,7 +33,7 @@ def find_angles(Dx, Dy, logger):
     if full_dist > a + b + c:
         raise Exception('No decisions. Full distance : {0}'.format(full_dist))
 
-    for k in range(-45, 45, 5):
+    for k in range(-45, 45, 3):
 
         ksi = math.radians(k)
 
@@ -67,7 +67,7 @@ def find_angles(Dx, Dy, logger):
                 if abs(new_Dx - Dx) > 0.01 or abs(new_Dy - Dy) > 0.01:
                     continue
                     # only one of two coeffs is correct
-                #print(f'B: {Bx, By}. C: {Cx, Cy}')
+                print(f'B: {Bx, By}. C: {Cx, Cy}')
                 #print(f'alpha: {round(math.degrees(alpha), 2)}, beta: {round(math.degrees(beta), 2)}, gamma: {round(math.degrees(gamma), 2)}')
                 if leg_angles_correct(
                     alpha=math.degrees(alpha), 
@@ -80,14 +80,14 @@ def find_angles(Dx, Dy, logger):
     return results
 
 def calculate_leg_angles(O: Point, D: Point, logger):
-    #logger.info(f'[CLA] O: {O}, D: {D}, {leg_tag}')
+    print(f'[CLA] O: {O}, D: {D}')
     tetta = math.atan2(D.y - O.y, D.x - O.x)
     #print(tetta, math.degrees(tetta))
     
     A = Point(O.x + cfg.leg["d"] * math.cos(tetta),
                 O.y + cfg.leg["d"] * math.sin(tetta),
                 O.z)    
-    #print(f'A: {A}')
+    print(f'A: {A}')
     l = round(math.sqrt((D.x - A.x) ** 2 + (D.y - A.y) ** 2), 2)
     delta_z = round(D.z - O.z, 2)
     logger.info(f'Trying l {l} and delta_z {delta_z}')
@@ -99,19 +99,28 @@ def calculate_leg_angles(O: Point, D: Point, logger):
     
     logger.info(f'Success : {math.degrees(alpha)}, {math.degrees(beta)}, {math.degrees(gamma)}')
 
-    D_calculated = calculate_D_point(O, tetta, alpha, beta, gamma)
-    #logger.info(f'[CLA] D initial : {D}')
-    #logger.info(f'[CLA] D calculated : {D_calculated}')
+    D_calculated = calculate_D_point(O, tetta, alpha, beta, gamma, D)
+    print(f'[CLA] D initial : {D}')
+    print(f'[CLA] D calculated : {D_calculated}')
 
-    if abs(D_calculated.x - D.x) > 0.01 or \
-        abs(D_calculated.y - D.y) > 0.01 or \
-        abs(D_calculated.z - D.z) > 0.01:
+    
+    if (abs(D_calculated.x - D.x) > 0.01) or \
+        (abs(D_calculated.y - D.y) > 0.01) or \
+        (abs(D_calculated.z - D.z) > 0.01):
+        #print(abs(D_calculated.x - D.x), abs(D_calculated.y - D.y), abs(D_calculated.z - D.z))
         raise Exception('D_prev far from D. Angles : {0}'
                         .format(([math.degrees(x) for x in [tetta, alpha, beta, gamma]])))
-
+    
     return tetta, alpha, beta, gamma
 
-def calculate_D_point(O: Point, tetta: float, alpha: float, beta: float, gamma: float) -> Point:
+def calculate_D_point(
+        O: Point, 
+        tetta: float, 
+        alpha: float, 
+        beta: float, 
+        gamma: float, 
+        D: Point | None = None
+    ) -> Point:
     A = Point(O.x + cfg.leg["d"] * math.cos(tetta),
                 O.y + cfg.leg["d"] * math.sin(tetta),
                 O.z)
@@ -123,11 +132,23 @@ def calculate_D_point(O: Point, tetta: float, alpha: float, beta: float, gamma: 
     D_xz = [C_xz[0] + cfg.leg["c"] * math.cos(alpha + beta + gamma),
             C_xz[1] + cfg.leg["c"] * math.sin(alpha + beta + gamma)]
 
-    D = Point(round(A.x + D_xz[0] * math.cos(tetta), 2),
+    D_calculated = Point(round(A.x + D_xz[0] * math.cos(tetta), 2),
                     round(A.y + D_xz[0] * math.sin(tetta), 2),
                     round(A.z + D_xz[1], 2))
-
-    return D
+    if D is None:
+        return D_calculated
+    
+    if (abs(D_calculated.x - D.x) > 0.01) or \
+        (abs(D_calculated.y - D.y) > 0.01) or \
+        (abs(D_calculated.z - D.z) > 0.01):
+        return Point(round(A.x - D_xz[0] * math.cos(tetta), 2),
+                    round(A.y - D_xz[0] * math.sin(tetta), 2),
+                    round(A.z + D_xz[1], 2))
+    print(f'[CDP] A: {A}')
+    print(f'[CDP] Bxz: {B_xz}')
+    print(f'[CDP] Cxz: {C_xz}')
+    print(f'[CDP] Dxz: {D_xz}')
+    return D_calculated
 
 def get_best_angles(all_angles):
     min_distance = 100000
@@ -155,7 +176,13 @@ def get_best_angles(all_angles):
     return best_angles
 
 def get_angles_distance(angles):
-    return (math.degrees(angles[0] + angles[1] + angles[2])) ** 2
+    print('Angles:', 
+          math.degrees(angles[0]),
+          math.degrees(angles[1]),
+          math.degrees(angles[2]),
+          math.degrees(angles[0] + angles[1] + angles[2])
+          )
+    return (math.degrees(angles[0] + angles[1] + angles[2]) + 90) ** 2
 
 def convert_alpha(alpha: float) -> float:
     alpha_converted = round(math.degrees(alpha), 2)
@@ -325,7 +352,11 @@ if __name__ == '__main__':
     angles_converted_back = convert_legs_angles_to_kinematic(angles_converted)
     print(angles_converted_back)
     """
-    angles = get_leg_angles(13.58, -14.0, logger)
-    print([math.degrees(x) for x in angles]) # [24.958930027784827, -76.18992780336993, -53.76900222441494]
-    angles = get_leg_angles(10, -14.0, logger)
-    print([math.degrees(x) for x in angles]) # [19.42853486276713, -74.1493912084663, -65.2791436543008]
+    O = Point(x=3.8, y=-3.8, z=0)
+    D = Point(x=9.13, y=-7.01, z=-14.28)
+    a = calculate_leg_angles(O, D, logger)
+    print(a)
+    #angles = get_leg_angles(0.3, -8.2, logger)
+    #print([math.degrees(x) for x in angles])
+
+    # 40.69674025591244 -136.88832870747177 -35.808411548440716 -132.00000000000006

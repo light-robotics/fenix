@@ -14,8 +14,8 @@ leg = {
 
 start = {
     "vertical"                 : 12,
-    "horizontal_x"             : 17, # 15
-    "horizontal_y"             : 17, # 15
+    "horizontal_x"             : 18, # 15
+    "horizontal_y"             : 18, # 15
     "x_offset_body"            : 0,
     "y_offset_body"            : 0,
     "initial_z_position_delta" : 5, # 3
@@ -31,8 +31,8 @@ modes = {
         "y": 15,
     },
     "walking_mode" : {
-        "x": 14,
-        "y": 20,
+        "x": 18,
+        "y": 18,
     },
     "battle_mode" : {
         "x": 15,
@@ -102,7 +102,7 @@ angles_limits = {
         "max": 90
     },
     "beta": {
-        "min": -100,
+        "min": -140,
         "max": 75,
     },
     "gamma": {
