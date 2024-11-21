@@ -33,7 +33,7 @@ def find_angles(Dx, Dy, logger):
     if full_dist > a + b + c:
         raise Exception('No decisions. Full distance : {0}'.format(full_dist))
 
-    for k in range(-45, 45, 15):
+    for k in range(-45, 45, 5):
 
         ksi = math.radians(k)
 
@@ -67,7 +67,8 @@ def find_angles(Dx, Dy, logger):
                 if abs(new_Dx - Dx) > 0.01 or abs(new_Dy - Dy) > 0.01:
                     continue
                     # only one of two coeffs is correct
-
+                #print(f'B: {Bx, By}. C: {Cx, Cy}')
+                #print(f'alpha: {round(math.degrees(alpha), 2)}, beta: {round(math.degrees(beta), 2)}, gamma: {round(math.degrees(gamma), 2)}')
                 if leg_angles_correct(
                     alpha=math.degrees(alpha), 
                     beta=math.degrees(beta), 
@@ -86,7 +87,7 @@ def calculate_leg_angles(O: Point, D: Point, logger):
     A = Point(O.x + cfg.leg["d"] * math.cos(tetta),
                 O.y + cfg.leg["d"] * math.sin(tetta),
                 O.z)    
-
+    #print(f'A: {A}')
     l = round(math.sqrt((D.x - A.x) ** 2 + (D.y - A.y) ** 2), 2)
     delta_z = round(D.z - O.z, 2)
     logger.info(f'Trying l {l} and delta_z {delta_z}')
@@ -164,10 +165,10 @@ def convert_alpha_to_kinematic(alpha_deg: float) -> float:
     return round(math.radians(alpha_deg), 4)
 
 def convert_beta(beta: float) -> float:
-    return round(math.degrees(beta) + 90, 2)
+    return -round(math.degrees(beta) + 90, 2)
 
 def convert_beta_to_kinematic(beta_deg: float) -> float:
-    return round(math.radians(beta_deg - 90), 4)
+    return round(math.radians(-beta_deg - 90), 4)
 
 def convert_gamma(gamma: float) -> float:
     return -round(math.degrees(gamma), 2)
@@ -215,20 +216,23 @@ def convert_legs_angles(legs_angles: List[float], logger=None) -> List[float]:
         convert_beta(legs_angles[2]),
         convert_alpha(legs_angles[1]),
         convert_tetta(legs_angles[0], 1),
+
         convert_gamma(legs_angles[7]),
         convert_beta(legs_angles[6]),
         convert_alpha(legs_angles[5]),
         convert_tetta(legs_angles[4], 2),
+
         convert_gamma(legs_angles[11]),
         convert_beta(legs_angles[10]),
         convert_alpha(legs_angles[9]),
         convert_tetta(legs_angles[8], 3),
+
         convert_gamma(legs_angles[15]),
         convert_beta(legs_angles[14]),
         convert_alpha(legs_angles[13]),
         convert_tetta(legs_angles[12], 4),
     ]
-
+    
     #print(f'Converted: {angles_converted}')
 
     if not tettas_correct([
@@ -260,24 +264,29 @@ def convert_legs_angles_to_kinematic(legs_angles: List[float]) -> List[float]:
     # input: 16 angles in DEGREES
     # output: 16 converted angles in RADIANS
     # now tetta, alpha, beta one leg after another
+    #print(f'convert_legs_angles_to_kinematic. Before {legs_angles}')
     angles_converted = [
-        convert_tetta_to_kinematic(legs_angles[2], 1),        
-        convert_alpha_to_kinematic(legs_angles[1]),
-        convert_beta_to_kinematic(legs_angles[0]),
+        convert_tetta_to_kinematic(legs_angles[3], 1),        
+        convert_alpha_to_kinematic(legs_angles[2]),
+        convert_beta_to_kinematic(legs_angles[1]),
+        convert_gamma_to_kinematic(legs_angles[0]),
 
-        convert_tetta_to_kinematic(legs_angles[5], 2),        
-        convert_alpha_to_kinematic(legs_angles[4]),
-        convert_beta_to_kinematic(legs_angles[3]),
+        convert_tetta_to_kinematic(legs_angles[7], 2),        
+        convert_alpha_to_kinematic(legs_angles[6]),
+        convert_beta_to_kinematic(legs_angles[5]),
+        convert_gamma_to_kinematic(legs_angles[4]),
 
-        convert_tetta_to_kinematic(legs_angles[8], 3),
-        convert_alpha_to_kinematic(legs_angles[7]),
-        convert_beta_to_kinematic(legs_angles[6]),
-
-        convert_tetta_to_kinematic(legs_angles[11], 4),
+        convert_tetta_to_kinematic(legs_angles[11], 3),
         convert_alpha_to_kinematic(legs_angles[10]),
         convert_beta_to_kinematic(legs_angles[9]),
-    ]
+        convert_gamma_to_kinematic(legs_angles[8]),
 
+        convert_tetta_to_kinematic(legs_angles[15], 4),
+        convert_alpha_to_kinematic(legs_angles[14]),
+        convert_beta_to_kinematic(legs_angles[13]),
+        convert_gamma_to_kinematic(legs_angles[12]),
+    ]
+    #print(f'convert_legs_angles_to_kinematic. After {angles_converted}')
     return angles_converted
 
 # ----------------------

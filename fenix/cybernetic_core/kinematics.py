@@ -78,13 +78,16 @@ class Leg:
         self.logger = logging.getLogger('angles_logger') #logging.getLogger('main_logger')
         self.O = O
         self.D = D
+        #print(f'O: {O}. D: {D}')
         self.update_angles()
 
     def update_angles(self):
         # tetta is not fully correct, because it uses atan2
         # tetta is corrected via convert_tetta function
+        #print(self.O, self.D)
         calculated_angles = calculate_leg_angles(self.O, self.D, self.logger)
         self.tetta, self.alpha, self.beta, self.gamma = calculated_angles
+        #print(f'Best angles: {round(math.degrees(self.alpha), 2), round(math.degrees(self.beta), 2), round(math.degrees(self.gamma), 2)}')
 
     def move_mount_point(self, delta_x, delta_y, delta_z):
         self.O.move(delta_x, delta_y, delta_z)
@@ -92,6 +95,7 @@ class Leg:
     
     def move_end_point(self, delta_x, delta_y, delta_z):
         self.D.move(delta_x, delta_y, delta_z)
+        #print(f'D Move: {delta_x, delta_y, delta_z}')
         self.update_angles()
 
 class FenixKinematics:
@@ -196,6 +200,7 @@ class FenixKinematics:
         #print(f'Leg1 : {[round(math.degrees(x), 2) for x in [tetta1, alpha1, beta1, gamma1]]}')
         D1 = calculate_D_point(O1, tetta1, alpha1, beta1, gamma1)
         self.logger.info('[Init] Building leg 1')
+        #print(f'Building leg 1: {math.degrees(alpha1), math.degrees(beta1), math.degrees(gamma1)}')
         Leg1 = Leg(O1, D1)
 
         O2 = Point(cfg.leg["mount_point_offset"],

@@ -382,11 +382,21 @@ class FenixServos:
 if __name__ == '__main__':
     fnx = FenixServos()
 
-    
-    fnx.set_speed(2000)
-    sequence = [[65, 16, 19, 0.0, 65, 16, 19, 0.0, 65, 16, 19, 0.0, 65, 16, 19, 0.0]]
+    """
+    fnx.set_speed(1000)
+    sequence = [
+        [
+            47.59, -3.55, 81.13, 0.0, 
+            47.59, -3.55, 81.13, 0.0, 
+            69.84, -22.73, 17.11, 0.0, 
+            69.84, -22.73, 17.11, 0.0
+        ]
+    ]
     # 19.42853486276713, -74.1493912084663, -65.2791436543008   
     for angles in sequence:     
         fnx.set_servo_values_paced(angles)
     
+    #time.sleep(2)
+    fnx.disable_torque()
+    """
     fnx.print_status()
