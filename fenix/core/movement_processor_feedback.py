@@ -130,6 +130,7 @@ class MovementProcessor:
             if not code_config.DEBUG:
                 new_angles = move_function(angles_snapshot)
                 self.fenix_position = convert_legs_angles_to_kinematic(new_angles[:])
+                print(f'convert_legs_angles_to_kinematic: {self.fenix_position}')
             else:
                 time.sleep(1.0)
         self.logger.info(f'[MOVE] finished: {datetime.datetime.now()}')

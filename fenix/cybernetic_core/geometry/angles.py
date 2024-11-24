@@ -20,11 +20,52 @@ class AnglesException(Exception):
 class GeometryException(Exception):
     pass
 
+class FenixPositionLeg():
+    def __init__(self, number, alpha, beta, gamma, tetta):
+        self.number = number
+        self.alpha = alpha
+        self.beta = beta
+        self.gamma = gamma
+        self.tetta = tetta
+
+class FenixPosition():
+    def __init__(self, 
+            leg1_tetta,
+            leg1_alpha,
+            leg1_beta,
+            leg1_gamma,
+            leg2_tetta,
+            leg2_alpha,
+            leg2_beta,
+            leg2_gamma,
+            leg3_tetta,
+            leg3_alpha,
+            leg3_beta,
+            leg3_gamma,
+            leg4_tetta,
+            leg4_alpha,
+            leg4_beta,
+            leg4_gamma
+            ):
+        leg1 = FenixPositionLeg(1, leg1_alpha, leg1_beta, leg1_gamma, leg1_tetta)
+        leg2 = FenixPositionLeg(2, leg2_alpha, leg2_beta, leg2_gamma, leg2_tetta)
+        leg3 = FenixPositionLeg(3, leg3_alpha, leg3_beta, leg3_gamma, leg3_tetta)
+        leg4 = FenixPositionLeg(4, leg4_alpha, leg4_beta, leg4_gamma, leg4_tetta)
+        self.legs = {
+            1: leg1, 2: leg2, 3: leg3, 4: leg4
+        }
+
+    def to_servo(self):
+        return [
+
+        ]
+
 @lru_cache(maxsize=None)
 def get_leg_angles(delta_x, delta_z, logger):
     possible_angles = find_angles(delta_x, delta_z, logger)
-
-    return get_best_angles(possible_angles)
+    best_angles = get_best_angles(possible_angles)
+    logger.info(f'Best angles: {[math.degrees(x) for x in best_angles]}')
+    return best_angles
 
 def find_angles(Dx, Dy, logger):
     a, b, c = cfg.leg["a"], cfg.leg["b"], cfg.leg["c"]
@@ -67,7 +108,7 @@ def find_angles(Dx, Dy, logger):
                 if abs(new_Dx - Dx) > 0.01 or abs(new_Dy - Dy) > 0.01:
                     continue
                     # only one of two coeffs is correct
-                print(f'B: {Bx, By}. C: {Cx, Cy}')
+                #print(f'B: {Bx, By}. C: {Cx, Cy}')
                 #print(f'alpha: {round(math.degrees(alpha), 2)}, beta: {round(math.degrees(beta), 2)}, gamma: {round(math.degrees(gamma), 2)}')
                 if leg_angles_correct(
                     alpha=math.degrees(alpha), 
@@ -80,14 +121,14 @@ def find_angles(Dx, Dy, logger):
     return results
 
 def calculate_leg_angles(O: Point, D: Point, logger):
-    print(f'[CLA] O: {O}, D: {D}')
+    #print(f'[CLA] O: {O}, D: {D}')
     tetta = math.atan2(D.y - O.y, D.x - O.x)
     #print(tetta, math.degrees(tetta))
     
     A = Point(O.x + cfg.leg["d"] * math.cos(tetta),
                 O.y + cfg.leg["d"] * math.sin(tetta),
                 O.z)    
-    print(f'A: {A}')
+    #print(f'A: {A}')
     l = round(math.sqrt((D.x - A.x) ** 2 + (D.y - A.y) ** 2), 2)
     delta_z = round(D.z - O.z, 2)
     logger.info(f'Trying l {l} and delta_z {delta_z}')
@@ -100,8 +141,8 @@ def calculate_leg_angles(O: Point, D: Point, logger):
     logger.info(f'Success : {math.degrees(alpha)}, {math.degrees(beta)}, {math.degrees(gamma)}')
 
     D_calculated = calculate_D_point(O, tetta, alpha, beta, gamma, D)
-    print(f'[CLA] D initial : {D}')
-    print(f'[CLA] D calculated : {D_calculated}')
+    #print(f'[CLA] D initial : {D}')
+    #print(f'[CLA] D calculated : {D_calculated}')
 
     
     if (abs(D_calculated.x - D.x) > 0.01) or \
@@ -144,10 +185,10 @@ def calculate_D_point(
         return Point(round(A.x - D_xz[0] * math.cos(tetta), 2),
                     round(A.y - D_xz[0] * math.sin(tetta), 2),
                     round(A.z + D_xz[1], 2))
-    print(f'[CDP] A: {A}')
-    print(f'[CDP] Bxz: {B_xz}')
-    print(f'[CDP] Cxz: {C_xz}')
-    print(f'[CDP] Dxz: {D_xz}')
+    #print(f'[CDP] A: {A}')
+    #print(f'[CDP] Bxz: {B_xz}')
+    #print(f'[CDP] Cxz: {C_xz}')
+    #print(f'[CDP] Dxz: {D_xz}')
     return D_calculated
 
 def get_best_angles(all_angles):
@@ -176,12 +217,14 @@ def get_best_angles(all_angles):
     return best_angles
 
 def get_angles_distance(angles):
+    """
     print('Angles:', 
           math.degrees(angles[0]),
           math.degrees(angles[1]),
           math.degrees(angles[2]),
           math.degrees(angles[0] + angles[1] + angles[2])
           )
+    """
     return (math.degrees(angles[0] + angles[1] + angles[2]) + 90) ** 2
 
 def convert_alpha(alpha: float) -> float:
@@ -316,6 +359,90 @@ def convert_legs_angles_to_kinematic(legs_angles: List[float]) -> List[float]:
     #print(f'convert_legs_angles_to_kinematic. After {angles_converted}')
     return angles_converted
 
+
+    
+def convert_legs_angles_C(fp_in: FenixPosition, logger=None) -> FenixPosition:
+    # input: 16 angles in RADIANS
+    # output: 16 converted angles in DEGREES
+    # now tetta, alpha, beta one leg after another
+    #print(f'Before conversion: {legs_angles}')
+    fp = FenixPosition(
+        leg1_alpha=convert_alpha(fp_in.legs[1].alpha),
+        leg1_beta=convert_beta(fp_in.legs[1].beta),
+        leg1_gamma=convert_gamma(fp_in.legs[1].gamma),
+        leg1_tetta=convert_tetta(fp_in.legs[1].tetta, 1),
+
+        leg2_alpha=convert_alpha(fp_in.legs[2].alpha),
+        leg2_beta=convert_beta(fp_in.legs[2].beta),
+        leg2_gamma=convert_gamma(fp_in.legs[2].gamma),
+        leg2_tetta=convert_tetta(fp_in.legs[2].tetta, 2),
+
+        leg3_alpha=convert_alpha(fp_in.legs[3].alpha),
+        leg3_beta=convert_beta(fp_in.legs[3].beta),
+        leg3_gamma=convert_gamma(fp_in.legs[3].gamma),
+        leg3_tetta=convert_tetta(fp_in.legs[3].tetta, 3),
+
+        leg4_alpha=convert_alpha(fp_in.legs[4].alpha),
+        leg4_beta=convert_beta(fp_in.legs[4].beta),
+        leg4_gamma=convert_gamma(fp_in.legs[4].gamma),
+        leg4_tetta=convert_tetta(fp_in.legs[4].tetta, 4),
+    )    
+    #print(f'Converted: {angles_converted}')
+
+    if not tettas_correct([
+        fp.legs[1].tetta, 
+        fp.legs[2].tetta, 
+        fp.legs[3].tetta, 
+        fp.legs[4].tetta
+        ], 
+        logger=logger):
+        raise AnglesException('Bad tettas')
+
+    for i in range(4):
+        alpha_converted = fp.legs[i+1].alpha
+        beta_converted = fp.legs[i+1].beta
+        gamma_converted = fp.legs[i+1].gamma
+        tetta_converted = fp.legs[i+1].tetta
+        if not leg_angles_correct(
+                alpha=alpha_converted,
+                beta=beta_converted,
+                gamma=gamma_converted,
+                tetta=tetta_converted,
+                logger=logger
+            ):
+            raise AnglesException(f'Leg {i+1}. Bad angles:alpha {alpha_converted}, beta {beta_converted}, gamma {gamma_converted}, tetta {tetta_converted}')
+
+    return fp
+
+def convert_legs_angles_to_kinematic_C(fp_in: FenixPosition, logger=None) -> FenixPosition:
+    # input: 16 angles in DEGREES
+    # output: 16 converted angles in RADIANS
+    # now tetta, alpha, beta one leg after another
+    #print(f'convert_legs_angles_to_kinematic. Before {legs_angles}')
+    fp = FenixPosition(
+        leg1_alpha=convert_alpha_to_kinematic(fp_in.legs[1].alpha),
+        leg1_beta=convert_beta_to_kinematic(fp_in.legs[1].beta),
+        leg1_gamma=convert_gamma_to_kinematic(fp_in.legs[1].gamma),
+        leg1_tetta=convert_tetta_to_kinematic(fp_in.legs[1].tetta, 1),
+
+        leg2_alpha=convert_alpha_to_kinematic(fp_in.legs[2].alpha),
+        leg2_beta=convert_beta_to_kinematic(fp_in.legs[2].beta),
+        leg2_gamma=convert_gamma_to_kinematic(fp_in.legs[2].gamma),
+        leg2_tetta=convert_tetta_to_kinematic(fp_in.legs[2].tetta, 2),
+
+        leg3_alpha=convert_alpha_to_kinematic(fp_in.legs[3].alpha),
+        leg3_beta=convert_beta_to_kinematic(fp_in.legs[3].beta),
+        leg3_gamma=convert_gamma_to_kinematic(fp_in.legs[3].gamma),
+        leg3_tetta=convert_tetta_to_kinematic(fp_in.legs[3].tetta, 3),
+
+        leg4_alpha=convert_alpha_to_kinematic(fp_in.legs[4].alpha),
+        leg4_beta=convert_beta_to_kinematic(fp_in.legs[4].beta),
+        leg4_gamma=convert_gamma_to_kinematic(fp_in.legs[4].gamma),
+        leg4_tetta=convert_tetta_to_kinematic(fp_in.legs[4].tetta, 4)
+    )
+
+    return fp
+
 # ----------------------
 # moves for Fenix
 def get_angle_by_coords(x1, y1):
@@ -345,18 +472,38 @@ if __name__ == '__main__':
     logging.config.dictConfig(code_config.logger_config)
     logger = logging.getLogger('main_logger')
 
+    fp = FenixPosition('physical', 44.51882068166497, 14.398429391637588, -82.79813097435527, -20.637939780612253, -26.762858610560755, 12.719663051904275, -128.64048416277242, 26.401895199628335, -135.24095796267952, 4.079459501331462, -131.7573745682841, 13.68223214772406, 114.59728860411596, 9.837685342396234, -134.63935227779214, 33.598245106471474)
+    print(fp.legs[1].alpha)
+
     """
     angles = [0.7853981633974483, 0.06096254159288539, 1.9076410156604413, -0.7853981633974483, 0.06096254159288539, 1.9076410156604413, -2.356194490192345, 0.06096254159288539, 1.9076410156604413, 2.356194490192345, 0.06096254159288539, 1.9076410156604413]
     angles_converted = convert_legs_angles(angles)
     print(angles_converted)
     angles_converted_back = convert_legs_angles_to_kinematic(angles_converted)
     print(angles_converted_back)
-    """
+    
     O = Point(x=3.8, y=-3.8, z=0)
-    D = Point(x=9.13, y=-7.01, z=-14.28)
-    a = calculate_leg_angles(O, D, logger)
-    print(a)
+    #D = Point(x=9.13, y=-7.01, z=-14)
+    for z in range(-20, 10):
+        for y in [-5, 0, 5]:
+            for x in [9, 13, 17]:
+                D = Point(x=x, y=y, z=z)                
+                try:
+                    a = calculate_leg_angles(O, D, logger)
+                    print(f'D: {D}')
+                    #print([round(math.degrees(x), 2) for x in a])
+                except Exception as e:
+                    if 'No angles' not in str(e):
+                        print(e)
     #angles = get_leg_angles(0.3, -8.2, logger)
     #print([math.degrees(x) for x in angles])
 
     # 40.69674025591244 -136.88832870747177 -35.808411548440716 -132.00000000000006
+    
+    [-12.994616791916506, -13.243320770137336, -137.86707982845593, 31.110400598593166]
+    [36.15818543980832, -16.428406089263376, -138.46132915745176, 31.88973524671527]
+    [-12.994616791916506, -8.269444188721673, -135.48420122953993, 20.753645418261787]
+    [36.15818543980832, -11.648881972170209, -136.48554311597042, 22.13442508814046]
+    [-12.994616791916506, -3.7008469377274382, -132.58336145386508, 10.284208391592482]
+    [36.15818543980832, -7.210819829356003, -134.0060979992245, 12.216917828580524]
+    """

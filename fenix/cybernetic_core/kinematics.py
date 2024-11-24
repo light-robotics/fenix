@@ -6,7 +6,7 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from configs import config as cfg
-from cybernetic_core.geometry.angles import calculate_leg_angles, turn_on_angle, convert_legs_angles, calculate_D_point
+from cybernetic_core.geometry.angles import calculate_leg_angles, turn_on_angle, convert_legs_angles, calculate_D_point, convert_legs_angles_to_kinematic
 from cybernetic_core.geometry.lines import Point, LinearFunc, calculate_intersection, move_on_a_line
 import configs.code_config as code_config
 import logging.config
@@ -1336,9 +1336,11 @@ class FenixKinematics:
         self.body_to_center()
 
 if __name__ == '__main__':
-    fk = FenixKinematics()
-    #fk.body_movement(0, 0, 5)
-    #fk.left_turn_in_move()
-    angles = fk.current_position #sequence[-1].angles_snapshot
-    print([math.degrees(angle) for angle in angles])
-    print(fk.sequence)
+    angles = [0.6011, 0.6493, -1.4409, -1.5582, -0.4712, 0.2555, -2.2452, 0.4314, -2.3604, 0.067, -2.2996, 0.2346, 2.0043, 0.2178, -2.3248, 0.4691]
+    
+    # {'leg': 1, 'deltas': [8, 0, 16]} : Moving to [-58.0, 43.74, -29.26, -11.76, -13.97, 27.24, 13.27, 17.51, -8.09, 38.6, 6.51, -0.25, -31.7, 42.83, 11.13, -19.18]
+    fk = FenixKinematics(fenix_position=angles)
+    fk.move_leg_endpoint(1, [0, 0, -20])
+    print(fk.sequence[-1].angles_snapshot)
+    angles_2 = [0.777, 0.2513, -1.4451, -0.3602, -0.4671, 0.222, -2.2452, 0.4608, -2.3604, 0.0712, -2.2996, 0.2388, 2.0001, 0.1717, -2.3499, 0.5864]
+    print([math.degrees(x) for x in angles_2])

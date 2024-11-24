@@ -65,13 +65,13 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
         for leg in [1, 3, 2, 4]:
             
             if leg in [1, 4]:
-                y_diff = -3
+                y_diff = 0 # -2
             else:
-                y_diff = 3
+                y_diff = 0 # 2
             if leg in [1, 2]:
-                x_diff = -2
+                x_diff = 0 # -1
             else:
-                x_diff = 2
+                x_diff = 0 # 1
             sequence.append(Move('body_compensation_for_a_leg', {'leg': leg}))
             sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM + x_diff, y_diff, 16]}))
             sequence.append(Move('touch', {'leg': leg}))
@@ -103,8 +103,10 @@ def get_angles_for_sequence(move: Move, fenix_position: List[int]):
     elif move.move_type == 'endpoint':
         fk.move_leg_endpoint(move.values['leg'], move.values['deltas'])
     elif move.move_type == 'touch':
+        """
         leg_num = move.values['leg']
         leg = fk.legs[leg_num]
+        
         global leg1x, leg1y, leg2x, leg2y, leg3x, leg3y, leg4x, leg4y
         delta_x, delta_y = 0, 0
         if int(leg_num) == 1:
@@ -132,9 +134,9 @@ def get_angles_for_sequence(move: Move, fenix_position: List[int]):
               , 'delta:'
               , delta_x
               , delta_y)
-        
+        """
         delta_x = delta_y = 0
-        fk.leg_move_custom(move.values['leg'], 'touch', [-delta_x, -delta_y, -15])
+        fk.leg_move_custom(move.values['leg'], 'touch', [-delta_x, -delta_y, -20])
     elif move.move_type == 'balance':
         with open('/fenix/fenix/wrk/gyroaccel_data.txt', "r") as f:
             pitch, roll = f.readline().split(',')

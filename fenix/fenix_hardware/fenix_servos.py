@@ -160,10 +160,10 @@ class FenixServos:
                 self.logger.info(f'Body balance moving wrong roll {prev_roll, roll}. Exiting')
                 return self.get_current_angles()
             
-            if abs(pitch) < config.fenix["balance_offset"] and abs(roll) < config.fenix["balance_offset"]:
+            if abs(pitch) < config.fenix["balance_offset"] or abs(roll) < config.fenix["balance_offset"]:
                 current_angles = self.get_current_angles()
                 self.logger.info(f'current angles: {current_angles}')
-                self.logger.info(f'Body balanced. Exiting')
+                self.logger.info(f'Body balanced (at least one side). Exiting')
                 self.send_command_to_servos(current_angles, 0)
                 return current_angles
             
@@ -383,14 +383,10 @@ if __name__ == '__main__':
     fnx = FenixServos()
 
     """
-    fnx.set_speed(1000)
+    fnx.set_speed(2000)
     sequence = [
-        [
-            47.59, -3.55, 81.13, 0.0, 
-            47.59, -3.55, 81.13, 0.0, 
-            69.84, -22.73, 17.11, 0.0, 
-            69.84, -22.73, 17.11, 0.0
-        ]
+        [-65.37, 30.75, -34.63, -10.55, -22.04, 37.07, 15.02, 18.02, -15.2, 42.89, 3.69, -0.26, -18.72, 38.35, 13.62, -20.17],
+        [44.51882068166497, 14.398429391637588, -82.79813097435527, -20.637939780612253, -26.762858610560755, 12.719663051904275, -128.64048416277242, 26.401895199628335, -135.24095796267952, 4.079459501331462, -131.7573745682841, 13.68223214772406, 114.59728860411596, 9.837685342396234, -134.63935227779214, 33.598245106471474]
     ]
     # 19.42853486276713, -74.1493912084663, -65.2791436543008   
     for angles in sequence:     
