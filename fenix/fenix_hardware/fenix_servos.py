@@ -9,6 +9,7 @@ import configs.code_config as code_config
 import logging.config
 logging.config.dictConfig(code_config.logger_config)
 
+from cybernetic_core.geometry.angles import FenixPosition
 
 class FenixServos:
     def __init__(self):
@@ -42,8 +43,34 @@ class FenixServos:
         self.speed = new_speed
         self.logger.info(f'FenixServos. Speed set to {self.speed}')
     
-    #@timing
-    def get_current_angles(self):
+    def get_current_angles(self) -> FenixPosition:
+        current_position = FenixPosition(
+            leg1_gamma=self.m1.read_angle(2),
+            leg1_beta=self.m1.read_angle(3),
+            leg1_alpha=self.m1.read_angle(4),
+            leg1_tetta=self.m1.read_angle(5),
+
+            leg2_gamma=self.m1.read_angle(8),
+            leg2_beta=self.m1.read_angle(9),
+            leg2_alpha=self.m1.read_angle(10),
+            leg2_tetta=self.m1.read_angle(11),
+
+            leg3_gamma=self.m4.read_angle(14),
+            leg3_beta=self.m4.read_angle(15),
+            leg3_alpha=self.m4.read_angle(16),
+            leg3_tetta=self.m4.read_angle(17),
+
+            leg4_gamma=self.m4.read_angle(20),
+            leg4_beta=self.m4.read_angle(21),
+            leg4_alpha=self.m4.read_angle(22),
+            leg4_tetta=self.m4.read_angle(23),
+        )
+        
+        self.logger.info(f'Read current angles : {current_position}')
+        
+        return current_position
+
+    def get_current_angles_old(self):
         current_angles = []
         
         for i in [2, 3, 4, 5, 8, 9, 10, 11]:
@@ -111,8 +138,29 @@ class FenixServos:
             for _ in range(4):
                 m.move_servo_to_angle(j, angles[j-1], rate)
                 j += 1
-    #@timing
-    def send_command_to_servos(self, angles, rate):
+    
+    def send_command_to_servos(self, fp: FenixPosition, rate):
+        self.m1.move_servo_to_angle(2, fp.legs[1].gamma, rate)
+        self.m1.move_servo_to_angle(3, fp.legs[1].beta, rate)
+        self.m1.move_servo_to_angle(4, fp.legs[1].alpha, rate)
+        self.m1.move_servo_to_angle(5, fp.legs[1].tetta, rate)
+
+        self.m1.move_servo_to_angle(8, fp.legs[2].gamma, rate)
+        self.m1.move_servo_to_angle(9, fp.legs[2].beta, rate)
+        self.m1.move_servo_to_angle(10, fp.legs[2].alpha, rate)
+        self.m1.move_servo_to_angle(11, fp.legs[2].tetta, rate)
+
+        self.m4.move_servo_to_angle(14, fp.legs[3].gamma, rate)
+        self.m4.move_servo_to_angle(15, fp.legs[3].beta, rate)
+        self.m4.move_servo_to_angle(16, fp.legs[3].alpha, rate)
+        self.m4.move_servo_to_angle(17, fp.legs[3].tetta, rate)
+
+        self.m4.move_servo_to_angle(20, fp.legs[4].gamma, rate)
+        self.m4.move_servo_to_angle(21, fp.legs[4].beta, rate)
+        self.m4.move_servo_to_angle(22, fp.legs[4].alpha, rate)
+        self.m4.move_servo_to_angle(23, fp.legs[4].tetta, rate)
+
+    def send_command_to_servos_old(self, angles, rate):
         j = 0
         for i in [2, 3, 4, 5, 8, 9, 10, 11]:
             self.m1.move_servo_to_angle(i, angles[j], rate)
@@ -324,20 +372,20 @@ class FenixServos:
         self.logger.info(f'Wait time : {wait_time}, speed : {int(self.speed * 0.9)}')
         time.sleep(wait_time)
 
-    def set_servo_values_not_paced_v2(self, angles, prev_angles=None):
+    def set_servo_values_not_paced_v2(self, fp: FenixPosition, prev_fp: FenixPosition = None):
         # every command is executed over a computed time, depending on the angle
-        _, max_angle_diff = self.get_angles_diff(angles, prev_angles)
+        _, max_angle_diff = self.get_angles_diff(fp, prev_fp)
         rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
         wait_time = max(0, rate / 1000 - config.fenix['movement_command_advance_ms'])
 
         self.logger.info(f'max_angle_diff: {max_angle_diff}, self.speed : {self.speed}, self.speed * max_angle_diff / 45 : {self.speed * max_angle_diff / 45}')
         self.logger.info(f'Wait time : {wait_time}')
         
-        self.send_command_to_servos(angles, rate)
+        self.send_command_to_servos(fp, rate)
         
         time.sleep(wait_time)
         self.logger.info(f'[DIFF] Diff with target:')
-        self.get_angles_diff(angles)
+        self.get_angles_diff(fp)
 
     def set_servo_values_overshoot(self, angles, prev_angles=None):
         angles_diff, max_angle_diff = self.get_angles_diff(angles, prev_angles)
@@ -367,12 +415,12 @@ class FenixServos:
         self.logger.info(f'[DIFF] Diff from target:')
         self.get_angles_diff(angles)
 
-    def get_angles_diff(self, target_angles, test_angles=None):
-        if test_angles is None:
-            test_angles = self.get_current_angles()
+    def get_angles_diff(self, target_position: FenixPosition, test_position: FenixPosition = None):
+        if test_position is None:
+            test_position = self.get_current_angles()
 
         angles_diff = []
-        for current, target in zip(test_angles, target_angles):
+        for current, target in zip(test_position.to_servo(), target_position.to_servo()):
             angles_diff.append(round(current - target, 2))
         max_angle_diff = max([abs(x) for x in angles_diff])
         self.logger.info(f'[DIFF] Max : {max_angle_diff}. Avg : {sum([abs(x) for x in angles_diff])/16}. Sum : {sum([abs(x) for x in angles_diff])}')

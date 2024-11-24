@@ -143,7 +143,7 @@ class MovementProcessor:
 
         original_move_function = move_function
         for move_snapshot in sequence:
-            angles = move_snapshot.angles_snapshot.to_servo()
+            angles = move_snapshot.angles_snapshot
             #if move_snapshot.move_type == 'body' and self.speed != self.body_speed:
             #    self.fs.set_speed(self.body_speed)
             if move_snapshot.move_type == 'body':
