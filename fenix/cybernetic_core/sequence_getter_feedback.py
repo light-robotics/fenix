@@ -9,6 +9,7 @@ from cybernetic_core.kinematics import FenixKinematics
 from configs import config as cfg
 from configs import code_config
 from cybernetic_core.cybernetic_utils.moves import Sequence
+from cybernetic_core.geometry.angles import FenixPosition
 
 #from functools import cache
 memory = Memory(code_config.cache_dir, verbose=0)
@@ -87,7 +88,7 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
     #print(f'[SG]. Sequence commands: {sequence}')
     return sequence
 
-def get_angles_for_sequence(move: Move, fenix_position: List[int]):
+def get_angles_for_sequence(move: Move, fenix_position: FenixPosition):
     fk = FenixKinematics(fenix_position=fenix_position)
     print(f'Move: {move.move_type}. {move.values}')
     # print(f'fenix_position: {fenix_position}')

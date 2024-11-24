@@ -21,12 +21,14 @@ class GeometryException(Exception):
     pass
 
 class FenixPositionLeg():
-    def __init__(self, number, alpha, beta, gamma, tetta):
-        self.number = number
+    def __init__(self, alpha, beta, gamma, tetta):
         self.alpha = alpha
         self.beta = beta
         self.gamma = gamma
         self.tetta = tetta
+    
+    def __repr__(self):
+        return f'a: {self.alpha}, b: {self.beta}, g: {self.gamma}, t: {self.tetta}'
 
 class FenixPosition():
     def __init__(self, 
@@ -47,18 +49,52 @@ class FenixPosition():
             leg4_beta,
             leg4_gamma
             ):
-        leg1 = FenixPositionLeg(1, leg1_alpha, leg1_beta, leg1_gamma, leg1_tetta)
-        leg2 = FenixPositionLeg(2, leg2_alpha, leg2_beta, leg2_gamma, leg2_tetta)
-        leg3 = FenixPositionLeg(3, leg3_alpha, leg3_beta, leg3_gamma, leg3_tetta)
-        leg4 = FenixPositionLeg(4, leg4_alpha, leg4_beta, leg4_gamma, leg4_tetta)
+        leg1 = FenixPositionLeg(leg1_alpha, leg1_beta, leg1_gamma, leg1_tetta)
+        leg2 = FenixPositionLeg(leg2_alpha, leg2_beta, leg2_gamma, leg2_tetta)
+        leg3 = FenixPositionLeg(leg3_alpha, leg3_beta, leg3_gamma, leg3_tetta)
+        leg4 = FenixPositionLeg(leg4_alpha, leg4_beta, leg4_gamma, leg4_tetta)
         self.legs = {
             1: leg1, 2: leg2, 3: leg3, 4: leg4
         }
 
     def to_servo(self):
         return [
-
+            self.legs[1].gamma, self.legs[1].beta, self.legs[1].alpha, self.legs[1].tetta,
+            self.legs[2].gamma, self.legs[2].beta, self.legs[2].alpha, self.legs[2].tetta,
+            self.legs[3].gamma, self.legs[3].beta, self.legs[3].alpha, self.legs[3].tetta,
+            self.legs[4].gamma, self.legs[4].beta, self.legs[4].alpha, self.legs[4].tetta,
         ]
+
+    def __hash__(self):
+        return hash(self.to_servo())
+
+    def __repr__(self):
+        return f'\n1: {self.legs[1]}\n2: {self.legs[2]}\n3: {self.legs[3]}\n4: {self.legs[4]}\n'
+
+def build_position_from_servos(servo_angles: List[float]) -> FenixPosition:
+    # incoming angles: gamma, beta, alpha, tetta for leg 1 to 4
+    gamma1, beta1, alpha1, tetta1, gamma2, beta2, alpha2, tetta2, gamma3, beta3, alpha3, tetta3, gamma4, beta4, alpha4, tetta4 = servo_angles
+    return FenixPosition(
+        leg1_alpha=alpha1,
+        leg1_beta=beta1,
+        leg1_gamma=gamma1,
+        leg1_tetta=tetta1,
+
+        leg2_alpha=alpha2,
+        leg2_beta=beta2,
+        leg2_gamma=gamma2,
+        leg2_tetta=tetta2,
+
+        leg3_alpha=alpha3,
+        leg3_beta=beta3,
+        leg3_gamma=gamma3,
+        leg3_tetta=tetta3,
+
+        leg4_alpha=alpha4,
+        leg4_beta=beta4,
+        leg4_gamma=gamma4,
+        leg4_tetta=tetta4,
+    )
 
 @lru_cache(maxsize=None)
 def get_leg_angles(delta_x, delta_z, logger):
@@ -140,7 +176,7 @@ def calculate_leg_angles(O: Point, D: Point, logger):
     
     logger.info(f'Success : {math.degrees(alpha)}, {math.degrees(beta)}, {math.degrees(gamma)}')
 
-    D_calculated = calculate_D_point(O, tetta, alpha, beta, gamma, D)
+    D_calculated = calculate_D_point(O, FenixPositionLeg(alpha, beta, gamma, tetta), D)
     #print(f'[CLA] D initial : {D}')
     #print(f'[CLA] D calculated : {D_calculated}')
 
@@ -156,25 +192,22 @@ def calculate_leg_angles(O: Point, D: Point, logger):
 
 def calculate_D_point(
         O: Point, 
-        tetta: float, 
-        alpha: float, 
-        beta: float, 
-        gamma: float, 
+        fp_leg: FenixPositionLeg,
         D: Point | None = None
     ) -> Point:
-    A = Point(O.x + cfg.leg["d"] * math.cos(tetta),
-                O.y + cfg.leg["d"] * math.sin(tetta),
+    A = Point(O.x + cfg.leg["d"] * math.cos(fp_leg.tetta),
+                O.y + cfg.leg["d"] * math.sin(fp_leg.tetta),
                 O.z)
     
-    B_xz = [cfg.leg["a"] * math.cos(alpha),
-            cfg.leg["a"] * math.sin(alpha)]
-    C_xz = [B_xz[0] + cfg.leg["b"] * math.cos(alpha + beta),
-            B_xz[1] + cfg.leg["b"] * math.sin(alpha + beta)]
-    D_xz = [C_xz[0] + cfg.leg["c"] * math.cos(alpha + beta + gamma),
-            C_xz[1] + cfg.leg["c"] * math.sin(alpha + beta + gamma)]
+    B_xz = [cfg.leg["a"] * math.cos(fp_leg.alpha),
+            cfg.leg["a"] * math.sin(fp_leg.alpha)]
+    C_xz = [B_xz[0] + cfg.leg["b"] * math.cos(fp_leg.alpha + fp_leg.beta),
+            B_xz[1] + cfg.leg["b"] * math.sin(fp_leg.alpha + fp_leg.beta)]
+    D_xz = [C_xz[0] + cfg.leg["c"] * math.cos(fp_leg.alpha + fp_leg.beta + fp_leg.gamma),
+            C_xz[1] + cfg.leg["c"] * math.sin(fp_leg.alpha + fp_leg.beta + fp_leg.gamma)]
 
-    D_calculated = Point(round(A.x + D_xz[0] * math.cos(tetta), 2),
-                    round(A.y + D_xz[0] * math.sin(tetta), 2),
+    D_calculated = Point(round(A.x + D_xz[0] * math.cos(fp_leg.tetta), 2),
+                    round(A.y + D_xz[0] * math.sin(fp_leg.tetta), 2),
                     round(A.z + D_xz[1], 2))
     if D is None:
         return D_calculated
@@ -182,8 +215,8 @@ def calculate_D_point(
     if (abs(D_calculated.x - D.x) > 0.01) or \
         (abs(D_calculated.y - D.y) > 0.01) or \
         (abs(D_calculated.z - D.z) > 0.01):
-        return Point(round(A.x - D_xz[0] * math.cos(tetta), 2),
-                    round(A.y - D_xz[0] * math.sin(tetta), 2),
+        return Point(round(A.x - D_xz[0] * math.cos(fp_leg.tetta), 2),
+                    round(A.y - D_xz[0] * math.sin(fp_leg.tetta), 2),
                     round(A.z + D_xz[1], 2))
     #print(f'[CDP] A: {A}')
     #print(f'[CDP] Bxz: {B_xz}')

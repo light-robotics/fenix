@@ -6,7 +6,7 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from cybernetic_core.kinematics import FenixKinematics
-from cybernetic_core.geometry.angles import convert_legs_angles, convert_legs_angles_to_kinematic
+from cybernetic_core.geometry.angles import build_position_from_servos, convert_legs_angles_to_kinematic_C
 from cybernetic_core.sequence_getter_feedback import get_sequence_for_command, get_angles_for_sequence
 from cybernetic_core.geometry.angles import AnglesException
 from core.utils.multiphase_moves import CommandsForwarder
@@ -106,7 +106,7 @@ class MovementProcessor:
 
         for move in sequence:
             next_angles = get_angles_for_sequence(move, self.fenix_position)
-            angles_snapshot = next_angles.angles_snapshot[:]
+            angles_snapshot = next_angles.angles_snapshot.to_servo()
             #print(f'angles_snapshot: {angles_snapshot}')
 
             if next_angles.move_type == 'body':
@@ -129,7 +129,8 @@ class MovementProcessor:
             self.logger.info(f'Speed: {self.fs.speed}')
             if not code_config.DEBUG:
                 new_angles = move_function(angles_snapshot)
-                self.fenix_position = convert_legs_angles_to_kinematic(new_angles[:])
+                fp = build_position_from_servos(new_angles)
+                self.fenix_position = convert_legs_angles_to_kinematic_C(fp)
                 print(f'convert_legs_angles_to_kinematic: {self.fenix_position}')
             else:
                 time.sleep(1.0)
@@ -153,12 +154,12 @@ class MovementProcessor:
                     self.fs.disable_torque()
                     
                 else:
-                    try:
+                    #try:
                         self.execute_command(command, speed)
-                    except Exception as e:
-                        self.fs.disable_torque()
-                        time.sleep(1.0)
-                        print(e)
+                    #except Exception as e:
+                    #    self.fs.disable_torque()
+                    #    time.sleep(1.0)
+                    #    print(e)
 
         except KeyboardInterrupt:
             print('Movement stopped')

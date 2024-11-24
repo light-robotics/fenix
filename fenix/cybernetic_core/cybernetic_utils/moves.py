@@ -1,12 +1,13 @@
 import copy
 from typing import List, Dict
 from dataclasses import dataclass
+from cybernetic_core.geometry.angles import FenixPosition
 
 
 @dataclass
 class MoveSnapshot:
     move_type: str
-    angles_snapshot: List[float]
+    angles_snapshot: FenixPosition
 
 class Sequence:
     def __init__(self, moves: List[MoveSnapshot]):
@@ -17,7 +18,7 @@ class Move:
                  command: str, # change command to enum some day
                  value: int = 0, 
                  legs: List[int] = [1, 2, 3, 4], 
-                 target_legs_position: Dict[int, List[float]] = None
+                 target_legs_position: Dict[int, FenixPosition] = None
         ):
         self.command = command
         self.value = value
