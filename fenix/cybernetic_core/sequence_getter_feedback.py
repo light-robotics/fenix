@@ -48,9 +48,9 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
                 sequence.append(Move('body_movement', {'deltas': [14, 0, 0]}))
 
             if leg in [1, 4]:
-                y_diff = -2
+                y_diff = 2
             else:
-                y_diff = 2 
+                y_diff = -2 
             if leg in [1, 2]:
                 x_diff = -0
             else:
@@ -63,12 +63,12 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
             sequence.append(Move('balance', {}))
         sequence.append(Move('body_to_center', {}))
     elif command == 'forward_one_legged':
-        for leg in [1, 3, 2, 4]:
+        for leg in [3, 4, 1, 2]:
             
             if leg in [1, 4]:
-                y_diff = 0 # -2
+                y_diff = -2 # -2
             else:
-                y_diff = 0 # 2
+                y_diff = 2 # 2
             if leg in [1, 2]:
                 x_diff = 0 # -1
             else:
@@ -137,8 +137,8 @@ def get_angles_for_sequence(move: Move, fenix_position: FenixPosition):
               , delta_y)
         delta = move.values['deltas']
         print(f'delta before: {delta}')
-        delta[0] -= delta_x
-        delta[1] -= delta_y
+        delta[0] += delta_x
+        delta[1] += delta_y
         print(f'delta after: {delta}')
         fk.move_leg_endpoint(move.values['leg'], delta)
     elif move.move_type == 'touch':

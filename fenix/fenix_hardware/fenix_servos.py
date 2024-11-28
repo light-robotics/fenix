@@ -233,10 +233,10 @@ class FenixServos:
         pitch, roll = float(pitch), float(roll)
         self.logger.info(f"ga_data: {pitch, roll}")
 
-        if abs(pitch) < config.fenix["balance_offset"] or abs(roll) < config.fenix["balance_offset"]:
-            initially_balanced = True
-        else:
-            initially_balanced = False
+        #if abs(pitch) < 2 * config.fenix["balance_offset"] or abs(roll) < 2 * config.fenix["balance_offset"]:
+        #    initially_balanced = True
+        #else:
+        #    initially_balanced = False
         
         for s in range(50):
             self.logger.info(f'Step {s}')
@@ -251,6 +251,7 @@ class FenixServos:
                 self.send_command_to_servos(current_angles, 0)
                 return current_angles
 
+            """
             if not initially_balanced:            
                 with open('/fenix/fenix/wrk/gyroaccel_data.txt', "r") as f:
                     pitch, roll = f.readline().split(',')
@@ -263,7 +264,7 @@ class FenixServos:
                     self.logger.info(f'Body balanced (at least one side). Exiting')
                     self.send_command_to_servos(current_angles, 0)
                     return current_angles
-
+            """
             time.sleep(0.03)
         return self.get_current_angles()
             

@@ -31,8 +31,8 @@ modes = {
         "y": 15,
     },
     "walking_mode" : {
-        "x": 17,
-        "y": 20,
+        "x": 18,
+        "y": 18,
     },
     "battle_mode" : {
         "x": 15,
@@ -46,7 +46,7 @@ speed = {
 }
 
 moves = {
-    "up_or_down_cm"         : 4,
+    "up_or_down_cm"         : 2,
     "move_body_cm"          : 7,
     "forward_body_1_leg_cm" : 8,
     "forward_body_2_leg_cm" : 7,    

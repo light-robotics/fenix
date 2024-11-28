@@ -139,7 +139,7 @@ class MovementProcessor:
         for move in sequence:
             command_executed = False
             attempts = 1
-            while not command_executed and attempts < 4:
+            while not command_executed and attempts < 5:
                 try:
                     attempts += 1
                     self.get_and_move_to_angles(move)
@@ -150,8 +150,13 @@ class MovementProcessor:
                     self.get_and_move_to_angles(down_sequence[0])
                 except AnglesException as e:
                     print(f'Execution of command {command} resulted in:\n{e}\nMoving up')
-                    up_sequence = get_sequence_for_command('up')
-                    self.get_and_move_to_angles(up_sequence[0])
+                    try:
+                        up_sequence = get_sequence_for_command('up')
+                        self.get_and_move_to_angles(up_sequence[0])
+                    except AnglesException as e:
+                        print(f'Execution of command UP resulted in:\n{e}\nMoving down')
+                        down_sequence = get_sequence_for_command('down')
+                        self.get_and_move_to_angles(down_sequence[0])
                     
             
 
