@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from cybernetic_core.kinematics import FenixKinematics
 from cybernetic_core.geometry.angles import build_position_from_servos, convert_legs_angles_to_kinematic_C
 from cybernetic_core.sequence_getter_feedback import get_sequence_for_command, get_angles_for_sequence
-from cybernetic_core.geometry.angles import AnglesException
+from cybernetic_core.geometry.angles import AnglesException, DistanceException
 from core.utils.multiphase_moves import CommandsForwarder
 import configs.code_config as code_config
 import logging.config
@@ -93,47 +93,68 @@ class MovementProcessor:
             print(f'Executing move: {command}')
             if command == 'none':
                 time.sleep(0.1)
-            else:    
+            else:
                 self.run_sequence(command, kwargs)
-                        
+
+    def get_and_move_to_angles(self, move):
+        next_angles = get_angles_for_sequence(move, self.fenix_position)
+        angles_snapshot = next_angles.angles_snapshot
+        #print(f'angles_snapshot: {angles_snapshot}')
+
+        if next_angles.move_type == 'body':
+            self.fs.set_speed(self.body_speed)
+        else:
+            self.fs.set_speed(self.speed)
+                    
+        if next_angles.move_type == 'touch':
+            self.logger.info('[MP] Using function set_servo_values_touching')
+            move_function = self.fs.set_servo_values_touching
+        elif next_angles.move_type == 'balance':
+            self.logger.info('[MP] Using function set_servo_values_balancing')
+            move_function = self.fs.set_servo_values_balancing
+            self.fs.set_speed(2000)
+        else:
+            self.logger.info('[MP] Using function set_servo_values_paced_wo_feedback')
+            move_function = self.fs.set_servo_values_paced_wo_feedback
+
+        self.logger.info(f'[MP] Moving to {angles_snapshot}. Move type: {next_angles.move_type}')
+        self.logger.info(f'Speed: {self.fs.speed}')
+
+        new_angles = move_function(angles_snapshot)
+
+        self.fenix_position = convert_legs_angles_to_kinematic_C(new_angles)
+        print(f'convert_legs_angles_to_kinematic: {self.fenix_position}')
+
+
     def run_sequence(self, command: str, kwargs=None) -> None:        
         self.logger.info(f'[MOVE] Started run_sequence : {datetime.datetime.now()}')
         self.logger.info(f'MOVE. Trying command {command}')
+        
         sequence = get_sequence_for_command(command, kwargs)
+        #move = sequence[0]
             
         self.logger.info(f'[MOVE] Started: {datetime.datetime.now()}')    
         start_time = datetime.datetime.now()
 
         for move in sequence:
-            next_angles = get_angles_for_sequence(move, self.fenix_position)
-            angles_snapshot = next_angles.angles_snapshot.to_servo()
-            #print(f'angles_snapshot: {angles_snapshot}')
+            command_executed = False
+            attempts = 1
+            while not command_executed and attempts < 4:
+                try:
+                    attempts += 1
+                    self.get_and_move_to_angles(move)
+                    command_executed = True
+                except DistanceException as e:
+                    print(f'Execution of command {command} resulted in:\n{e}\nMoving down')
+                    down_sequence = get_sequence_for_command('down')
+                    self.get_and_move_to_angles(down_sequence[0])
+                except AnglesException as e:
+                    print(f'Execution of command {command} resulted in:\n{e}\nMoving up')
+                    up_sequence = get_sequence_for_command('up')
+                    self.get_and_move_to_angles(up_sequence[0])
+                    
+            
 
-            if next_angles.move_type == 'body':
-                self.fs.set_speed(self.body_speed)
-            else:
-                self.fs.set_speed(self.speed)
-                        
-            if next_angles.move_type == 'touch':
-                self.logger.info('[MP] Using function set_servo_values_touching')
-                move_function = self.fs.set_servo_values_touching
-            elif next_angles.move_type == 'balance':
-                self.logger.info('[MP] Using function set_servo_values_balancing')
-                move_function = self.fs.set_servo_values_balancing
-                self.fs.set_speed(2000)
-            else:
-                self.logger.info('[MP] Using function set_servo_values_paced_wo_feedback')
-                move_function = self.fs.set_servo_values_paced_wo_feedback
-
-            self.logger.info(f'[MP] Moving to {angles_snapshot}. Move type: {next_angles.move_type}')
-            self.logger.info(f'Speed: {self.fs.speed}')
-            if not code_config.DEBUG:
-                new_angles = move_function(angles_snapshot)
-                fp = build_position_from_servos(new_angles)
-                self.fenix_position = convert_legs_angles_to_kinematic_C(fp)
-                print(f'convert_legs_angles_to_kinematic: {self.fenix_position}')
-            else:
-                time.sleep(1.0)
         self.logger.info(f'[MOVE] finished: {datetime.datetime.now()}')
         self.logger.info(f'[TIMING] Step took : {datetime.datetime.now() - start_time}')
 

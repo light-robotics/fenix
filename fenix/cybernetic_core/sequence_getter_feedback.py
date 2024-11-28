@@ -74,7 +74,8 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
             else:
                 x_diff = 0 # 1
             sequence.append(Move('body_compensation_for_a_leg', {'leg': leg}))
-            sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM + x_diff, y_diff, 16]}))
+            sequence.append(Move('endpoint_normalized', {'leg': leg, 'deltas': [0, 0, 24]}))
+            sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM + x_diff, y_diff, 0]}))
             sequence.append(Move('touch', {'leg': leg}))
             sequence.append(Move('body_to_center', {}))
             sequence.append(Move('balance', {}))
@@ -103,8 +104,7 @@ def get_angles_for_sequence(move: Move, fenix_position: FenixPosition):
         fk.body_compensation_for_a_leg(move.values['leg'])
     elif move.move_type == 'endpoint':
         fk.move_leg_endpoint(move.values['leg'], move.values['deltas'])
-    elif move.move_type == 'touch':
-        """
+    elif move.move_type == 'endpoint_normalized':
         leg_num = move.values['leg']
         leg = fk.legs[leg_num]
         
@@ -127,7 +127,7 @@ def get_angles_for_sequence(move: Move, fenix_position: FenixPosition):
                 leg4x, leg4y = leg.D.x, leg.D.y
             delta_x, delta_y = round(leg4x - leg.D.x, 1), round(leg4y - leg.D.y, 1)
         
-        print("Touch before. leg_num: ", 
+        print("Endpoint normalization. leg_num: ", 
               move.values['leg'],
               f'Dx = {leg.D.x}. Dy = {leg.D.y}',
               cfg.modes['walking_mode']['x']
@@ -135,9 +135,14 @@ def get_angles_for_sequence(move: Move, fenix_position: FenixPosition):
               , 'delta:'
               , delta_x
               , delta_y)
-        """
-        delta_x = delta_y = 0
-        fk.leg_move_custom(move.values['leg'], 'touch', [-delta_x, -delta_y, -20])
+        delta = move.values['deltas']
+        print(f'delta before: {delta}')
+        delta[0] -= delta_x
+        delta[1] -= delta_y
+        print(f'delta after: {delta}')
+        fk.move_leg_endpoint(move.values['leg'], delta)
+    elif move.move_type == 'touch':
+        fk.leg_move_custom(move.values['leg'], 'touch', [0, 0, -25])
     elif move.move_type == 'balance':
         with open('/fenix/fenix/wrk/gyroaccel_data.txt', "r") as f:
             pitch, roll = f.readline().split(',')

@@ -8,8 +8,9 @@ import configs.config as config
 import configs.code_config as code_config
 import logging.config
 logging.config.dictConfig(code_config.logger_config)
+from copy import deepcopy
 
-from cybernetic_core.geometry.angles import FenixPosition
+from cybernetic_core.geometry.angles import FenixPosition, build_position_from_servos
 
 class FenixServos:
     def __init__(self):
@@ -226,6 +227,16 @@ class FenixServos:
 
         self.send_command_to_servos(angles, rate)
         self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
+
+        with open('/fenix/fenix/wrk/gyroaccel_data.txt', "r") as f:
+            pitch, roll = f.readline().split(',')
+        pitch, roll = float(pitch), float(roll)
+        self.logger.info(f"ga_data: {pitch, roll}")
+
+        if abs(pitch) < config.fenix["balance_offset"] or abs(roll) < config.fenix["balance_offset"]:
+            initially_balanced = True
+        else:
+            initially_balanced = False
         
         for s in range(50):
             self.logger.info(f'Step {s}')
@@ -239,7 +250,20 @@ class FenixServos:
                 print(f'All down. Exiting')
                 self.send_command_to_servos(current_angles, 0)
                 return current_angles
-            
+
+            if not initially_balanced:            
+                with open('/fenix/fenix/wrk/gyroaccel_data.txt', "r") as f:
+                    pitch, roll = f.readline().split(',')
+                pitch, roll = float(pitch), float(roll)
+                self.logger.info(f"ga_data: {pitch, roll}")
+
+                if abs(pitch) < config.fenix["balance_offset"] or abs(roll) < config.fenix["balance_offset"]:
+                    current_angles = self.get_current_angles()
+                    self.logger.info(f'current angles: {current_angles}')
+                    self.logger.info(f'Body balanced (at least one side). Exiting')
+                    self.send_command_to_servos(current_angles, 0)
+                    return current_angles
+
             time.sleep(0.03)
         return self.get_current_angles()
             
@@ -290,11 +314,12 @@ class FenixServos:
                     break
                 else:
                     #adjusted_angles = [round(target + (-1.5 * diff if abs(diff) > self.diff_from_target_limit else 0), 1) for target, diff in zip(angles, diff_from_target[0])]
-                    adjusted_angles = [round(target + (-1.5 * diff), 1) for target, diff in zip(angles, diff_from_target[0])]
+                    adjusted_angles = [round(target + (-1.5 * diff), 1) for target, diff in zip(angles.to_servo(), diff_from_target[0])]
                     
                     self.logger.info(f'Adjusting to : {adjusted_angles}')
+                    fp_adjusted = build_position_from_servos(adjusted_angles)
                     adjustment_done = True
-                    self.send_command_to_servos(adjusted_angles, 0)
+                    self.send_command_to_servos(fp_adjusted, 0)
                     #time.sleep(0.03)
                     break
 
@@ -303,7 +328,7 @@ class FenixServos:
                 self.logger.info(f'Unreachable. Moving further')
                 break
 
-            prev_angles = current_angles[:]
+            prev_angles = deepcopy(current_angles)
     
     def set_servo_values_paced_wo_adjustment(self, angles):
         _, max_angle_diff = self.get_angles_diff(angles)

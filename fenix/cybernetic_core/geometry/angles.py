@@ -13,6 +13,8 @@ import configs.config as cfg
 import configs.code_config as code_config
 import logging.config
 
+class DistanceException(Exception):
+    pass
 
 class AnglesException(Exception):
     pass
@@ -99,6 +101,8 @@ def build_position_from_servos(servo_angles: List[float]) -> FenixPosition:
 @lru_cache(maxsize=None)
 def get_leg_angles(delta_x, delta_z, logger):
     possible_angles = find_angles(delta_x, delta_z, logger)
+    if len(possible_angles) == 0:
+        raise AnglesException(f'No angles. DeltaX: {delta_x}. DeltaZ: {delta_z}')
     best_angles = get_best_angles(possible_angles)
     logger.info(f'Best angles: {[math.degrees(x) for x in best_angles]}')
     return best_angles
@@ -108,9 +112,9 @@ def find_angles(Dx, Dy, logger):
     results = []
     full_dist = math.sqrt(Dx ** 2 + Dy ** 2)
     if full_dist > a + b + c:
-        raise Exception('No decisions. Full distance : {0}'.format(full_dist))
+        raise DistanceException('No decisions. Full distance : {0}'.format(full_dist))
 
-    for k in range(-45, 45, 3):
+    for k in range(-75, 75, 5):
 
         ksi = math.radians(k)
 
@@ -119,6 +123,7 @@ def find_angles(Dx, Dy, logger):
         dist = math.sqrt(Cx ** 2 + Cy ** 2)
 
         if dist > a + b or dist < abs(a - b):
+            #print(dist, dist > a + b, dist < abs(a - b))
             pass
         else:
             alpha1 = math.acos((a ** 2 + dist ** 2 - b ** 2) / (2 * a * dist))
@@ -142,6 +147,7 @@ def find_angles(Dx, Dy, logger):
                 new_Dx = Cx + c * math.cos(alpha + beta + gamma)
                 new_Dy = Cy + c * math.sin(alpha + beta + gamma)
                 if abs(new_Dx - Dx) > 0.01 or abs(new_Dy - Dy) > 0.01:
+                    
                     continue
                     # only one of two coeffs is correct
                 #print(f'B: {Bx, By}. C: {Cx, Cy}')
@@ -167,7 +173,7 @@ def calculate_leg_angles(O: Point, D: Point, logger):
     #print(f'A: {A}')
     l = round(math.sqrt((D.x - A.x) ** 2 + (D.y - A.y) ** 2), 2)
     delta_z = round(D.z - O.z, 2)
-    logger.info(f'Trying l {l} and delta_z {delta_z}')
+    logger.info(f'Trying l {l} and delta_z {delta_z}. O: {O}. D: {D}')
     alpha, beta, gamma = get_leg_angles(l, delta_z, logger)
 
     if not leg_angles_correct(alpha=alpha, beta=beta, gamma=gamma, tetta=tetta, logger=logger):
@@ -243,9 +249,6 @@ def get_best_angles(all_angles):
         if min_distance_num > 1:
             # print('best_angles : {0}'.format([math.degrees(x) for x in best_angles]))
             raise Exception('Min distance found : {0}'.format(min_distance))
-
-    if best_angles is None:        
-        raise Exception('No angles')
 
     return best_angles
 
@@ -505,38 +508,6 @@ if __name__ == '__main__':
     logging.config.dictConfig(code_config.logger_config)
     logger = logging.getLogger('main_logger')
 
-    fp = FenixPosition('physical', 44.51882068166497, 14.398429391637588, -82.79813097435527, -20.637939780612253, -26.762858610560755, 12.719663051904275, -128.64048416277242, 26.401895199628335, -135.24095796267952, 4.079459501331462, -131.7573745682841, 13.68223214772406, 114.59728860411596, 9.837685342396234, -134.63935227779214, 33.598245106471474)
-    print(fp.legs[1].alpha)
-
-    """
-    angles = [0.7853981633974483, 0.06096254159288539, 1.9076410156604413, -0.7853981633974483, 0.06096254159288539, 1.9076410156604413, -2.356194490192345, 0.06096254159288539, 1.9076410156604413, 2.356194490192345, 0.06096254159288539, 1.9076410156604413]
-    angles_converted = convert_legs_angles(angles)
-    print(angles_converted)
-    angles_converted_back = convert_legs_angles_to_kinematic(angles_converted)
-    print(angles_converted_back)
-    
-    O = Point(x=3.8, y=-3.8, z=0)
-    #D = Point(x=9.13, y=-7.01, z=-14)
-    for z in range(-20, 10):
-        for y in [-5, 0, 5]:
-            for x in [9, 13, 17]:
-                D = Point(x=x, y=y, z=z)                
-                try:
-                    a = calculate_leg_angles(O, D, logger)
-                    print(f'D: {D}')
-                    #print([round(math.degrees(x), 2) for x in a])
-                except Exception as e:
-                    if 'No angles' not in str(e):
-                        print(e)
-    #angles = get_leg_angles(0.3, -8.2, logger)
-    #print([math.degrees(x) for x in angles])
-
-    # 40.69674025591244 -136.88832870747177 -35.808411548440716 -132.00000000000006
-    
-    [-12.994616791916506, -13.243320770137336, -137.86707982845593, 31.110400598593166]
-    [36.15818543980832, -16.428406089263376, -138.46132915745176, 31.88973524671527]
-    [-12.994616791916506, -8.269444188721673, -135.48420122953993, 20.753645418261787]
-    [36.15818543980832, -11.648881972170209, -136.48554311597042, 22.13442508814046]
-    [-12.994616791916506, -3.7008469377274382, -132.58336145386508, 10.284208391592482]
-    [36.15818543980832, -7.210819829356003, -134.0060979992245, 12.216917828580524]
-    """
+    #fp = FenixPosition('physical', 44.51882068166497, 14.398429391637588, -82.79813097435527, -20.637939780612253, -26.762858610560755, 12.719663051904275, -128.64048416277242, 26.401895199628335, -135.24095796267952, 4.079459501331462, -131.7573745682841, 13.68223214772406, 114.59728860411596, 9.837685342396234, -134.63935227779214, 33.598245106471474)
+    #print(fp.legs[1].alpha)
+    print(find_angles(10.75, 6, logger))

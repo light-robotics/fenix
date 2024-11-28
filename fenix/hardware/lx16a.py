@@ -13,11 +13,11 @@ import logging.config
 
 neutral = {
     2 : 500,
-    3 : 300,
+    3 : 450,
     4 : 610,
     5 : 500,
     8 : 280,
-    9 : 300,
+    9 : 480,
     10 : 550,
     11 : 500,
     14 : 315,
@@ -624,7 +624,7 @@ if __name__ == '__main__':
         m4.read_values(i)
         time.sleep(0.0002)
     
-    m4.move_servo_to_angle(14, 0, 3000)
+    m3.move_servo_to_angle(3, 0, 3000)
     time.sleep(3)
-    m4.disable_torque(14)
+    m3.disable_torque(3)
     
