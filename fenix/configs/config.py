@@ -5,7 +5,7 @@ obstacle = {
 
 leg = {
     "a": 15,    # PointA to PointB - femur
-    "b": 7.0,
+    "b": 10.0,
     "c": 15.5, # 18,    # PointB to PointC - femur-tibia
     "d": 6.5,    # PointO to PointA - trochanter-coxa
     "mount_point_offset": 3.8, # ???
@@ -16,7 +16,7 @@ start = {
     "vertical"                 : 12,
     "horizontal_x"             : 18, # 15
     "horizontal_y"             : 18, # 15
-    "x_offset_body"            : -2,
+    "x_offset_body"            : 0,
     "y_offset_body"            : 0,
     "initial_z_position_delta" : 5, # 3
 }
@@ -31,8 +31,8 @@ modes = {
         "y": 15,
     },
     "walking_mode" : {
-        "x": 18,
-        "y": 18,
+        "x": 17,
+        "y": 22,
     },
     "battle_mode" : {
         "x": 15,
@@ -102,8 +102,8 @@ angles_limits = {
         "max": 90
     },
     "beta": {
-        "min": -135,
-        "max": 75,
+        "min": -145, # -135,
+        "max": 0, # 75,
     },
     "gamma": {
         "min": -110,

@@ -123,10 +123,11 @@ class MovementProcessor:
         new_angles = move_function(angles_snapshot)
 
         self.fenix_position = convert_legs_angles_to_kinematic_C(new_angles)
-        print(f'convert_legs_angles_to_kinematic: {self.fenix_position}')
+        #print(f'convert_legs_angles_to_kinematic: {self.fenix_position}')
 
 
-    def run_sequence(self, command: str, kwargs=None) -> None:        
+
+    def run_sequence(self, command: str, kwargs=None) -> bool:        
         self.logger.info(f'[MOVE] Started run_sequence : {datetime.datetime.now()}')
         self.logger.info(f'MOVE. Trying command {command}')
         
@@ -137,13 +138,15 @@ class MovementProcessor:
         start_time = datetime.datetime.now()
 
         for move in sequence:
+            #time.sleep(5)
             command_executed = False
             attempts = 1
-            while not command_executed and attempts < 5:
+            while not command_executed and attempts < 8:
                 try:
                     attempts += 1
                     self.get_and_move_to_angles(move)
                     command_executed = True
+                    #return result
                 except DistanceException as e:
                     print(f'Execution of command {command} resulted in:\n{e}\nMoving down')
                     down_sequence = get_sequence_for_command('down')
@@ -156,12 +159,11 @@ class MovementProcessor:
                     except AnglesException as e:
                         print(f'Execution of command UP resulted in:\n{e}\nMoving down')
                         down_sequence = get_sequence_for_command('down')
-                        self.get_and_move_to_angles(down_sequence[0])
-                    
-            
+                        self.get_and_move_to_angles(down_sequence[0])    
 
         self.logger.info(f'[MOVE] finished: {datetime.datetime.now()}')
         self.logger.info(f'[TIMING] Step took : {datetime.datetime.now() - start_time}')
+        return False
 
     def move(self):
         try:

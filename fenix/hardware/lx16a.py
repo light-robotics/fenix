@@ -16,16 +16,19 @@ neutral = {
     3 : 450,
     4 : 610,
     5 : 500,
+
     8 : 280,
     9 : 480,
     10 : 550,
     11 : 500,
+
     14 : 315,
-    15 : 320,
+    15 : 470,
     16 : 560,
     17 : 500,
+
     20 : 250,
-    21 : 340,
+    21 : 480,
     22 : 560,
     23 : 500
 
@@ -166,6 +169,9 @@ class LX16A:
     # because sometimes command does not work and target stays unchanged
     def move_servo_to_angle(self, id: int, angle: float, rate: int = 0) -> None:
         position = neutral[id] + int(angle/0.24)
+        #if position < 0:
+        #    self.logger.error(f'Id : {id}. Target required : {position}. Angle: {angle}')
+        #    position = 0
         num_attempts = 3
         for i in range(num_attempts):
             try:
@@ -184,7 +190,7 @@ class LX16A:
                     continue
                 break
             except Exception as e:
-                self.logger.info(f'{i} attempt failed for servo {id}.\n{e}')
+                self.logger.info(f'{i} attempt failed for servo {id}. Position: {position}. Angle: {angle}.\n{e}')
       
     # read target position and rate
     def read_servo_target(self, id: int) -> Union[int, int]:
@@ -624,7 +630,7 @@ if __name__ == '__main__':
         m4.read_values(i)
         time.sleep(0.0002)
     
-    m3.move_servo_to_angle(3, 0, 3000)
+    m4.move_servo_to_angle(21, 0, 3000)
     time.sleep(3)
-    m3.disable_torque(3)
+    m4.disable_torque(21)
     

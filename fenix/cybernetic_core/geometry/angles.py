@@ -100,11 +100,13 @@ def build_position_from_servos(servo_angles: List[float]) -> FenixPosition:
 
 @lru_cache(maxsize=None)
 def get_leg_angles(delta_x, delta_z, logger):
+    if delta_x < 0:
+        raise AnglesException(f'Negative X. DeltaX: {delta_x}. DeltaZ: {delta_z}')
     possible_angles = find_angles(delta_x, delta_z, logger)
     if len(possible_angles) == 0:
         raise AnglesException(f'No angles. DeltaX: {delta_x}. DeltaZ: {delta_z}')
     best_angles = get_best_angles(possible_angles)
-    logger.info(f'Best angles: {[math.degrees(x) for x in best_angles]}')
+    logger.info(f'(delta_x, delta_z): ({delta_x}, {delta_z}). Best angles: {[math.degrees(x) for x in best_angles]}')
     return best_angles
 
 def find_angles(Dx, Dy, logger):
@@ -114,7 +116,7 @@ def find_angles(Dx, Dy, logger):
     if full_dist > a + b + c:
         raise DistanceException('No decisions. Full distance : {0}'.format(full_dist))
 
-    for k in range(-75, 75, 5):
+    for k in range(-45, 45, 1):
 
         ksi = math.radians(k)
 
@@ -165,7 +167,6 @@ def find_angles(Dx, Dy, logger):
 def calculate_leg_angles(O: Point, D: Point, logger):
     #print(f'[CLA] O: {O}, D: {D}')
     tetta = math.atan2(D.y - O.y, D.x - O.x)
-    #print(tetta, math.degrees(tetta))
     
     A = Point(O.x + cfg.leg["d"] * math.cos(tetta),
                 O.y + cfg.leg["d"] * math.sin(tetta),
@@ -173,14 +174,15 @@ def calculate_leg_angles(O: Point, D: Point, logger):
     #print(f'A: {A}')
     l = round(math.sqrt((D.x - A.x) ** 2 + (D.y - A.y) ** 2), 2)
     delta_z = round(D.z - O.z, 2)
-    logger.info(f'Trying l {l} and delta_z {delta_z}. O: {O}. D: {D}')
+    logger.info(f'[ANG] Trying l {l} and delta_z {delta_z}. O: {O}. D: {D}')
+
     alpha, beta, gamma = get_leg_angles(l, delta_z, logger)
 
+    logger.info(f'[ANG] Result : {[round(math.degrees(x), 2) for x in [alpha, beta, gamma, tetta]]}')
+
     if not leg_angles_correct(alpha=alpha, beta=beta, gamma=gamma, tetta=tetta, logger=logger):
-        logger.info(f'Bad tetta : {tetta}')
-        raise Exception(f'Bad tetta : {tetta}')
-    
-    logger.info(f'Success : {math.degrees(alpha)}, {math.degrees(beta)}, {math.degrees(gamma)}')
+        logger.info(f'[ANG] Bad tetta : {tetta}')
+        raise Exception(f'Bad tetta : {tetta}')       
 
     D_calculated = calculate_D_point(O, FenixPositionLeg(alpha, beta, gamma, tetta), D)
     #print(f'[CLA] D initial : {D}')
@@ -261,7 +263,7 @@ def get_angles_distance(angles):
           math.degrees(angles[0] + angles[1] + angles[2])
           )
     """
-    return (math.degrees(angles[0] + angles[1] + angles[2]) + 90) ** 2
+    return (math.degrees(angles[0] + angles[1] + angles[2]) + 95) ** 2
 
 def convert_alpha(alpha: float) -> float:
     alpha_converted = round(math.degrees(alpha), 2)
@@ -350,6 +352,7 @@ def convert_legs_angles(legs_angles: List[float], logger=None) -> List[float]:
         logger=logger):
         raise AnglesException('Bad tettas')
 
+    """
     for i in range(4):
         alpha_converted = angles_converted[4*i+2]
         beta_converted = angles_converted[4*i+1]
@@ -363,7 +366,7 @@ def convert_legs_angles(legs_angles: List[float], logger=None) -> List[float]:
                 logger=logger
             ):
             raise AnglesException(f'Leg {i+1}. Bad angles:alpha {alpha_converted}, beta {beta_converted}, gamma {gamma_converted}, tetta {tetta_converted}')
-
+    """
     return angles_converted
 
 def convert_legs_angles_to_kinematic(legs_angles: List[float]) -> List[float]:
@@ -401,7 +404,7 @@ def convert_legs_angles_C(fp_in: FenixPosition, logger=None) -> FenixPosition:
     # input: 16 angles in RADIANS
     # output: 16 converted angles in DEGREES
     # now tetta, alpha, beta one leg after another
-    #print(f'Before conversion: {legs_angles}')
+    #print(f'Before conversion: {fp_in}')
     fp = FenixPosition(
         leg1_alpha=convert_alpha(fp_in.legs[1].alpha),
         leg1_beta=convert_beta(fp_in.legs[1].beta),
@@ -423,7 +426,7 @@ def convert_legs_angles_C(fp_in: FenixPosition, logger=None) -> FenixPosition:
         leg4_gamma=convert_gamma(fp_in.legs[4].gamma),
         leg4_tetta=convert_tetta(fp_in.legs[4].tetta, 4),
     )    
-    #print(f'Converted: {angles_converted}')
+    #print(f'Converted: {fp}')
 
     if not tettas_correct([
         fp.legs[1].tetta, 
@@ -433,7 +436,7 @@ def convert_legs_angles_C(fp_in: FenixPosition, logger=None) -> FenixPosition:
         ], 
         logger=logger):
         raise AnglesException('Bad tettas')
-
+    """
     for i in range(4):
         alpha_converted = fp.legs[i+1].alpha
         beta_converted = fp.legs[i+1].beta
@@ -447,7 +450,7 @@ def convert_legs_angles_C(fp_in: FenixPosition, logger=None) -> FenixPosition:
                 logger=logger
             ):
             raise AnglesException(f'Leg {i+1}. Bad angles:alpha {alpha_converted}, beta {beta_converted}, gamma {gamma_converted}, tetta {tetta_converted}')
-
+    """
     return fp
 
 def convert_legs_angles_to_kinematic_C(fp_in: FenixPosition, logger=None) -> FenixPosition:
