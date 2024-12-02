@@ -263,7 +263,7 @@ def get_angles_distance(angles):
           math.degrees(angles[0] + angles[1] + angles[2])
           )
     """
-    return (math.degrees(angles[0] + angles[1] + angles[2]) + 95) ** 2
+    return (math.degrees(angles[0] + angles[1] + angles[2]) + 92) ** 2
 
 def convert_alpha(alpha: float) -> float:
     alpha_converted = round(math.degrees(alpha), 2)

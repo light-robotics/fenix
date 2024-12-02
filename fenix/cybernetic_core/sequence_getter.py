@@ -170,8 +170,8 @@ def get_sequence_for_command_cached(command: str, fenix_position: FenixPosition,
         fk.move_2_legs_phased_24(-FORWARD_LEGS_2LEG_CM, FORWARD_LEGS_2LEG_CM)
     elif command == 'forward_one_legged':
         fk.move_body_straight(FORWARD_LEGS_1LEG_CM, 0)
-    elif command == 'touching':
-        fk.leg_move_with_touching()
+    #elif command == 'touching':
+    #    fk.leg_move_with_touching()
     elif command in ['battle_mode', 'sentry_mode', 'walking_mode', 'run_mode']:
         fk.switch_mode(command)
     elif command == "left_turn_in_move":

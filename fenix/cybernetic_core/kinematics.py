@@ -429,7 +429,7 @@ class FenixKinematics:
         self.add_angles_snapshot('endpoint')
         #self.compensated_leg_movement(leg_num, [0, 0, -self.leg_up])
     
-    def leg_move_custom(self, leg_num, mode, leg_delta=[0, 0, 0]):
+    def leg_move_custom(self, leg_num, mode, leg_delta=[0, 0, 0], add_snapshot=True):
         self.move_leg_endpoint(
             leg_num, 
             [
@@ -437,7 +437,8 @@ class FenixKinematics:
                 leg_delta[1], 
                 leg_delta[2]
             ], 
-            mode
+            mode,
+            add_snapshot=add_snapshot
         )
     
     def leg_move_obstacled(self, leg_num, delta_x, delta_y, obstacle_z=0, move_type:int = 1):
@@ -464,10 +465,11 @@ class FenixKinematics:
         else:
             self.move_leg_endpoint(leg_num, [0, 0, -self.obstacled_leg_up + obstacle_z])
 
-    def move_leg_endpoint(self, leg_num, leg_delta, snapshot_type='endpoint'):        
+    def move_leg_endpoint(self, leg_num, leg_delta, snapshot_type='endpoint', add_snapshot=True):        
         self.legs[leg_num].move_end_point(*leg_delta)
         self.legs_deltas[leg_num] = [x + y for x, y in zip(self.legs_deltas[leg_num], leg_delta)]        
-        self.add_angles_snapshot(snapshot_type)
+        if add_snapshot:
+            self.add_angles_snapshot(snapshot_type)
 
     def print_legs_diff(self):
         print(self.legs_deltas)
