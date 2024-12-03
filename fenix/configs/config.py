@@ -31,8 +31,8 @@ modes = {
         "y": 15,
     },
     "walking_mode" : {
-        "x": 16,
-        "y": 20,
+        "x": 17,
+        "y": 17,
     },
     "battle_mode" : {
         "x": 15,
@@ -57,7 +57,7 @@ moves = {
 
 fenix = {
     "margin": {
-        1: 5,
+        1: 4,
         2: 3
     },
     "leg_up": {

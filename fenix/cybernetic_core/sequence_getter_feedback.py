@@ -83,9 +83,9 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
         for leg in [3, 4, 1, 2]:
             
             if leg == 1:
-                y_diff = 0 #-3
+                y_diff = -3 #-3
             elif leg == 2:
-                y_diff = 0 # 3
+                y_diff = 3 # 3
             else:
                 y_diff = 0
             #if leg in [1, 4]:
@@ -98,15 +98,15 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
                 x_diff = 0 # 1
 
             #sequence.append(Move('body_compensation_for_a_leg', {'leg': leg}))
-            side_step = 9
+            side_step = 5
             if leg == 3:
-                sequence.append(Move('body_movement', {'deltas': [side_step, 0, 0]}))
+                sequence.append(Move('body_movement', {'deltas': [0, side_step, 0]}))
             elif leg == 4:
-                sequence.append(Move('body_movement', {'deltas': [side_step, -0, 0]}))
+                sequence.append(Move('body_movement', {'deltas': [0, -side_step, 0]}))
             elif leg == 1:
-                sequence.append(Move('body_movement', {'deltas': [-side_step, -0, 0]}))
+                sequence.append(Move('body_movement', {'deltas': [-0, -side_step, 0]}))
             elif leg == 2:
-                sequence.append(Move('body_movement', {'deltas': [-side_step, 0, 0]}))
+                sequence.append(Move('body_movement', {'deltas': [-0, side_step, 0]}))
 
             sequence.append(Move('endpoint_normalized', {'leg': leg, 'deltas': [0, 0, 24]}))
             sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM + x_diff, y_diff, 0]}))
