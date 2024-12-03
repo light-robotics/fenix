@@ -109,9 +109,16 @@ class MovementProcessor:
         if next_angles.move_type == 'touch':
             self.logger.info('[MP] Using function set_servo_values_touching')
             move_function = self.fs.set_servo_values_touching
-        elif next_angles.move_type == 'balance':
-            self.logger.info('[MP] Using function set_servo_values_balancing')
-            move_function = self.fs.set_servo_values_balancing
+        elif next_angles.move_type == 'touch_2legs':
+            self.logger.info('[MP] Using function set_servo_values_3leg_touching')
+            move_function = self.fs.set_servo_values_3leg_touching
+        elif next_angles.move_type == 'balance1':
+            self.logger.info('[MP] Using function set_servo_values_balancing_1leg')
+            move_function = self.fs.set_servo_values_balancing_1leg
+            self.fs.set_speed(2000)
+        elif next_angles.move_type == 'balance2':
+            self.logger.info('[MP] Using function set_servo_values_balancing_2leg')
+            move_function = self.fs.set_servo_values_balancing_2leg
             self.fs.set_speed(2000)
         else:
             self.logger.info('[MP] Using function set_servo_values_paced_wo_feedback')

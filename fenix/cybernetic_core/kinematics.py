@@ -440,7 +440,7 @@ class FenixKinematics:
             mode,
             add_snapshot=add_snapshot
         )
-    
+   
     def leg_move_obstacled(self, leg_num, delta_x, delta_y, obstacle_z=0, move_type:int = 1):
         self.obstacled_leg_up = self.leg_up_single
         self.logger.info(f'Move. leg_num = {leg_num}, delta_x = {delta_x}, delta_y = {delta_y}, obstacle_z = {obstacle_z}')
