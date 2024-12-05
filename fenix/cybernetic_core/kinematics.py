@@ -430,16 +430,17 @@ class FenixKinematics:
         #self.compensated_leg_movement(leg_num, [0, 0, -self.leg_up])
     
     def leg_move_custom(self, leg_num, mode, leg_delta=[0, 0, 0], add_snapshot=True):
-        self.move_leg_endpoint(
-            leg_num, 
-            [
-                leg_delta[0], 
-                leg_delta[1], 
-                leg_delta[2]
-            ], 
-            mode,
-            add_snapshot=add_snapshot
-        )
+        for i in range(3):
+            self.move_leg_endpoint(
+                leg_num, 
+                [
+                    round(leg_delta[0]/3, 1), 
+                    round(leg_delta[1]/3, 1),
+                    round(leg_delta[2]/3, 1)
+                ], 
+                mode,
+                add_snapshot=add_snapshot
+            )
    
     def leg_move_obstacled(self, leg_num, delta_x, delta_y, obstacle_z=0, move_type:int = 1):
         self.obstacled_leg_up = self.leg_up_single

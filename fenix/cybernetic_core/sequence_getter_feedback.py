@@ -94,9 +94,9 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
         for leg in [3, 4, 1, 2]:
             
             if leg == 1:
-                y_diff = -3 #-3
+                y_diff = -2
             elif leg == 2:
-                y_diff = 3 # 3
+                y_diff = 2
             else:
                 y_diff = 0
             #if leg in [1, 4]:
@@ -108,7 +108,9 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
             else:
                 x_diff = 0 # 1
 
-            #sequence.append(Move('body_compensation_for_a_leg', {'leg': leg}))
+            """
+            sequence.append(Move('body_compensation_for_a_leg', {'leg': leg}))
+            """
             side_step = 6
             if leg == 3:
                 sequence.append(Move('body_movement', {'deltas': [0, side_step, 0]}))
@@ -118,7 +120,7 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
                 sequence.append(Move('body_movement', {'deltas': [-0, -side_step, 0]}))
             elif leg == 2:
                 sequence.append(Move('body_movement', {'deltas': [-0, side_step, 0]}))
-
+            
             sequence.append(Move('endpoint_normalized', {'leg': leg, 'deltas': [0, 0, 30]}))
             sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM + x_diff, y_diff, 0]}))
             sequence.append(Move('touch', {'leg': leg}))
@@ -127,7 +129,7 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
             sequence.append(Move('body_to_center', {}))
             sequence.append(Move('balance', {}))
             sequence.append(Move('balance', {}))
-        #sequence.append(Move('body_to_center', {}))
+        
     elif command in ['battle_mode', 'sentry_mode', 'walking_mode', 'run_mode']:
         sequence.append(Move('switch_mode', {"mode": command}))
     else:
@@ -157,41 +159,8 @@ def get_angles_for_sequence(move: Move, fenix_position: FenixPosition):
     elif move.move_type == 'endpoint_normalized':
         leg_num = move.values['leg']
         leg = fk.legs[leg_num]
-        
-        global leg1x, leg1y, leg2x, leg2y, leg3x, leg3y, leg4x, leg4y
-        delta_x, delta_y = 0, 0
-        if int(leg_num) == 1:
-            if 'leg1x' not in globals():
-                leg1x, leg1y = leg.D.x, leg.D.y
-            delta_x, delta_y = round(leg1x - leg.D.x, 1), round(leg1y - leg.D.y, 1)
-        elif leg_num == 2:
-            if 'leg2x' not in globals():
-                leg2x, leg2y = leg.D.x, leg.D.y
-            delta_x, delta_y = round(leg2x - leg.D.x, 1), round(leg2y - leg.D.y, 1)
-        elif leg_num == 3:
-            if 'leg3x' not in globals():
-                leg3x, leg3y = leg.D.x, leg.D.y
-            delta_x, delta_y = round(leg3x - leg.D.x, 1), round(leg3y - leg.D.y, 1)
-        elif leg_num == 4:
-            if 'leg4x' not in globals():
-                leg4x, leg4y = leg.D.x, leg.D.y
-            delta_x, delta_y = round(leg4x - leg.D.x, 1), round(leg4y - leg.D.y, 1)
-        
-        """
-        print("Endpoint normalization. leg_num: ", 
-              move.values['leg'],
-              f'Dx = {leg.D.x}. Dy = {leg.D.y}',
-              cfg.modes['walking_mode']['x']
-              ,'\n'
-              , 'delta:'
-              , delta_x
-              , delta_y)
-        """
+          
         delta = move.values['deltas']
-        #print(f'delta before: {delta}')
-        #delta[0] += delta_x
-        #delta[1] += delta_y
-        #print(f'delta after: {delta}')
         fk.move_leg_endpoint(move.values['leg'], delta)
     elif move.move_type == 'touch':
         fk.leg_move_custom(move.values['leg'], 'touch', [0, 0, -24])
@@ -250,4 +219,4 @@ def get_angles_for_sequence(move: Move, fenix_position: FenixPosition):
         fk.switch_mode(move.values['mode'])
 
     #print(f'[SG]. Sequence: {fk.sequence[-1]}')
-    return fk.sequence[-1]
+    return fk.sequence
