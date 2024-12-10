@@ -104,7 +104,7 @@ class FenixKinematics:
     or provide horizontal x, y and vertical v
     or provide exact angles to create a kinematic model
     """
-    def __init__(self, fenix_position: FenixPosition = None):
+    def __init__(self, fenix_position: FenixPosition = None, init_snapshot=True):
         logging.config.dictConfig(code_config.logger_config)
         self.logger = logging.getLogger('main_logger')
 
@@ -144,7 +144,8 @@ class FenixKinematics:
         
         self.angles_history = []
         self.D_points_history = []
-        self.add_angles_snapshot('init')
+        if init_snapshot:
+            self.add_angles_snapshot('init')
 
     def get_sequence_length(self):
         sum_diff = 0

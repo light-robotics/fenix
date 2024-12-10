@@ -143,7 +143,7 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
     return sequence
 
 def get_angles_for_sequence(move: Move, fenix_position: FenixPosition):
-    fk = FenixKinematics(fenix_position=fenix_position)
+    fk = FenixKinematics(fenix_position=fenix_position, init_snapshot=False)
     print(f'Move: {move.move_type}. {move.values}')
     # print(f'fenix_position: {fenix_position}')
 
