@@ -94,15 +94,17 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
         for leg in [3, 4, 1, 2]:
             
             if leg == 1:
-                y_diff = -2
+                y_diff = 0 # -2
             elif leg == 2:
-                y_diff = 2
+                y_diff = 0 # 2
             else:
                 y_diff = 0
+
             #if leg in [1, 4]:
             #    y_diff = -2 # -2
             #else:
             #    y_diff = 2 # 2
+            
             if leg in [1, 2]:
                 x_diff = 0 # -1
             else:
@@ -111,17 +113,19 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
             """
             sequence.append(Move('body_compensation_for_a_leg', {'leg': leg}))
             """
-            side_step = 6
+            side_step = 0
+            front_step = 10
             if leg == 3:
-                sequence.append(Move('body_movement', {'deltas': [0, side_step, 0]}))
+                sequence.append(Move('body_movement', {'deltas': [front_step, side_step, 0]}))
             elif leg == 4:
-                sequence.append(Move('body_movement', {'deltas': [0, -side_step, 0]}))
+                sequence.append(Move('body_movement', {'deltas': [front_step, -side_step, 0]}))
             elif leg == 1:
-                sequence.append(Move('body_movement', {'deltas': [-0, -side_step, 0]}))
+                sequence.append(Move('body_movement', {'deltas': [-front_step, -side_step, 0]}))
             elif leg == 2:
-                sequence.append(Move('body_movement', {'deltas': [-0, side_step, 0]}))
+                sequence.append(Move('body_movement', {'deltas': [-front_step, side_step, 0]}))
             
-            sequence.append(Move('endpoint_normalized', {'leg': leg, 'deltas': [0, 0, 30]}))
+            #sequence.append(Move('endpoint_normalized', {'leg': leg, 'deltas': [0, 0, 20]}))
+            sequence.append(Move('endpoint', {'leg': leg, 'deltas': [0, 0, 24]}))
             sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM + x_diff, y_diff, 0]}))
             sequence.append(Move('touch', {'leg': leg}))
             #sequence.append(Move('touch', {'leg': leg}))
@@ -153,6 +157,7 @@ def get_angles_for_sequence(move: Move, fenix_position: FenixPosition):
         fk.body_compensation_for_a_leg(move.values['leg'])
     elif move.move_type == 'endpoint':
         fk.move_leg_endpoint(move.values['leg'], move.values['deltas'])
+        #fk.move_leg_endpoint_abs(move.values['leg'], move.values['deltas'])
     elif move.move_type == 'endpoints':
         fk.move_leg_endpoint(move.values['legs'][0], move.values['deltas'], add_snapshot=False)
         fk.move_leg_endpoint(move.values['legs'][1], move.values['deltas'])
@@ -164,6 +169,7 @@ def get_angles_for_sequence(move: Move, fenix_position: FenixPosition):
         fk.move_leg_endpoint(move.values['leg'], delta)
     elif move.move_type == 'touch':
         fk.leg_move_custom(move.values['leg'], 'touch', [0, 0, -24])
+        #fk.move_leg_endpoint(move.values['leg'], [0, 0, -2])
     elif move.move_type == 'down_2_legs':
         fk.leg_move_custom(move.values['legs'][0], 'touch_2legs', [0, 0, -8], add_snapshot=False)
         fk.leg_move_custom(move.values['legs'][1], 'touch_2legs', [0, 0, -8])
@@ -187,34 +193,72 @@ def get_angles_for_sequence(move: Move, fenix_position: FenixPosition):
         with open('/fenix/fenix/wrk/gyroaccel_data.txt', "r") as f:
             pitch, roll = f.readline().split(',')
         pitch, roll = float(pitch), float(roll)
+        balance_value = -7
+
         if pitch < -cfg.fenix["balance_offset"] and abs(roll) < cfg.fenix["balance_offset"]:
-            fk.leg_move_custom(1, 'balance2', [0, 0, -5], add_snapshot=False)
-            fk.leg_move_custom(4, 'balance2', [0, 0, -5])
-            print('Balance [1, 4]')
+            if fk.legs[1].D.z + fk.legs[4].D.z > fk.legs[2].D.z + fk.legs[3].D.z:
+                fk.leg_move_custom(1, 'balance2', [0, 0, balance_value], add_snapshot=False)
+                fk.leg_move_custom(4, 'balance2', [0, 0, balance_value])
+                print(f'{pitch, roll}. Balance [1, 4] {balance_value}')
+            else:
+                fk.leg_move_custom(2, 'balance2', [0, 0, -balance_value], add_snapshot=False)
+                fk.leg_move_custom(3, 'balance2', [0, 0, -balance_value])
+                print(f'{pitch, roll}. Balance [2, 3] {-balance_value}')
         elif pitch > cfg.fenix["balance_offset"] and abs(roll) < cfg.fenix["balance_offset"]:
-            fk.leg_move_custom(2, 'balance2', [0, 0, -5], add_snapshot=False)
-            fk.leg_move_custom(3, 'balance2', [0, 0, -5])
-            print('Balance [2, 3]')
+            if fk.legs[2].D.z + fk.legs[3].D.z > fk.legs[1].D.z + fk.legs[4].D.z:
+                fk.leg_move_custom(2, 'balance2', [0, 0, balance_value], add_snapshot=False)
+                fk.leg_move_custom(3, 'balance2', [0, 0, balance_value])
+                print(f'{pitch, roll}. Balance [2, 3] {balance_value}')
+            else:
+                fk.leg_move_custom(1, 'balance2', [0, 0, -balance_value], add_snapshot=False)
+                fk.leg_move_custom(4, 'balance2', [0, 0, -balance_value])
+                print(f'{pitch, roll}. Balance [1, 4] {-balance_value}')
         elif abs(pitch) < cfg.fenix["balance_offset"] and roll < -cfg.fenix["balance_offset"]:
-            fk.leg_move_custom(3, 'balance2', [0, 0, -5], add_snapshot=False)
-            fk.leg_move_custom(4, 'balance2', [0, 0, -5])
-            print('Balance [3, 4]')
+            if fk.legs[3].D.z + fk.legs[4].D.z > fk.legs[1].D.z + fk.legs[2].D.z:
+                fk.leg_move_custom(3, 'balance2', [0, 0, balance_value], add_snapshot=False)
+                fk.leg_move_custom(4, 'balance2', [0, 0, balance_value])
+                print(f'{pitch, roll}. Balance [3, 4] {balance_value}')
+            else:
+                fk.leg_move_custom(1, 'balance2', [0, 0, -balance_value], add_snapshot=False)
+                fk.leg_move_custom(2, 'balance2', [0, 0, -balance_value])
+                print(f'{pitch, roll}. Balance [1, 2] {-balance_value}')
         elif abs(pitch) < cfg.fenix["balance_offset"] and roll > cfg.fenix["balance_offset"]:
-            fk.leg_move_custom(1, 'balance2', [0, 0, -5], add_snapshot=False)
-            fk.leg_move_custom(2, 'balance2', [0, 0, -5])
-            print('Balance [1, 2]')
+            if fk.legs[1].D.z + fk.legs[2].D.z > fk.legs[3].D.z + fk.legs[4].D.z:
+                fk.leg_move_custom(1, 'balance2', [0, 0, balance_value], add_snapshot=False)
+                fk.leg_move_custom(2, 'balance2', [0, 0, balance_value])
+                print(f'{pitch, roll}. Balance [1, 2] {balance_value}')
+            else:
+                fk.leg_move_custom(3, 'balance2', [0, 0, -balance_value], add_snapshot=False)
+                fk.leg_move_custom(4, 'balance2', [0, 0, -balance_value])
+                print(f'{pitch, roll}. Balance [3, 4] {-balance_value}')
         elif pitch < -cfg.fenix["balance_offset"] and roll > cfg.fenix["balance_offset"]:
-            fk.leg_move_custom(1, 'balance1', [0, 0, -5])
-            print('Balance [1]')
+            if fk.legs[1].D.z > fk.legs[3].D.z:
+                fk.leg_move_custom(1, 'balance1', [0, 0, balance_value])
+                print(f'{pitch, roll}. Balance [1] {balance_value}')
+            else:
+                fk.leg_move_custom(3, 'balance1', [0, 0, -balance_value])
+                print(f'{pitch, roll}. Balance [3] {-balance_value}')
         elif pitch > cfg.fenix["balance_offset"] and roll > cfg.fenix["balance_offset"]:
-            fk.leg_move_custom(2, 'balance1', [0, 0, -5])
-            print('Balance [2]')
+            if fk.legs[2].D.z > fk.legs[4].D.z:
+                fk.leg_move_custom(2, 'balance1', [0, 0, balance_value])
+                print(f'{pitch, roll}. Balance [2] {balance_value}')
+            else:
+                fk.leg_move_custom(4, 'balance1', [0, 0, -balance_value])
+                print(f'{pitch, roll}. Balance [4] {-balance_value}')
         elif pitch > cfg.fenix["balance_offset"] and roll < -cfg.fenix["balance_offset"]:
-            fk.leg_move_custom(3, 'balance1', [0, 0, -5])
-            print('Balance [3]')
+            if fk.legs[3].D.z > fk.legs[1].D.z:
+                fk.leg_move_custom(3, 'balance1', [0, 0, balance_value])
+                print(f'{pitch, roll}. Balance [3] {balance_value}')
+            else:
+                fk.leg_move_custom(1, 'balance1', [0, 0, -balance_value])
+                print(f'{pitch, roll}. Balance [1] {-balance_value}')
         elif pitch < -cfg.fenix["balance_offset"] and roll < -cfg.fenix["balance_offset"]:
-            fk.leg_move_custom(4, 'balance1', [0, 0, -5])
-            print('Balance [4]')
+            if fk.legs[4].D.z > fk.legs[2].D.z:
+                fk.leg_move_custom(4, 'balance1', [0, 0, -balance_value])
+                print(f'{pitch, roll}. Balance [4] {-balance_value}')
+            else:
+                fk.leg_move_custom(2, 'balance1', [0, 0, balance_value])
+                print(f'{pitch, roll}. Balance [2] {balance_value}')
     elif move.move_type == 'switch_mode':
         fk.switch_mode(move.values['mode'])
 

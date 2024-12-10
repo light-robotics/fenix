@@ -203,8 +203,12 @@ class FenixServos:
         for s in range(20):
             self.logger.info(f'Step {s}')
             
-            with open('/fenix/fenix/wrk/gyroaccel_data.txt', "r") as f:
-                pitch, roll = f.readline().split(',')
+            try:
+                with open('/fenix/fenix/wrk/gyroaccel_data.txt', "r") as f:
+                    pitch, roll = f.readline().split(',')
+            except ValueError as e:
+                print(f'Error reading balance:\n{e}')
+                continue
             pitch, roll = float(pitch), float(roll)
             self.logger.info(f"ga_data: {pitch, roll}")
             
@@ -239,10 +243,12 @@ class FenixServos:
         self.send_command_to_servos(angles, rate)
         self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
 
+        """
         with open('/fenix/fenix/wrk/gyroaccel_data.txt', "r") as f:
             pitch, roll = f.readline().split(',')
         pitch, roll = float(pitch), float(roll)
         self.logger.info(f"ga_data: {pitch, roll}")
+        """
 
         #if abs(pitch) < 2 * config.fenix["balance_offset"] or abs(roll) < 2 * config.fenix["balance_offset"]:
         #    initially_balanced = True

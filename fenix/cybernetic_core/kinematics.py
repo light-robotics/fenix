@@ -430,45 +430,56 @@ class FenixKinematics:
         #self.compensated_leg_movement(leg_num, [0, 0, -self.leg_up])
     
     def leg_move_custom(self, leg_num, mode, leg_delta=[0, 0, 0], add_snapshot=True):
-        for i in range(3):
+        if mode == 'touch':
+            iterations = 3
+        else:
+            iterations = 1
+        for i in range(iterations):
             self.move_leg_endpoint(
                 leg_num, 
                 [
-                    round(leg_delta[0]/3, 1), 
-                    round(leg_delta[1]/3, 1),
-                    round(leg_delta[2]/3, 1)
+                    round(leg_delta[0]/iterations, 1), 
+                    round(leg_delta[1]/iterations, 1),
+                    round(leg_delta[2]/iterations, 1)
                 ], 
                 mode,
                 add_snapshot=add_snapshot
             )
    
-    def leg_move_obstacled(self, leg_num, delta_x, delta_y, obstacle_z=0, move_type:int = 1):
-        self.obstacled_leg_up = self.leg_up_single
-        self.logger.info(f'Move. leg_num = {leg_num}, delta_x = {delta_x}, delta_y = {delta_y}, obstacle_z = {obstacle_z}')
-        if move_type == 1:
-            if obstacle_z >= 0:
-                self.move_leg_endpoint(leg_num, [delta_x, delta_y, self.obstacled_leg_up + obstacle_z])
-            else:
-                self.move_leg_endpoint(leg_num, [delta_x, delta_y, self.obstacled_leg_up])
-        else:
-            if obstacle_z >= 0:
-                self.logger.info(f'Move. Trying move for [{0, 0, self.obstacled_leg_up + obstacle_z}]')
-                self.move_leg_endpoint(leg_num, [0, 0, self.obstacled_leg_up + obstacle_z])
-                self.move_leg_endpoint(leg_num, [delta_x, delta_y, 0])
-                self.logger.info(f'Move. Endpoint for {[delta_x, delta_y, 0]} ok')
-            else:
-                self.move_leg_endpoint(leg_num, [delta_x, delta_y, self.obstacled_leg_up])
-
-        if obstacle_z >= 0:
-            self.logger.info(f'Move. Trying move for {-self.obstacled_leg_up}')
-            self.move_leg_endpoint(leg_num, [0, 0, -self.obstacled_leg_up])
-            self.logger.info('Move. Endpoint ok')
-        else:
-            self.move_leg_endpoint(leg_num, [0, 0, -self.obstacled_leg_up + obstacle_z])
-
     def move_leg_endpoint(self, leg_num, leg_delta, snapshot_type='endpoint', add_snapshot=True):        
         self.legs[leg_num].move_end_point(*leg_delta)
         self.legs_deltas[leg_num] = [x + y for x, y in zip(self.legs_deltas[leg_num], leg_delta)]        
+        if add_snapshot:
+            self.add_angles_snapshot(snapshot_type)
+
+    def move_leg_endpoint_abs(self, leg_num, leg_delta, snapshot_type='endpoint', add_snapshot=True):
+        leg = self.legs[leg_num]
+
+        if leg_num == 1:
+            x_coef, y_coef = 1, 1
+        elif leg_num == 2:
+            x_coef, y_coef = 1, -1
+        elif leg_num == 3:
+            x_coef, y_coef = -1, -1
+        elif leg_num == 4:
+            x_coef, y_coef = -1, 1
+
+        O_diff = [
+            x_coef * cfg.leg["mount_point_offset"] - leg.O.x,
+            y_coef * cfg.leg["mount_point_offset"] - leg.O.y,
+            - leg.O.z
+        ]
+        target = [
+            x_coef * cfg.modes["walking_mode"]["x"] + leg_delta[0] + O_diff[0], 
+            y_coef * cfg.modes["walking_mode"]["y"] + leg_delta[1] + O_diff[1], 
+            + leg_delta[2] + O_diff[2]
+        ]
+    
+        
+        new_delta = [target[0] - leg.D.x, target[1] - leg.D.y, target[2] - leg.D.z]
+        print(f'Legnum: {leg_num}. Leg.O: {leg.O}. O_diff: {O_diff}\nOriginal delta: {leg_delta}\nNew delta: {new_delta}')
+        self.legs[leg_num].move_end_point(*new_delta)
+        #self.legs_deltas[leg_num] = [x + y for x, y in zip(self.legs_deltas[leg_num], leg_delta)]        
         if add_snapshot:
             self.add_angles_snapshot(snapshot_type)
 

@@ -98,7 +98,9 @@ class MovementProcessor:
 
     def get_and_move_to_angles(self, move):
         sequence = get_angles_for_sequence(move, self.fenix_position)
+        print(f'Inner sequence: {len(sequence)}')
         for next_angles in sequence:
+            print(next_angles)
             angles_snapshot = next_angles.angles_snapshot
             #print(f'angles_snapshot: {angles_snapshot}')
 
@@ -107,20 +109,23 @@ class MovementProcessor:
             else:
                 self.fs.set_speed(self.speed)
                         
+            
             if next_angles.move_type == 'touch':
                 self.logger.info('[MP] Using function set_servo_values_touching')
                 move_function = self.fs.set_servo_values_touching
+                self.fs.set_speed(1000)
             elif next_angles.move_type == 'touch_2legs':
                 self.logger.info('[MP] Using function set_servo_values_3leg_touching')
                 move_function = self.fs.set_servo_values_3leg_touching
+                self.fs.set_speed(1000)
             elif next_angles.move_type == 'balance1':
                 self.logger.info('[MP] Using function set_servo_values_balancing_1leg')
                 move_function = self.fs.set_servo_values_balancing_1leg
-                self.fs.set_speed(2000)
+                self.fs.set_speed(3000)
             elif next_angles.move_type == 'balance2':
                 self.logger.info('[MP] Using function set_servo_values_balancing_2leg')
                 move_function = self.fs.set_servo_values_balancing_2leg
-                self.fs.set_speed(2000)
+                self.fs.set_speed(3000)
             else:
                 self.logger.info('[MP] Using function set_servo_values_paced_wo_feedback')
                 move_function = self.fs.set_servo_values_paced_wo_feedback
@@ -144,8 +149,9 @@ class MovementProcessor:
             
         self.logger.info(f'[MOVE] Started: {datetime.datetime.now()}')    
         start_time = datetime.datetime.now()
-
+        print(f'Outer Sequence len: {len(sequence)}')
         for move in sequence:
+            print(f'Move: {move}')
             #time.sleep(5)
             command_executed = False
             attempts = 1
@@ -168,6 +174,9 @@ class MovementProcessor:
                         print(f'Attempt {attempts}. Execution of command UP resulted in:\n{e}\nMoving down')
                         down_sequence = get_sequence_for_command('down')
                         self.get_and_move_to_angles(down_sequence[0])
+            if attempts == 8:
+                print('Command failed all attempts. Exiting') 
+                return False
 
         self.logger.info(f'[MOVE] finished: {datetime.datetime.now()}')
         self.logger.info(f'[TIMING] Step took : {datetime.datetime.now() - start_time}')
