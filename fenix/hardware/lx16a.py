@@ -22,7 +22,7 @@ neutral = {
     10 : 550,
     11 : 500,
 
-    14 : 315,
+    14 : 305,
     15 : 470,
     16 : 560,
     17 : 500,
@@ -630,7 +630,7 @@ if __name__ == '__main__':
         m4.read_values(i)
         time.sleep(0.0002)
     
-    m4.move_servo_to_angle(21, 0, 3000)
+    m4.move_servo_to_angle(14, 0, 3000)
     time.sleep(3)
-    m4.disable_torque(21)
+    m4.disable_torque(14)
     

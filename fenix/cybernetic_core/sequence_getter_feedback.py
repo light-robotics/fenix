@@ -44,28 +44,7 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
         sequence.append(Move('balance', {}))
         sequence.append(Move('balance', {}))
         sequence.append(Move('balance', {}))
-    elif command == 'forward_one_legged_v2':
-        for leg in [1, 2, 3, 4]:
-            if leg == 1:
-                sequence.append(Move('body_movement', {'deltas': [-7, 0, 0]}))
-            elif leg == 3:
-                sequence.append(Move('body_movement', {'deltas': [14, 0, 0]}))
-
-            if leg in [1, 4]:
-                y_diff = 2
-            else:
-                y_diff = -2 
-            if leg in [1, 2]:
-                x_diff = -0
-            else:
-                x_diff = 0
-            sequence.append(Move('balance', {}))
-            sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM + x_diff, y_diff, 10]}))
-            sequence.append(Move('touch', {'leg': leg}))
-            #sequence.append(Move('body_to_center', {}))
-            sequence.append(Move('balance', {}))
-            sequence.append(Move('balance', {}))
-        sequence.append(Move('body_to_center', {}))
+    
     #elif command == 'forward_two_legged':
     elif command == 'forward_32':
     #elif command == 'forward_one_legged':        
@@ -114,8 +93,9 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
             sequence.append(Move('body_compensation_for_a_leg', {'leg': leg}))
             """
             side_step = 0
-            front_step = 10
+            front_step = 8
             if leg == 3:
+                front_step = 4
                 sequence.append(Move('body_movement', {'deltas': [front_step, side_step, 0]}))
             elif leg == 4:
                 sequence.append(Move('body_movement', {'deltas': [front_step, -side_step, 0]}))
@@ -125,8 +105,12 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
                 sequence.append(Move('body_movement', {'deltas': [-front_step, side_step, 0]}))
             
             #sequence.append(Move('endpoint_normalized', {'leg': leg, 'deltas': [0, 0, 20]}))
-            sequence.append(Move('endpoint', {'leg': leg, 'deltas': [0, 0, 24]}))
-            sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM + x_diff, y_diff, 0]}))
+            sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [None, None, -30]}))
+            #sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM + x_diff, y_diff, 0]}))
+            if leg in [1, 2]:
+                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [cfg.modes["walking_mode"]["x"] + FORWARD_LEGS_1LEG_CM, None, None]}))
+            elif leg in [3, 4]:
+                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [-cfg.modes["walking_mode"]["x"] + FORWARD_LEGS_1LEG_CM, None, None]}))
             sequence.append(Move('touch', {'leg': leg}))
             #sequence.append(Move('touch', {'leg': leg}))
             #sequence.append(Move('touch', {'leg': leg}))
@@ -157,7 +141,8 @@ def get_angles_for_sequence(move: Move, fenix_position: FenixPosition):
         fk.body_compensation_for_a_leg(move.values['leg'])
     elif move.move_type == 'endpoint':
         fk.move_leg_endpoint(move.values['leg'], move.values['deltas'])
-        #fk.move_leg_endpoint_abs(move.values['leg'], move.values['deltas'])
+    elif move.move_type == 'endpoint_absolute':
+        fk.move_leg_endpoint_abs(move.values['leg'], move.values['deltas'])
     elif move.move_type == 'endpoints':
         fk.move_leg_endpoint(move.values['legs'][0], move.values['deltas'], add_snapshot=False)
         fk.move_leg_endpoint(move.values['legs'][1], move.values['deltas'])

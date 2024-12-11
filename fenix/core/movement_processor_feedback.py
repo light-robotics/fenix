@@ -110,9 +110,21 @@ class MovementProcessor:
                 self.fs.set_speed(self.speed)
                         
             
-            if next_angles.move_type == 'touch':
-                self.logger.info('[MP] Using function set_servo_values_touching')
-                move_function = self.fs.set_servo_values_touching
+            if next_angles.move_type == 'touch_1':
+                self.logger.info('[MP] Using function set_servo_values_touching_1')
+                move_function = self.fs.set_servo_values_touching_1
+                self.fs.set_speed(1000)
+            elif next_angles.move_type == 'touch_2':
+                self.logger.info('[MP] Using function set_servo_values_touching_2')
+                move_function = self.fs.set_servo_values_touching_2
+                self.fs.set_speed(1000)
+            elif next_angles.move_type == 'touch_3':
+                self.logger.info('[MP] Using function set_servo_values_touching_3')
+                move_function = self.fs.set_servo_values_touching_3
+                self.fs.set_speed(1000)
+            elif next_angles.move_type == 'touch_4':
+                self.logger.info('[MP] Using function set_servo_values_touching_4')
+                move_function = self.fs.set_servo_values_touching_4
                 self.fs.set_speed(1000)
             elif next_angles.move_type == 'touch_2legs':
                 self.logger.info('[MP] Using function set_servo_values_3leg_touching')

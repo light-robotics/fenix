@@ -235,7 +235,19 @@ class FenixServos:
             time.sleep(0.1)
         return self.get_current_angles()
 
-    def set_servo_values_touching(self, angles):
+    def set_servo_values_touching_1(self, angles):
+        return self.set_servo_values_touching(angles, 1)
+
+    def set_servo_values_touching_2(self, angles):
+        return self.set_servo_values_touching(angles, 2)
+    
+    def set_servo_values_touching_3(self, angles):
+        return self.set_servo_values_touching(angles, 3)
+    
+    def set_servo_values_touching_4(self, angles):
+        return self.set_servo_values_touching(angles, 4)
+
+    def set_servo_values_touching(self, angles, legnum):
         _, max_angle_diff = self.get_angles_diff(angles)
         rate = round(max(self.speed * max_angle_diff / 45, self.max_speed)) # speed is normalized
         self.logger.info(f'max_angle_diff: {max_angle_diff}, self.speed : {self.speed}, self.speed * max_angle_diff / 45 : {self.speed * max_angle_diff / 45}')
@@ -243,45 +255,19 @@ class FenixServos:
         self.send_command_to_servos(angles, rate)
         self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
 
-        """
-        with open('/fenix/fenix/wrk/gyroaccel_data.txt', "r") as f:
-            pitch, roll = f.readline().split(',')
-        pitch, roll = float(pitch), float(roll)
-        self.logger.info(f"ga_data: {pitch, roll}")
-        """
-
-        #if abs(pitch) < 2 * config.fenix["balance_offset"] or abs(roll) < 2 * config.fenix["balance_offset"]:
-        #    initially_balanced = True
-        #else:
-        #    initially_balanced = False
-        
         for s in range(50):
             self.logger.info(f'Step {s}')
             
             with open("/fenix/fenix/wrk/neopixel_command.txt", "r") as f:
                 legs_down = f.readline().split(',')[0]
             self.logger.info(f"legs_down: {legs_down}")
-            if legs_down == '1111':
+            if len(legs_down) == 4 and legs_down[legnum - 1] == '1':
                 current_angles = self.get_current_angles()
                 self.logger.info(f'current angles: {current_angles}')
-                print(f'All down. Exiting')
+                print(f'{legnum} down. Exiting')
                 self.send_command_to_servos(current_angles, 0)
                 return current_angles
 
-            """
-            if not initially_balanced:            
-                with open('/fenix/fenix/wrk/gyroaccel_data.txt', "r") as f:
-                    pitch, roll = f.readline().split(',')
-                pitch, roll = float(pitch), float(roll)
-                self.logger.info(f"ga_data: {pitch, roll}")
-
-                if abs(pitch) < config.fenix["balance_offset"] or abs(roll) < config.fenix["balance_offset"]:
-                    current_angles = self.get_current_angles()
-                    self.logger.info(f'current angles: {current_angles}')
-                    self.logger.info(f'Body balanced (at least one side). Exiting')
-                    self.send_command_to_servos(current_angles, 0)
-                    return current_angles
-            """
             time.sleep(0.03)
         return self.get_current_angles()
 

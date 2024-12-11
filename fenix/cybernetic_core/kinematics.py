@@ -433,6 +433,7 @@ class FenixKinematics:
     def leg_move_custom(self, leg_num, mode, leg_delta=[0, 0, 0], add_snapshot=True):
         if mode == 'touch':
             iterations = 3
+            mode = f'touch_{leg_num}'
         else:
             iterations = 1
         for i in range(iterations):
@@ -452,33 +453,24 @@ class FenixKinematics:
         self.legs_deltas[leg_num] = [x + y for x, y in zip(self.legs_deltas[leg_num], leg_delta)]        
         if add_snapshot:
             self.add_angles_snapshot(snapshot_type)
+        print(f'move_leg_endpoint. Leg {leg_num}. D: {self.legs[leg_num].D}')
 
     def move_leg_endpoint_abs(self, leg_num, leg_delta, snapshot_type='endpoint', add_snapshot=True):
         leg = self.legs[leg_num]
-
-        if leg_num == 1:
-            x_coef, y_coef = 1, 1
-        elif leg_num == 2:
-            x_coef, y_coef = 1, -1
-        elif leg_num == 3:
-            x_coef, y_coef = -1, -1
-        elif leg_num == 4:
-            x_coef, y_coef = -1, 1
-
-        O_diff = [
-            x_coef * cfg.leg["mount_point_offset"] - leg.O.x,
-            y_coef * cfg.leg["mount_point_offset"] - leg.O.y,
-            - leg.O.z
-        ]
-        target = [
-            x_coef * cfg.modes["walking_mode"]["x"] + leg_delta[0] + O_diff[0], 
-            y_coef * cfg.modes["walking_mode"]["y"] + leg_delta[1] + O_diff[1], 
-            + leg_delta[2] + O_diff[2]
-        ]
-    
+        target_x = leg_delta[0]
+        if leg_delta[0] is None:
+            target_x = leg.D.x
         
-        new_delta = [target[0] - leg.D.x, target[1] - leg.D.y, target[2] - leg.D.z]
-        print(f'Legnum: {leg_num}. Leg.O: {leg.O}. O_diff: {O_diff}\nOriginal delta: {leg_delta}\nNew delta: {new_delta}')
+        target_y = leg_delta[1]
+        if leg_delta[1] is None:
+            target_y = leg.D.y
+
+        target_z = leg_delta[2]
+        if leg_delta[2] is None:
+            target_z = leg.D.z
+
+        new_delta = [target_x - leg.D.x, target_y - leg.D.y, -target_z + leg.D.z]
+        print(f'Legnum: {leg_num}.\nOriginal delta: {leg_delta}\nNew delta: {new_delta}')
         self.legs[leg_num].move_end_point(*new_delta)
         #self.legs_deltas[leg_num] = [x + y for x, y in zip(self.legs_deltas[leg_num], leg_delta)]        
         if add_snapshot:
