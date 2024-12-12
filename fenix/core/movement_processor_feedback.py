@@ -105,7 +105,7 @@ class MovementProcessor:
             #print(f'angles_snapshot: {angles_snapshot}')
 
             if next_angles.move_type == 'body':
-                self.fs.set_speed(self.body_speed)
+                self.fs.set_speed(1500)
             else:
                 self.fs.set_speed(self.speed)
                         
@@ -146,7 +146,7 @@ class MovementProcessor:
             self.logger.info(f'Speed: {self.fs.speed}')
 
             new_angles = move_function(angles_snapshot)
-
+            
             self.fenix_position = convert_legs_angles_to_kinematic_C(new_angles)
         #print(f'convert_legs_angles_to_kinematic: {self.fenix_position}')
 

@@ -31,8 +31,8 @@ modes = {
         "y": 15,
     },
     "walking_mode" : {
-        "x": 18,
-        "y": 18,
+        "x": 14,
+        "y": 24,
     },
     "battle_mode" : {
         "x": 15,

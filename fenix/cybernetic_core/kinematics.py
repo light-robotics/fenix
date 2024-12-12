@@ -432,7 +432,7 @@ class FenixKinematics:
     
     def leg_move_custom(self, leg_num, mode, leg_delta=[0, 0, 0], add_snapshot=True):
         if mode == 'touch':
-            iterations = 3
+            iterations = 2
             mode = f'touch_{leg_num}'
         else:
             iterations = 1
@@ -456,6 +456,7 @@ class FenixKinematics:
         print(f'move_leg_endpoint. Leg {leg_num}. D: {self.legs[leg_num].D}')
 
     def move_leg_endpoint_abs(self, leg_num, leg_delta, snapshot_type='endpoint', add_snapshot=True):
+        min_z = min([leg.D.z for leg in self.legs.values()])
         leg = self.legs[leg_num]
         target_x = leg_delta[0]
         if leg_delta[0] is None:
@@ -469,8 +470,9 @@ class FenixKinematics:
         if leg_delta[2] is None:
             target_z = leg.D.z
 
-        new_delta = [target_x - leg.D.x, target_y - leg.D.y, -target_z + leg.D.z]
+        new_delta = [target_x - leg.D.x, target_y - leg.D.y, target_z - leg.D.z + min_z]
         print(f'Legnum: {leg_num}.\nOriginal delta: {leg_delta}\nNew delta: {new_delta}')
+        self.logger.info(f'move_leg_endpoint_abs. Legnum: {leg_num}.\nOriginal delta: {leg_delta}\nNew delta: {new_delta}')
         self.legs[leg_num].move_end_point(*new_delta)
         #self.legs_deltas[leg_num] = [x + y for x, y in zip(self.legs_deltas[leg_num], leg_delta)]        
         if add_snapshot:

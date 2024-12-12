@@ -67,6 +67,7 @@ class FenixEnders():
 
     def run(self):
         global front_left_down, right_down
+        prev_value = None
         print("Press CTRL-C to exit.")
         try:
             while True:
@@ -91,7 +92,9 @@ class FenixEnders():
                 else:
                     result_legs += '0'
 
-                self.neopixel.issue_command(result_legs)
+                if result_legs != prev_value:
+                    self.neopixel.issue_command(result_legs)
+                prev_value = result_legs
                 time.sleep(0.01)
 
         finally:

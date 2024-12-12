@@ -93,24 +93,27 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
             sequence.append(Move('body_compensation_for_a_leg', {'leg': leg}))
             """
             side_step = 0
-            front_step = 8
+            #front_step = 10
             if leg == 3:
-                front_step = 4
+                front_step = 7
                 sequence.append(Move('body_movement', {'deltas': [front_step, side_step, 0]}))
             elif leg == 4:
+                front_step = 9
                 sequence.append(Move('body_movement', {'deltas': [front_step, -side_step, 0]}))
             elif leg == 1:
+                front_step = 6
                 sequence.append(Move('body_movement', {'deltas': [-front_step, -side_step, 0]}))
             elif leg == 2:
+                front_step = 6
                 sequence.append(Move('body_movement', {'deltas': [-front_step, side_step, 0]}))
             
-            #sequence.append(Move('endpoint_normalized', {'leg': leg, 'deltas': [0, 0, 20]}))
-            sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [None, None, -30]}))
-            #sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM + x_diff, y_diff, 0]}))
-            if leg in [1, 2]:
-                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [cfg.modes["walking_mode"]["x"] + FORWARD_LEGS_1LEG_CM, None, None]}))
-            elif leg in [3, 4]:
-                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [-cfg.modes["walking_mode"]["x"] + FORWARD_LEGS_1LEG_CM, None, None]}))
+            #sequence.append(Move('endpoint', {'leg': leg, 'deltas': [0, 0, 27]}))
+            sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [None, None, 34]}))
+            sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM, 0, 0]}))
+            #if leg in [1, 2]:
+            #    sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [cfg.modes["walking_mode"]["x"] + FORWARD_LEGS_1LEG_CM, None, None]}))
+            #elif leg in [3, 4]:
+            #    sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [-cfg.modes["walking_mode"]["x"] + FORWARD_LEGS_1LEG_CM, None, None]}))
             sequence.append(Move('touch', {'leg': leg}))
             #sequence.append(Move('touch', {'leg': leg}))
             #sequence.append(Move('touch', {'leg': leg}))
@@ -153,7 +156,12 @@ def get_angles_for_sequence(move: Move, fenix_position: FenixPosition):
         delta = move.values['deltas']
         fk.move_leg_endpoint(move.values['leg'], delta)
     elif move.move_type == 'touch':
-        fk.leg_move_custom(move.values['leg'], 'touch', [0, 0, -24])
+        leg = move.values['leg']
+        if leg in [1, 4]:
+            y_diff = -1
+        else:
+            y_diff = 1
+        fk.leg_move_custom(move.values['leg'], 'touch', [0, 0, -27])
         #fk.move_leg_endpoint(move.values['leg'], [0, 0, -2])
     elif move.move_type == 'down_2_legs':
         fk.leg_move_custom(move.values['legs'][0], 'touch_2legs', [0, 0, -8], add_snapshot=False)
@@ -178,7 +186,7 @@ def get_angles_for_sequence(move: Move, fenix_position: FenixPosition):
         with open('/fenix/fenix/wrk/gyroaccel_data.txt', "r") as f:
             pitch, roll = f.readline().split(',')
         pitch, roll = float(pitch), float(roll)
-        balance_value = -7
+        balance_value = -10
 
         if pitch < -cfg.fenix["balance_offset"] and abs(roll) < cfg.fenix["balance_offset"]:
             if fk.legs[1].D.z + fk.legs[4].D.z > fk.legs[2].D.z + fk.legs[3].D.z:
@@ -239,8 +247,8 @@ def get_angles_for_sequence(move: Move, fenix_position: FenixPosition):
                 print(f'{pitch, roll}. Balance [1] {-balance_value}')
         elif pitch < -cfg.fenix["balance_offset"] and roll < -cfg.fenix["balance_offset"]:
             if fk.legs[4].D.z > fk.legs[2].D.z:
-                fk.leg_move_custom(4, 'balance1', [0, 0, -balance_value])
-                print(f'{pitch, roll}. Balance [4] {-balance_value}')
+                fk.leg_move_custom(4, 'balance1', [0, 0, balance_value])
+                print(f'{pitch, roll}. Balance [4] {balance_value}')
             else:
                 fk.leg_move_custom(2, 'balance1', [0, 0, balance_value])
                 print(f'{pitch, roll}. Balance [2] {balance_value}')
