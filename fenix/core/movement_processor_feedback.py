@@ -100,9 +100,9 @@ class MovementProcessor:
         sequence = get_angles_for_sequence(move, self.fenix_position)
         print(f'Inner sequence: {len(sequence)}')
         for next_angles in sequence:
-            print(next_angles)
+            #print(next_angles)
             angles_snapshot = next_angles.angles_snapshot
-            #print(f'angles_snapshot: {angles_snapshot}')
+            print(f'angles_snapshot: {angles_snapshot}')
 
             if next_angles.move_type == 'body':
                 self.fs.set_speed(1500)
@@ -147,6 +147,7 @@ class MovementProcessor:
 
             new_angles = move_function(angles_snapshot)
             
+            print('New position set')
             self.fenix_position = convert_legs_angles_to_kinematic_C(new_angles)
         #print(f'convert_legs_angles_to_kinematic: {self.fenix_position}')
 

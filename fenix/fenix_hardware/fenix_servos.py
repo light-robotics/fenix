@@ -200,7 +200,7 @@ class FenixServos:
         self.send_command_to_servos(angles, rate)
         self.logger.info(f'Command sent. Rate: {rate}, angles: {angles}')
         prev_pitch, prev_roll = None, None
-        for s in range(20):
+        for s in range(30):
             self.logger.info(f'Step {s}')
             
             try:
@@ -211,28 +211,36 @@ class FenixServos:
                 continue
             pitch, roll = float(pitch), float(roll)
             self.logger.info(f"ga_data: {pitch, roll}")
+            current_angles = self.get_current_angles()
             
+            """
             if prev_pitch and abs(prev_pitch) <= abs(pitch):
                 self.logger.info(f'Body balance moving wrong pitch {prev_pitch, pitch}. Exiting')
+                print(f'Returned current angles inside wrong 1')
+                self.send_command_to_servos(current_angles, 0)
                 return self.get_current_angles()
             if prev_roll and abs(prev_roll) <= abs(roll):
                 self.logger.info(f'Body balance moving wrong roll {prev_roll, roll}. Exiting')
+                print(f'Returned current angles inside wrong 2')
+                self.send_command_to_servos(current_angles, 0)
                 return self.get_current_angles()
-            
+            """
             if legs == 1:
                 condition = abs(pitch) < config.fenix["balance_offset"] or abs(roll) < config.fenix["balance_offset"]
             elif legs == 2:
                 condition = abs(pitch) < config.fenix["balance_offset"] and abs(roll) < config.fenix["balance_offset"]
             
             if condition:
-                current_angles = self.get_current_angles()
+                #current_angles = self.get_current_angles()
                 self.logger.info(f'current angles: {current_angles}')
                 self.logger.info(f'Body balanced. Exiting')
                 self.send_command_to_servos(current_angles, 0)
+                print(f'Returned current angles inside')
                 return current_angles
             
             prev_pitch, prev_roll = pitch, roll
             time.sleep(0.1)
+        print(f'Returned current angles outside')
         return self.get_current_angles()
 
     def set_servo_values_touching_1(self, angles):
