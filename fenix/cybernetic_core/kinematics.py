@@ -468,9 +468,9 @@ class FenixKinematics:
 
         target_z = leg_delta[2]
         if leg_delta[2] is None:
-            target_z = leg.D.z
+            target_z = leg.D.z - min_z
 
-        new_delta = [target_x - leg.D.x, target_y - leg.D.y, target_z - leg.D.z + min_z]
+        new_delta = [round(target_x - leg.D.x, 1), round(target_y - leg.D.y, 1), round(target_z - leg.D.z + min_z, 1)]
         print(f'Legnum: {leg_num}.\nOriginal delta: {leg_delta}\nNew delta: {new_delta}')
         self.logger.info(f'move_leg_endpoint_abs. Legnum: {leg_num}.\nOriginal delta: {leg_delta}\nNew delta: {new_delta}')
         self.legs[leg_num].move_end_point(*new_delta)

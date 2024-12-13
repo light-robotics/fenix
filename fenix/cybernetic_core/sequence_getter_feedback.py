@@ -95,10 +95,10 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
             side_step = 0
             #front_step = 10
             if leg == 3:
-                front_step = 7
+                front_step = 6
                 sequence.append(Move('body_movement', {'deltas': [front_step, side_step, 0]}))
             elif leg == 4:
-                front_step = 9
+                front_step = 8
                 sequence.append(Move('body_movement', {'deltas': [front_step, -side_step, 0]}))
             elif leg == 1:
                 front_step = 6
@@ -108,15 +108,22 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
                 sequence.append(Move('body_movement', {'deltas': [-front_step, side_step, 0]}))
             
             #sequence.append(Move('endpoint', {'leg': leg, 'deltas': [0, 0, 27]}))
-            sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [None, None, 34]}))
-            sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM, 0, 0]}))
-            #if leg in [1, 2]:
-            #    sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [cfg.modes["walking_mode"]["x"] + FORWARD_LEGS_1LEG_CM, None, None]}))
-            #elif leg in [3, 4]:
-            #    sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [-cfg.modes["walking_mode"]["x"] + FORWARD_LEGS_1LEG_CM, None, None]}))
+            sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [None, None, 30]}))
+            #sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM, 0, 0]}))
+            if leg == 3:
+                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [-13.07, -25, None]}))
+                #Point(x=-13.07, y=-24.99, z=9.67)
+            elif leg == 4:
+                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [-17.03, 26.6, None]}))
+                #Point(x=-17.03, y=26.6, z=6.06)
+            elif leg == 1:
+                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [25.23, 23.17, None]}))
+                #Point(x=25.23, y=23.17, z=8.52)
+            elif leg == 2:
+                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [24.68, -27.09, None]}))
+                #Point(x=24.68, y=-27.09, z=7.61)
+
             sequence.append(Move('touch', {'leg': leg}))
-            #sequence.append(Move('touch', {'leg': leg}))
-            #sequence.append(Move('touch', {'leg': leg}))
             sequence.append(Move('body_to_center', {}))
             sequence.append(Move('balance', {}))
             sequence.append(Move('balance', {}))
@@ -132,6 +139,7 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
 def get_angles_for_sequence(move: Move, fenix_position: FenixPosition):
     fk = FenixKinematics(fenix_position=fenix_position, init_snapshot=False)
     print(f'Move: {move.move_type}. {move.values}')
+    print('Legs Ds: ', [leg.D for leg in fk.legs.values()])
     # print(f'fenix_position: {fenix_position}')
 
     if move.move_type == 'body_movement':
@@ -250,8 +258,8 @@ def get_angles_for_sequence(move: Move, fenix_position: FenixPosition):
                 fk.leg_move_custom(4, 'balance1', [0, 0, balance_value])
                 print(f'{pitch, roll}. Balance [4] {balance_value}')
             else:
-                fk.leg_move_custom(2, 'balance1', [0, 0, balance_value])
-                print(f'{pitch, roll}. Balance [2] {balance_value}')
+                fk.leg_move_custom(2, 'balance1', [0, 0, -balance_value])
+                print(f'{pitch, roll}. Balance [2] {-balance_value}')
     elif move.move_type == 'switch_mode':
         fk.switch_mode(move.values['mode'])
 

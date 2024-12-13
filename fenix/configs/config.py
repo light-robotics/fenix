@@ -46,7 +46,7 @@ speed = {
 }
 
 moves = {
-    "up_or_down_cm"         : 3,
+    "up_or_down_cm"         : 2,
     "move_body_cm"          : 7,
     "forward_body_1_leg_cm" : 10,
     "forward_body_2_leg_cm" : 7,    
