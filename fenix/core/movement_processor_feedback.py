@@ -168,7 +168,7 @@ class MovementProcessor:
             #time.sleep(5)
             command_executed = False
             attempts = 1
-            while not command_executed and attempts < 8:
+            while not command_executed and attempts < 12:
                 try:
                     attempts += 1
                     self.get_and_move_to_angles(move)
@@ -187,7 +187,7 @@ class MovementProcessor:
                         print(f'Attempt {attempts}. Execution of command UP resulted in:\n{e}\nMoving down')
                         down_sequence = get_sequence_for_command('down')
                         self.get_and_move_to_angles(down_sequence[0])
-            if attempts == 8:
+            if attempts == 12:
                 print('Command failed all attempts. Exiting') 
                 return False
 

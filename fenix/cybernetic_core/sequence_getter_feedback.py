@@ -71,27 +71,6 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
         sequence.append(Move('body_movement', {'deltas': [4, 0, 0]}))
     elif command == 'forward_one_legged':
         for leg in [3, 4, 1, 2]:
-            
-            if leg == 1:
-                y_diff = 0 # -2
-            elif leg == 2:
-                y_diff = 0 # 2
-            else:
-                y_diff = 0
-
-            #if leg in [1, 4]:
-            #    y_diff = -2 # -2
-            #else:
-            #    y_diff = 2 # 2
-            
-            if leg in [1, 2]:
-                x_diff = 0 # -1
-            else:
-                x_diff = 0 # 1
-
-            """
-            sequence.append(Move('body_compensation_for_a_leg', {'leg': leg}))
-            """
             side_step = 0
             #front_step = 10
             if leg == 3:
@@ -103,12 +82,13 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
             elif leg == 1:
                 front_step = 8
                 sequence.append(Move('body_movement', {'deltas': [-front_step, -side_step, 0]}))
+                sequence.append(Move('body_movement', {'deltas': [0, 0, 4]}))
             elif leg == 2:
                 front_step = 9
                 sequence.append(Move('body_movement', {'deltas': [-front_step, side_step, 0]}))
             
             #sequence.append(Move('endpoint', {'leg': leg, 'deltas': [0, 0, 27]}))
-            sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [None, None, 27]}))
+            sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [None, None, 30]}))
             #sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM, 0, 0]}))
             """
             if leg == 3:
@@ -129,10 +109,10 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
                 sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [-15.0, -19.6, None]}))
                 #Point(x=-15.09, y=-18.6, z=8.43)
             elif leg == 4:
-                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [-19.8, 19.5, None]}))
+                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [-19.8, 21, None]}))
                 #Point(x=-19.8, y=20.48, z=8.95)
             elif leg == 1:
-                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [28.7, 19.1, None]}))
+                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [28.7, 21, None]}))
                 #Point(x=28.72, y=14.09, z=7.93)
             elif leg == 2:
                 sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [29.2, -18.86, None]}))
