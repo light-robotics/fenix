@@ -174,14 +174,14 @@ def calculate_leg_angles(O: Point, D: Point, logger):
     #print(f'A: {A}')
     l = round(math.sqrt((D.x - A.x) ** 2 + (D.y - A.y) ** 2), 2)
     delta_z = round(D.z - O.z, 2)
-    logger.info(f'[ANG] Trying l {l} and delta_z {delta_z}. O: {O}. D: {D}')
+    #logger.info(f'[ANG] Trying l {l} and delta_z {delta_z}. O: {O}. D: {D}')
 
     alpha, beta, gamma = get_leg_angles(l, delta_z, logger)
 
-    logger.info(f'[ANG] Result : {[round(math.degrees(x), 2) for x in [alpha, beta, gamma, tetta]]}')
+    #logger.info(f'[ANG] Result : {[round(math.degrees(x), 2) for x in [alpha, beta, gamma, tetta]]}')
 
     if not leg_angles_correct(alpha=alpha, beta=beta, gamma=gamma, tetta=tetta, logger=logger):
-        logger.info(f'[ANG] Bad tetta : {tetta}')
+        #logger.info(f'[ANG] Bad tetta : {tetta}')
         raise Exception(f'Bad tetta : {tetta}')       
 
     D_calculated = calculate_D_point(O, FenixPositionLeg(alpha, beta, gamma, tetta), D)

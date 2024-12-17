@@ -183,7 +183,7 @@ class MovementProcessor:
                     try:
                         up_sequence = get_sequence_for_command('up')
                         self.get_and_move_to_angles(up_sequence[0])
-                    except AnglesException as e:
+                    except (AnglesException, DistanceException) as e:
                         print(f'Attempt {attempts}. Execution of command UP resulted in:\n{e}\nMoving down')
                         down_sequence = get_sequence_for_command('down')
                         self.get_and_move_to_angles(down_sequence[0])

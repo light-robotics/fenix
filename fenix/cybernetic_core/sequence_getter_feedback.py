@@ -74,21 +74,22 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
             side_step = 0
             #front_step = 10
             if leg == 3:
-                front_step = 7
+                front_step = 4 # 6
                 sequence.append(Move('body_movement', {'deltas': [front_step, side_step, 0]}))
             elif leg == 4:
-                front_step = 9
+                front_step = 6 # 8
                 sequence.append(Move('body_movement', {'deltas': [front_step, -side_step, 0]}))
             elif leg == 1:
-                front_step = 8
+                front_step = 5 # 7
                 sequence.append(Move('body_movement', {'deltas': [-front_step, -side_step, 0]}))
                 sequence.append(Move('body_movement', {'deltas': [0, 0, 4]}))
             elif leg == 2:
-                front_step = 9
+                front_step = 6 # 8
                 sequence.append(Move('body_movement', {'deltas': [-front_step, side_step, 0]}))
             
             #sequence.append(Move('endpoint', {'leg': leg, 'deltas': [0, 0, 27]}))
-            sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [None, None, 30]}))
+            #sequence.append(Move('endpoint', {'leg': leg, 'deltas': [-3, 0, 10]}))
+            sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [None, None, 28]}))
             #sequence.append(Move('endpoint', {'leg': leg, 'deltas': [FORWARD_LEGS_1LEG_CM, 0, 0]}))
             """
             if leg == 3:
@@ -106,16 +107,16 @@ def get_sequence_for_command(command: str, kwargs=None) -> Sequence:
             """
             # 18-18 :
             if leg == 3:
-                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [-15.0, -19.6, None]}))
+                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [-15.0, -19.5, None]}))
                 #Point(x=-15.09, y=-18.6, z=8.43)
             elif leg == 4:
-                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [-19.8, 21, None]}))
+                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [-19.8, 18, None]}))
                 #Point(x=-19.8, y=20.48, z=8.95)
             elif leg == 1:
-                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [28.7, 21, None]}))
+                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [28.7, 15, None]}))
                 #Point(x=28.72, y=14.09, z=7.93)
             elif leg == 2:
-                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [29.2, -18.86, None]}))
+                sequence.append(Move('endpoint_absolute', {'leg': leg, 'deltas': [29.2, -13, None]}))
                 #Point(x=29.17, y=-16.86, z=9.48)
             sequence.append(Move('touch', {'leg': leg}))
             sequence.append(Move('body_to_center', {}))
@@ -189,8 +190,16 @@ def get_angles_for_sequence(move: Move, fenix_position: FenixPosition):
         else:
             print('More than one leg up')
     elif move.move_type == 'balance':
-        with open('/fenix/fenix/wrk/gyroaccel_data.txt', "r") as f:
-            pitch, roll = f.readline().split(',')
+        attempts = 0
+        ga_read = False
+        while not ga_read and attempts < 5:
+            try:
+                attempts += 1
+                with open('/fenix/fenix/wrk/gyroaccel_data.txt', "r") as f:
+                    pitch, roll = f.readline().split(',')
+                ga_read = True
+            except ValueError:
+                continue
         pitch, roll = float(pitch), float(roll)
         balance_value = -5
 

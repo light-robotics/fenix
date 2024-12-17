@@ -31,10 +31,10 @@ class FenixServos:
         self.servos = [2, 3, 4, 5, 8, 9, 10, 11, 14, 15, 16, 17, 20, 21, 22, 23]
 
     def print_status(self):
-        for i in [2, 3, 4, 5, 8, 9, 10, 11]:
+        for i in [2, 3, 4, 5, 20, 21, 22, 23]:
             self.m1.read_values(i)
             time.sleep(0.0002)
-        for i in [14, 15, 16, 17, 20, 21, 22, 23]:
+        for i in [8, 9, 10, 11, 14, 15, 16, 17]:
             self.m4.read_values(i)
             time.sleep(0.0002)
     
@@ -51,20 +51,20 @@ class FenixServos:
             leg1_alpha=self.m1.read_angle(4),
             leg1_tetta=self.m1.read_angle(5),
 
-            leg2_gamma=self.m1.read_angle(8),
-            leg2_beta=self.m1.read_angle(9),
-            leg2_alpha=self.m1.read_angle(10),
-            leg2_tetta=self.m1.read_angle(11),
+            leg2_gamma=self.m4.read_angle(8),
+            leg2_beta=self.m4.read_angle(9),
+            leg2_alpha=self.m4.read_angle(10),
+            leg2_tetta=self.m4.read_angle(11),
 
             leg3_gamma=self.m4.read_angle(14),
             leg3_beta=self.m4.read_angle(15),
             leg3_alpha=self.m4.read_angle(16),
             leg3_tetta=self.m4.read_angle(17),
 
-            leg4_gamma=self.m4.read_angle(20),
-            leg4_beta=self.m4.read_angle(21),
-            leg4_alpha=self.m4.read_angle(22),
-            leg4_tetta=self.m4.read_angle(23),
+            leg4_gamma=self.m1.read_angle(20),
+            leg4_beta=self.m1.read_angle(21),
+            leg4_alpha=self.m1.read_angle(22),
+            leg4_tetta=self.m1.read_angle(23),
         )
         
         self.logger.info(f'Read current angles : {current_position}')
@@ -116,9 +116,9 @@ class FenixServos:
         return True
 
     def get_board_by_id(self, id):
-        if id in [2, 3, 4, 5, 8, 9, 10, 11]:
+        if id in [2, 3, 4, 5, 20, 21, 22, 23]:
             return self.m1
-        elif id in [14, 15, 16, 17, 20, 21, 22, 23]:
+        elif id in [8, 9, 10, 11, 14, 15, 16, 17]:
             return self.m4
         else:
             raise ValueError(f'Bad id: {id}')
@@ -146,20 +146,20 @@ class FenixServos:
         self.m1.move_servo_to_angle(4, fp.legs[1].alpha, rate)
         self.m1.move_servo_to_angle(5, fp.legs[1].tetta, rate)
 
-        self.m1.move_servo_to_angle(8, fp.legs[2].gamma, rate)
-        self.m1.move_servo_to_angle(9, fp.legs[2].beta, rate)
-        self.m1.move_servo_to_angle(10, fp.legs[2].alpha, rate)
-        self.m1.move_servo_to_angle(11, fp.legs[2].tetta, rate)
+        self.m4.move_servo_to_angle(8, fp.legs[2].gamma, rate)
+        self.m4.move_servo_to_angle(9, fp.legs[2].beta, rate)
+        self.m4.move_servo_to_angle(10, fp.legs[2].alpha, rate)
+        self.m4.move_servo_to_angle(11, fp.legs[2].tetta, rate)
 
         self.m4.move_servo_to_angle(14, fp.legs[3].gamma, rate)
         self.m4.move_servo_to_angle(15, fp.legs[3].beta, rate)
         self.m4.move_servo_to_angle(16, fp.legs[3].alpha, rate)
         self.m4.move_servo_to_angle(17, fp.legs[3].tetta, rate)
 
-        self.m4.move_servo_to_angle(20, fp.legs[4].gamma, rate)
-        self.m4.move_servo_to_angle(21, fp.legs[4].beta, rate)
-        self.m4.move_servo_to_angle(22, fp.legs[4].alpha, rate)
-        self.m4.move_servo_to_angle(23, fp.legs[4].tetta, rate)
+        self.m1.move_servo_to_angle(20, fp.legs[4].gamma, rate)
+        self.m1.move_servo_to_angle(21, fp.legs[4].beta, rate)
+        self.m1.move_servo_to_angle(22, fp.legs[4].alpha, rate)
+        self.m1.move_servo_to_angle(23, fp.legs[4].tetta, rate)
 
     def send_command_to_servos_old(self, angles, rate):
         j = 0
