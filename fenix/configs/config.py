@@ -5,14 +5,15 @@ obstacle = {
 
 leg = {
     "a": 15,    # PointA to PointB - femur
-    "b": 15.8, # 18,    # PointB to PointC - femur-tibia
-    "d": 6.5,    # PointO to PointA - trochanter-coxa
+    "b": 10.0,
+    "c": 11.7, # 15.7, # 11.7,  # 15.5, # 11.3, # 18,    # PointB to PointC - femur-tibia
+    "d": 5.2,    # PointO to PointA - trochanter-coxa
     "mount_point_offset": 3.8, # ???
     #"phi_angle" : -22.5 # angle fix due to leg not being straight
 }
 
 start = {
-    "vertical"                 : 8,
+    "vertical"                 : 10,
     "horizontal_x"             : 16, # 15
     "horizontal_y"             : 16, # 15
     "x_offset_body"            : 0,
@@ -22,15 +23,15 @@ start = {
 
 modes = {
     "run_mode" : {
-        "x": 16,
-        "y": 16,
+        "x": 17,
+        "y": 17,
     },
     "sentry_mode" : {
         "x": 15,
         "y": 15,
     },
     "walking_mode" : {
-        "x": 13,
+        "x": 16,
         "y": 18,
     },
     "battle_mode" : {
@@ -40,14 +41,14 @@ modes = {
 }
 
 speed = {
-    "run" : 350,
+    "run" : 600,
     "hit" : 500,
 }
 
 moves = {
-    "up_or_down_cm"         : 4,
+    "up_or_down_cm"         : 2,
     "move_body_cm"          : 7,
-    "forward_body_1_leg_cm" : 5,
+    "forward_body_1_leg_cm" : 10,
     "forward_body_2_leg_cm" : 7,    
     "reposition_cm"         : 1,
     "side_look_angle"       : 12,
@@ -56,12 +57,12 @@ moves = {
 
 fenix = {
     "margin": {
-        1: 6,
-        2: 6
+        1: 4,
+        2: 3
     },
     "leg_up": {
-        1: 5,
-        2: 4
+        1: 15,
+        2: 7
     },
     # parameters for moving further, when moving with feedback
     "servos": {
@@ -72,7 +73,7 @@ fenix = {
     # when moving without feedback
     "movement_command_advance_ms" : -0.05,
     "movement_overshoot_coefficient" : 0.0,
-    "balance_offset": 2.5,
+    "balance_offset": 1.5,
 }
 
 limits = {
@@ -101,7 +102,11 @@ angles_limits = {
         "max": 90
     },
     "beta": {
-        "min": -100,
-        "max": 75,
+        "min": -145, # -135,
+        "max": 0, # 75,
+    },
+    "gamma": {
+        "min": -110,
+        "max": 110,
     }
 }

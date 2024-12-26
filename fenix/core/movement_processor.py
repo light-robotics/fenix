@@ -15,6 +15,7 @@ from hardware.mpu6050_avg import single_scan
 import configs.code_config as code_config
 import configs.config as config
 import logging.config
+from copy import deepcopy
 
 if not code_config.DEBUG:
     from fenix_hardware.fenix_servos import FenixServos
@@ -127,7 +128,7 @@ class MovementProcessor:
                 self.logger.info(f'MOVE. Command aborted')
                 return
             self.logger.info(f'[TIMING] Sequence calculation took : {datetime.datetime.now() - before_sequence_time}')
-            self.fenix_position = new_position[:] # WTF?
+            self.fenix_position = deepcopy(new_position)
         except (ValueError, AnglesException) as e:
             print(f'MOVE Failed. Could not process command - {str(e)}')
             self.logger.info(f'MOVE Failed. Could not process command - {str(e)}')
@@ -142,7 +143,7 @@ class MovementProcessor:
 
         original_move_function = move_function
         for move_snapshot in sequence:
-            angles = move_snapshot.angles_snapshot[:]
+            angles = move_snapshot.angles_snapshot
             #if move_snapshot.move_type == 'body' and self.speed != self.body_speed:
             #    self.fs.set_speed(self.body_speed)
             if move_snapshot.move_type == 'body':
@@ -179,15 +180,15 @@ class MovementProcessor:
                 if command == 'exit':
                     break
 
-                if command == 'enable_torque':
-                    self.fs.enable_torque()
+                if command == 'disable_torque':
+                    self.fs.disable_torque()
                     
                 else:
-                    try:
+                    #try:
                         self.execute_command(command, speed)
-                    except Exception as e:
-                        self.fs.disable_torque()
-                        print(e)
+                    #except Exception as e:
+                    #    self.fs.disable_torque()
+                    #    print(e)
                         #raise Exception
 
         except KeyboardInterrupt:

@@ -73,7 +73,7 @@ def main():
         start_time = time.time()
 
         # Calculate average angles over 5 readings
-        pitch_avg, roll_avg, yaw_avg = average_angles(sensor, 20)
+        pitch_avg, roll_avg, yaw_avg = average_angles(sensor, 10)
 
         pitch_avg -= math.radians(pitch_bias)
         roll_avg -= math.radians(roll_bias)

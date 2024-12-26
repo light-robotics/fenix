@@ -7,7 +7,7 @@ class FenixTofCamera():
 
     def __init__(self):
         self.cam = ADC.ArducamCamera()
-        if self.cam.open(ADC.TOFConnect.CSI,0) != 0:
+        if self.cam.open(ADC.TOFConnect.CSI,1) != 0:
             print("initialization failed")
         if self.cam.start(ADC.TOFOutput.DEPTH) != 0:
             print("Failed to start camera")

@@ -72,7 +72,8 @@ class FenixDualSense(DualSense):
         self.command_writer.write_command('disable_torque', 1000)
 
     def on_options_press(self):
-        self.command_writer.write_command('exit', 0)
+        #self.command_writer.write_command('exit', 0)
+        self.command_writer.write_command('balance', 1000)
         time.sleep(0.5)
         self.command_writer.write_command('none', 1000)
     
