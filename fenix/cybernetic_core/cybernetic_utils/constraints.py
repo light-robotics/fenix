@@ -77,17 +77,17 @@ def leg_angles_correct(
     if alpha is not None:
         if alpha > cfg.angles_limits["alpha"]["max"] or \
             alpha < cfg.angles_limits["alpha"]["min"]:
-            logger.info(f'Bad alpha : {alpha}')
+            #logger.info(f'Bad alpha : {alpha}')
             return False
     
         if beta > cfg.angles_limits["beta"]["max"] or \
             beta < cfg.angles_limits["beta"]["min"]:
-            logger.info(f'Bad beta : {beta}')
+            #logger.info(f'Bad beta : {beta}')
             return False
     
         if gamma > cfg.angles_limits["gamma"]["max"] or \
             gamma < cfg.angles_limits["gamma"]["min"]:
-            logger.info(f'Bad gamma : {gamma}')
+            #logger.info(f'Bad gamma : {gamma}')
             return False
     
     return True

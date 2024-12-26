@@ -239,7 +239,7 @@ class FenixServos:
                 return current_angles
             
             prev_pitch, prev_roll = pitch, roll
-            time.sleep(0.1)
+            time.sleep(0.075)
         print(f'Returned current angles outside')
         return self.get_current_angles()
 
